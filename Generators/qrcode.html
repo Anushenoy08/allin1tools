@@ -6,6 +6,22 @@
     <title>QR Code Generator | allin1tools</title>
     <link rel="stylesheet" href="../common.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+      <script>
+        // Fallback QRCode library if the main one fails to load
+        if (typeof QRCode === 'undefined') {
+          // Load alternative CDN
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+          script.onload = function() {
+            console.log('QRCode library loaded from fallback CDN');
+          };
+          script.onerror = function() {
+            console.error('Failed to load QRCode library from fallback CDN');
+          };
+          document.head.appendChild(script);
+        }
+      </script>
     <style>
         /* Reset and base styles */
         * {
