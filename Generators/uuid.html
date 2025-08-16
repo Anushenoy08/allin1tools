@@ -1,89 +1,330 @@
----
-layout: default
-title: Best Online UUID Generator for FREE
-description: Generate a UUID here 
-permalink: /Generators/uuid.html
----
-<!-- TOOLBAR: remains as per your working common.css -->
-<div class="navbar">
-  <img src="../images/logo.png" alt="Logo">
-  <a href="../index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free UUID v4 Generator | allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Main container */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header title */
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Content card */
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Form groups */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        /* Button rows */
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .button-row.full-width {
+            justify-content: center;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-full {
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        /* Output area */
+        .output-area {
+            margin-top: 30px;
+        }
+        
+        .output-area label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .output-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            background: white;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        .output-textarea:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 10px;
+            }
+            
+            .content-card {
+                padding: 25px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .button-row {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content-card {
+                padding: 20px;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <a href="../index.html">HOME</a>
+        <a href="../article.html">ARTICLES</a>
+    </div>
 
-<h1>Free UUID v4 Generator</h1>
+    <div class="main-container">
+        <!-- Page Title -->
+        <h1 class="page-title">Free UUID v4 Generator</h1>
+        
+        <!-- Main Content Card -->
+        <div class="content-card">
+            <!-- Number of UUIDs Input -->
+            <div class="form-group">
+                <label for="uuidCount">Number of UUIDs:</label>
+                <input type="number" id="uuidCount" value="1" min="1" max="1000">
+            </div>
+            
+            <!-- Encoding Dropdown -->
+            <div class="form-group">
+                <label for="encoding">Encoding:</label>
+                <select id="encoding">
+                    <option value="none">None</option>
+                    <option value="base64">Base64</option>
+                    <option value="hex">Hexadecimal</option>
+                </select>
+            </div>
+            
+            <!-- Action Buttons Row 1 -->
+            <div class="button-row">
+                <button class="btn btn-primary" onclick="generateUUIDs()">Generate UUIDs</button>
+                <button class="btn btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button>
+                <button class="btn btn-success" onclick="downloadToFile()">Download to a file</button>
+            </div>
+            
+            <!-- Action Button Row 2 -->
+            <div class="button-row full-width">
+                <button class="btn btn-primary btn-full" onclick="generateAnother()">Generate Another</button>
+            </div>
+            
+            <!-- Generated UUIDs Output -->
+            <div class="output-area">
+                <label for="output">Generated UUIDs:</label>
+                <textarea id="output" class="output-textarea" placeholder="Your generated UUIDs will appear here..." readonly></textarea>
+            </div>
+        </div>
+    </div>
 
-<div class="uuid-container">
-  <div class="form-group">
-    <label for="count">Number of UUIDs:</label>
-    <input type="number" id="count" min="1" max="1000" value="1">
-  </div>
-
-  <div class="form-group">
-    <label for="encoding">Encoding:</label>
-    <select id="encoding">
-      <option value="none">None</option>
-      <option value="base64">Base64</option>
-      <option value="url">URL Encode</option>
-    </select>
-  </div>
-
-  <div class="button-grid">
-    <button class="primary-btn" onclick="generateUUIDs()">Generate UUIDs</button>
-    <button class="primary-btn" onclick="copyUUIDs()">Copy to Clipboard</button>
-    <button class="unique-download" onclick="downloadUUIDs()">Download to a file</button>
-    <button class="primary-btn" onclick="generateUUIDs()">Generate Another</button>
-  </div>
-
-  <div class="output-section">
-    <div class="output-label">Generated UUIDs:</div>
-    <div id="uuidBox" class="uuid-output-box">Your generated UUIDs will appear here...</div>
-  </div>
-</div>
-
-<script>
-function generateUUIDs() {
-  const count = parseInt(document.getElementById('count').value) || 1;
-  const encoding = document.getElementById('encoding').value;
-  const output = [];
-
-  for (let i = 0; i < count; i++) {
-    let rawUUID = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-
-    if (encoding === 'base64') {
-      rawUUID = btoa(rawUUID);
-    } else if (encoding === 'url') {
-      rawUUID = encodeURIComponent(rawUUID).replace(/-/g, '%2D');
-    }
-
-    output.push(rawUUID);
-  }
-
-  document.getElementById('uuidBox').innerText = output.join('\n');
-}
-
-function copyUUIDs() {
-  const text = document.getElementById('uuidBox').innerText.trim();
-  if (!text || text.includes('Your generated UUIDs will appear here')) {
-    alert('Please generate UUIDs first.');
-    return;
-  }
-  navigator.clipboard.writeText(text);
-  alert('UUIDs copied to clipboard!');
-}
-
-function downloadUUIDs() {
-  const text = document.getElementById('uuidBox').innerText.trim();
-  if (!text || text.includes('Your generated UUIDs will appear here')) {
-    alert('Please generate UUIDs first.');
-    return;
-  }
-  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "uuids.txt";
-  link.click();
-}
-</script>
+    <script>
+        // Generate UUID v4 function
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        // Generate multiple UUIDs
+        function generateUUIDs() {
+            const count = parseInt(document.getElementById('uuidCount').value);
+            const encoding = document.getElementById('encoding').value;
+            const output = document.getElementById('output');
+            
+            let uuids = [];
+            for (let i = 0; i < count; i++) {
+                uuids.push(generateUUID());
+            }
+            
+            let result = uuids.join('\n');
+            
+            // Apply encoding if selected
+            if (encoding === 'base64') {
+                result = btoa(result);
+            } else if (encoding === 'hex') {
+                result = result.replace(/-/g, '').toUpperCase();
+            }
+            
+            output.value = result;
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.style.background = '#4caf50';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#2196f3';
+            }, 2000);
+        }
+        
+        // Download to file
+        function downloadToFile() {
+            const output = document.getElementById('output');
+            const content = output.value;
+            
+            if (!content || content === 'Your generated UUIDs will appear here...') {
+                alert('Please generate some UUIDs first!');
+                return;
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated-uuids.txt';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        // Generate another set
+        function generateAnother() {
+            generateUUIDs();
+        }
+        
+        // Initialize with one UUID
+        window.onload = function() {
+            generateUUIDs();
+        };
+    </script>
+</body>
+</html>
