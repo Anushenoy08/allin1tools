@@ -509,6 +509,17 @@
             option.addEventListener('click', function() {
                 document.querySelectorAll('.logo-option').forEach(opt => opt.classList.remove('selected'));
                 this.classList.add('selected');
+                
+                // Visual feedback
+                console.log('Logo selected:', this.dataset.logo);
+                
+                // If QR code already exists, update it with new logo
+                const preview = document.getElementById('qrPreview');
+                const existingCanvas = preview.querySelector('canvas');
+                if (existingCanvas) {
+                    const selectedLogo = this.dataset.logo;
+                    addLogoToQR(existingCanvas, selectedLogo);
+                }
             });
         });
         
@@ -606,8 +617,25 @@
             setTimeout(() => {
                 const canvas = preview.querySelector('canvas');
                 if (canvas) {
+                    console.log('Canvas found, applying logo overlay');
+                    
+                    // Create a new canvas for the final result
+                    const finalCanvas = document.createElement('canvas');
+                    const ctx = finalCanvas.getContext('2d');
+                    finalCanvas.width = 256;
+                    finalCanvas.height = 256;
+                    
+                    // Draw the QR code to the new canvas
+                    ctx.drawImage(canvas, 0, 0);
+                    
+                    // Replace the original canvas with our new one
+                    preview.innerHTML = '';
+                    preview.appendChild(finalCanvas);
+                    
+                    // Add logo overlay if selected
                     if (selectedLogo) {
-                        addLogoToQR(canvas, selectedLogo);
+                        console.log('Adding logo:', selectedLogo);
+                        addLogoToQR(finalCanvas, selectedLogo);
                     }
                     
                     // Show download button
@@ -615,7 +643,7 @@
                 } else {
                     console.error('Canvas not found after QR generation');
                 }
-            }, 200); // Increased timeout to ensure QR code is fully generated
+            }, 300); // Increased timeout to ensure QR code is fully generated
         }
         
         // Process QR code image from data URL
@@ -675,10 +703,21 @@
                 ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
                 
                 console.log('Logo added successfully:', logoName);
+                
+                // Force canvas update
+                canvas.style.display = 'none';
+                canvas.offsetHeight; // Trigger reflow
+                canvas.style.display = 'block';
             };
             
             logoImg.onerror = function() {
                 console.error('Failed to load logo:', logoName);
+                // Try alternative path
+                if (logoName === 'email') {
+                    logoImg.src = '../images/mail.png';
+                } else if (logoName === 'scanner') {
+                    logoImg.src = '../images/scanner.png';
+                }
             };
             
             // Load logo image with correct path
