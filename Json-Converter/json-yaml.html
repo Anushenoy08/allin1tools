@@ -1,0 +1,339 @@
+---
+layout: default
+title: Best Online JSON to YAML Converter for FREE
+permalink: /Json-Converter/json-yaml.html
+---
+
+<!-- TOOLBAR: remains as per your working common.css -->
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+  <div class="json-converter-title">JSON to YAML Converter</div>
+  
+  <div class="json-converter-layout">
+    <!-- Left side: Input -->
+    <div class="json-converter-left">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Input</span>
+          <div class="toolbar-options">
+            <label class="upload-option">
+              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
+              <span class="upload-icon">📁</span>
+            </label>
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearInput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Object or Array Example: {"name":"John","age":30,"city":"New York"}'></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Center: Buttons -->
+    <div class="json-converter-center">
+      <div class="action-btns">
+        <button onclick="convertToYAML()">Convert to YAML</button>
+        <button onclick="copyOutput()">Copy YAML</button>
+        <button onclick="downloadOutput()">Download YAML</button>
+      </div>
+    </div>
+    
+    <!-- Right side: Output -->
+    <div class="json-converter-right">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Output</span>
+          <div class="toolbar-options">
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearOutput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="yamlOutput" placeholder="YAML result will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function convertToYAML() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const output = document.getElementById('yamlOutput');
+  output.value = '';
+
+  try {
+    const obj = JSON.parse(input);
+    const yaml = jsonToYaml(obj);
+    output.value = yaml;
+  } catch (e) {
+    alert('Invalid JSON format.');
+  }
+}
+
+function jsonToYaml(obj, indent = 0) {
+  const spaces = '  '.repeat(indent);
+  
+  if (obj === null) return 'null';
+  if (typeof obj === 'string') return `"${obj}"`;
+  if (typeof obj === 'number' || typeof obj === 'boolean') return obj.toString();
+  
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return '[]';
+    
+    let result = '';
+    for (let i = 0; i < obj.length; i++) {
+      const item = obj[i];
+      if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+        result += spaces + '- ' + jsonToYaml(item, indent + 1).substring(spaces.length + 2);
+      } else {
+        result += spaces + '- ' + jsonToYaml(item, indent + 1);
+      }
+      if (i < obj.length - 1) result += '\n';
+    }
+    return result;
+  }
+  
+  if (typeof obj === 'object') {
+    const keys = Object.keys(obj);
+    if (keys.length === 0) return '{}';
+    
+    let result = '';
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const value = obj[key];
+      
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        result += spaces + key + ':\n' + jsonToYaml(value, indent + 1);
+      } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+        result += spaces + key + ':\n' + jsonToYaml(value, indent + 1);
+      } else {
+        result += spaces + key + ': ' + jsonToYaml(value, indent + 1);
+      }
+      
+      if (i < keys.length - 1) result += '\n';
+    }
+    return result;
+  }
+  
+  return obj.toString();
+}
+
+function clearInput() {
+  document.getElementById('jsonInput').value = '';
+}
+
+function clearOutput() {
+  document.getElementById('yamlOutput').value = '';
+}
+
+function uploadJSONFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('jsonInput').value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function toggleFullScreen(button) {
+  const box = button.closest('.json-converter-box');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function toggleFullScreen(button) {
+  // Check if we're on mobile/tablet
+  if (window.innerWidth <= 1024) {
+    // Mobile/Tablet fullscreen
+    const which = button.closest('.json-converter-box').querySelector('.box-label').textContent.toLowerCase();
+    enterMobileFullscreen(which);
+  } else {
+    // Desktop fullscreen
+    const box = button.closest('.json-converter-box');
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      if (box.requestFullscreen) {
+        box.requestFullscreen().then(() => {
+          console.log('Fullscreen entered successfully');
+        }).catch(err => {
+          console.error('Fullscreen error:', err);
+          alert('Failed to enter fullscreen mode: ' + err.message);
+        });
+      } else if (box.webkitRequestFullscreen) {
+        box.webkitRequestFullscreen().then(() => {
+          console.log('Webkit fullscreen entered successfully');
+        }).catch(err => {
+          console.error('Webkit fullscreen error:', err);
+          alert('Failed to enter fullscreen mode: ' + err.message);
+        });
+      } else if (box.msRequestFullscreen) {
+        box.msRequestFullscreen().then(() => {
+          console.log('MS fullscreen entered successfully');
+        }).catch(err => {
+          console.error('MS fullscreen error:', err);
+          alert('Failed to enter fullscreen mode: ' + err.message);
+        });
+      } else {
+        console.error('No fullscreen API available');
+        alert('Fullscreen is not supported in this browser');
+      }
+    } else {
+      exitFullScreen();
+    }
+  }
+}
+
+function exitFullScreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen().then(() => {
+      console.log('Fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Exit fullscreen error:', err);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen().then(() => {
+      console.log('Webkit fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Webkit exit fullscreen error:', err);
+    });
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen().then(() => {
+      console.log('MS fullscreen exited successfully');
+    }).catch(err => {
+      console.error('MS exit fullscreen error:', err);
+    });
+  }
+}
+
+function enterMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'yamlOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  
+  // Copy content to mobile textarea
+  mobileTextarea.value = textarea.value;
+  
+  // Show overlay
+  overlay.classList.add('active');
+  
+  // Focus on mobile textarea
+  setTimeout(() => {
+    mobileTextarea.focus();
+  }, 100);
+  
+  // Sync content changes back to original textarea
+  mobileTextarea.addEventListener('input', function() {
+    textarea.value = this.value;
+  });
+}
+
+function exitMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'yamlOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  
+  // Copy content back to original textarea
+  textarea.value = mobileTextarea.value;
+  
+  // Hide overlay
+  overlay.classList.remove('active');
+}
+
+// Handle escape key for mobile fullscreen
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const inputOverlay = document.getElementById('mobileFullscreenInput');
+    const outputOverlay = document.getElementById('mobileFullscreenOutput');
+    
+    if (inputOverlay.classList.contains('active')) {
+      exitMobileFullscreen('input');
+    } else if (outputOverlay.classList.contains('active')) {
+      exitMobileFullscreen('output');
+    }
+  }
+});
+
+function copyOutput() {
+  const output = document.getElementById('yamlOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to YAML first.');
+    return;
+  }
+  
+  navigator.clipboard.writeText(output).then(() => {
+    alert('YAML copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+    alert('Failed to copy to clipboard. Please try again.');
+  });
+}
+
+function downloadOutput() {
+  const output = document.getElementById('yamlOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to YAML first.');
+    return;
+  }
+  
+  const blob = new Blob([output], { type: 'text/yaml;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'converted.yaml');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>
+
+<!-- Mobile Fullscreen Overlays -->
+<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
+  </div>
+</div>
+
+<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" placeholder="YAML result will appear here..." readonly></textarea>
+  </div>
+</div>

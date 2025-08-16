@@ -1,0 +1,199 @@
+---
+layout: default
+title: Best Online SHA Hash Generator for FREE
+permalink: /Generators/sha.html
+---
+
+<div class="navbar">
+    <img src="../images/logo.png" alt="Logo">
+    <a href="../index.html">HOME</a>
+    <a href="/article/">ARTICLES</a>
+</div>
+<div class="sha-generator-container">
+    <div class="sha-title">SHA HASH GENERATOR</div>
+    <div class="sha-box-row">
+        <div class="sha-box">
+            <div class="sha-io-box">
+                <div class="sha-label">Input</div>
+                <textarea id="shaInput" class="sha-input" placeholder="Enter text..."></textarea>
+            </div>
+            <div class="sha-center-col">
+                <div class="sha-dropdowns" id="shaAlgoDropdowns" style="gap:14px;">
+                    <select id="sha2Select" class="sha-dropdown" onchange="onSHA2Select()">
+                        <option value="">SHA-2 Family</option>
+                        <option value="SHA-224">SHA-224</option>
+                        <option value="SHA-256">SHA-256</option>
+                        <option value="SHA-384">SHA-384</option>
+                        <option value="SHA-512">SHA-512</option>
+                        <option value="SHA-512/224">SHA-512/224</option>
+                        <option value="SHA-512/256">SHA-512/256</option>
+                    </select>
+                    <select id="sha3Select" class="sha-dropdown" onchange="onSHA3Select()">
+                        <option value="">SHA-3 Family</option>
+                        <option value="SHA3-224">SHA3-224</option>
+                        <option value="SHA3">SHA3</option>
+                        <option value="SHA3-384">SHA3-384</option>
+                        <option value="SHA3-512">SHA3-512</option>
+                        <option value="SHAKE128">SHAKE128</option>
+                        <option value="SHAKE256">SHAKE256</option>
+                    </select>
+                </div>
+                <div class="sha-btn-row">
+                    <button class="sha-btn-large" onclick="generateSHA()">Generate</button>
+                    <button class="sha-btn-large" onclick="copySHA()">Copy</button>
+                    <button class="sha-btn-large" onclick="clearSHA()">Clear</button>
+                </div>
+                <div class="popup" id="shaPopup">Copied!</div>
+            </div>
+            <div class="sha-io-box">
+                <div class="sha-label">Output</div>
+                <textarea id="shaOutput" class="sha-output" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Debug: Check what functions are available
+    console.log('Available libraries:', {
+        'CryptoJS': typeof CryptoJS,
+        'js-sha3 functions': {
+            sha3_224: typeof sha3_224,
+            sha3_256: typeof sha3_256,
+            sha3_384: typeof sha3_384,
+            sha3_512: typeof sha3_512,
+            shake128: typeof shake128,
+            shake256: typeof shake256
+        }
+    });
+
+    function showPopup(msg) {
+        const popup = document.getElementById('shaPopup');
+        popup.textContent = msg;
+        popup.style.display = 'block';
+        setTimeout(() => { popup.style.display = 'none'; }, 1200);
+    }
+    function showError(msg) {
+        document.getElementById('shaError').textContent = msg;
+    }
+    function clearError() {
+        document.getElementById('shaError').textContent = '';
+    }
+    function onSHA2Select() {
+        document.getElementById('sha3Select').selectedIndex = 0;
+    }
+    function onSHA3Select() {
+        document.getElementById('sha2Select').selectedIndex = 0;
+    }
+    function getSelectedSHA() {
+        const s2 = document.getElementById('sha2Select').value;
+        const s3 = document.getElementById('sha3Select').value;
+        if (s2) return s2;
+        if (s3) return s3;
+        return '';
+    }
+    async function generateSHA() {
+        clearError();
+        const input = document.getElementById('shaInput').value;
+        const algo = getSelectedSHA();
+        if (!input.trim()) {
+            showError('Please enter text to hash.');
+            return;
+        }
+        if (!algo) {
+            showError('Please select a SHA algorithm.');
+            return;
+        }
+        let output = '';
+        try {
+            // Use crypto.subtle for native browser support
+            if (algo === 'SHA-256' || algo === 'SHA-384' || algo === 'SHA-512') {
+                const enc = new TextEncoder();
+                const data = enc.encode(input);
+                const hash = await crypto.subtle.digest(algo, data);
+                output = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+            // Use CryptoJS for SHA-2 family
+            else if (algo === 'SHA-224') {
+                if (typeof CryptoJS !== 'undefined') {
+                    output = CryptoJS.SHA224(input).toString();
+                } else {
+                    throw new Error('CryptoJS library not loaded.');
+                }
+            } else if (algo === 'SHA-512/224') {
+                if (typeof CryptoJS !== 'undefined') {
+                    // SHA-512/224 is SHA-512 truncated to 224 bits
+                    const hash = CryptoJS.SHA512(input);
+                    output = hash.toString().substring(0, 56); // 224 bits = 56 hex characters
+                } else {
+                    throw new Error('CryptoJS library not loaded.');
+                }
+            } else if (algo === 'SHA-512/256') {
+                if (typeof CryptoJS !== 'undefined') {
+                    // SHA-512/256 is SHA-512 truncated to 256 bits
+                    const hash = CryptoJS.SHA512(input);
+                    output = hash.toString().substring(0, 64); // 256 bits = 64 hex characters
+                } else {
+                    throw new Error('CryptoJS library not loaded.');
+                }
+            }
+            // Use js-sha3 library for SHA-3 family
+            else if (algo === 'SHA3-224') {
+                if (typeof sha3_224 === 'function') {
+                    output = sha3_224(input);
+                } else {
+                    throw new Error('SHA3-224 function not available.');
+                }
+            } else if (algo === 'SHA3') {
+                if (typeof sha3_256 === 'function') {
+                    output = sha3_256(input);
+                } else {
+                    throw new Error('SHA3-256 function not available.');
+                }
+            } else if (algo === 'SHA3-384') {
+                if (typeof sha3_384 === 'function') {
+                    output = sha3_384(input);
+                } else {
+                    throw new Error('SHA3-384 function not available.');
+                }
+            } else if (algo === 'SHA3-512') {
+                if (typeof sha3_512 === 'function') {
+                    output = sha3_512(input);
+                } else {
+                    throw new Error('SHA3-512 function not available.');
+                }
+            } else if (algo === 'SHAKE128') {
+                if (typeof shake128 === 'function') {
+                    output = shake128(input, 256);
+                } else {
+                    throw new Error('SHAKE128 function not available.');
+                }
+            } else if (algo === 'SHAKE256') {
+                if (typeof shake256 === 'function') {
+                    output = shake256(input, 512);
+                } else {
+                    throw new Error('SHAKE256 function not available.');
+                }
+            } else {
+                output = 'Algorithm not supported.';
+            }
+        } catch (e) {
+            output = 'Error: ' + e.message;
+        }
+        document.getElementById('shaOutput').value = output;
+    }
+    function copySHA() {
+        const output = document.getElementById('shaOutput').value;
+        if (!output) return;
+        navigator.clipboard.writeText(output).then(() => {
+            showPopup('Copied!');
+        });
+    }
+    function clearSHA() {
+        document.getElementById('shaInput').value = '';
+        document.getElementById('shaOutput').value = '';
+        clearError();
+        document.getElementById('sha2Select').selectedIndex = 0;
+        document.getElementById('sha3Select').selectedIndex = 0;
+    }
+</script>
+

@@ -1,0 +1,319 @@
+---
+layout: default
+title: Best Online JSON to TSV Converter for FREE
+permalink: /Json-Converter/json-tsv.html
+---
+
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+  <div class="json-converter-title">JSON to TSV Converter</div>
+  
+  <div class="json-converter-layout">
+    <!-- Left side: Input -->
+    <div class="json-converter-left">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Input</span>
+          <div class="toolbar-options">
+            <label class="upload-option">
+              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
+              <span class="upload-icon">📁</span>
+            </label>
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearInput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Array of Objects Example: [{"name":"John","age":30,"city":"New York"}]'></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Center: Buttons and Separator Dropdown -->
+    <div class="json-converter-center">
+      <div class="action-btns">
+        <button onclick="convertToTSV()">Convert to TSV</button>
+        <button onclick="copyOutput()">Copy TSV</button>
+        <button onclick="downloadOutput()">Download TSV</button>
+      </div>
+      
+      <!-- Separator Dropdown -->
+      <div style="margin-top: 20px; text-align: center;">
+        <label for="separatorSelect" style="font-weight: 500; color: #1565c0; margin-bottom: 8px; display: block;">Separator</label>
+        <select id="separatorSelect" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #b2ebf2; font-size: 1.08em; width: 100%; max-width: 250px;">
+          <option value="tab">Tab separator</option>
+          <option value=",">Comma (,) separator</option>
+          <option value=";">Semicolon (;) separator</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Right side: Output -->
+    <div class="json-converter-right">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Output</span>
+          <div class="toolbar-options">
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearOutput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="tsvOutput" placeholder="TSV result will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Fullscreen Overlays -->
+<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
+  </div>
+</div>
+
+<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" readonly></textarea>
+  </div>
+</div>
+
+<script>
+function convertToTSV() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const output = document.getElementById('tsvOutput');
+  const sepSelect = document.getElementById('separatorSelect');
+  let sep = '\t';
+  if (sepSelect) {
+    if (sepSelect.value === 'tab') sep = '\t';
+    else sep = sepSelect.value;
+  }
+  output.value = '';
+  try {
+    const arr = JSON.parse(input);
+    if (!Array.isArray(arr) || arr.length === 0 || typeof arr[0] !== 'object') {
+      alert('Input JSON must be a non-empty array of objects.');
+      return;
+    }
+    const tsv = jsonToTSVFlattened(arr, sep);
+    output.value = tsv;
+  } catch (e) {
+    alert('Invalid JSON format.');
+  }
+}
+
+// Flattens an object using slash notation for nested keys
+function flattenForTSV(obj, prefix = '', out = {}) {
+  for (let key in obj) {
+    if (!obj.hasOwnProperty(key)) continue;
+    let value = obj[key];
+    let newKey = prefix ? prefix + '/' + key : key;
+    if (typeof value === 'object' && value !== null) {
+      if (Array.isArray(value)) {
+        value.forEach((v, i) => {
+          if (typeof v === 'object' && v !== null) {
+            flattenForTSV(v, newKey + '/' + i, out);
+          } else {
+            out[newKey + '/' + i] = v;
+          }
+        });
+      } else {
+        flattenForTSV(value, newKey, out);
+      }
+    } else {
+      out[newKey] = value;
+    }
+  }
+  return out;
+}
+
+// Converts array of objects to TSV/CSV/semicolon, flattening nested objects/arrays
+function jsonToTSVFlattened(arr, sep) {
+  // Flatten all objects and collect all unique keys
+  const flatArr = arr.map(obj => flattenForTSV(obj));
+  const keys = Array.from(new Set(flatArr.flatMap(obj => Object.keys(obj))));
+  let lines = [];
+  lines.push(keys.join(sep));
+  for (const obj of flatArr) {
+    let row = keys.map(key => {
+      let value = obj[key];
+      // Escape separator and newlines
+      let safeValue = String(value !== undefined ? value : '');
+      if (sep === '\t') safeValue = safeValue.replace(/\t/g, ' ');
+      else safeValue = safeValue.replace(new RegExp(sep.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1'), 'g'), ' ');
+      safeValue = safeValue.replace(/\n/g, ' ');
+      return safeValue;
+    });
+    lines.push(row.join(sep));
+  }
+  return lines.join('\n');
+}
+
+function clearInput() {
+  document.getElementById('jsonInput').value = '';
+}
+
+function clearOutput() {
+  document.getElementById('tsvOutput').value = '';
+}
+
+function uploadJSONFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('jsonInput').value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function toggleFullScreen(button) {
+  const box = button.closest('.json-converter-box');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function toggleFullScreen(button) {
+  const box = button.closest('.json-converter-box');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function exitFullScreen() {
+  if (document.exitFullscreen) document.exitFullscreen();
+  else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  else if (document.msExitFullscreen) document.msExitFullscreen();
+}
+
+function enterMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'tsvOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  
+  // Copy content to mobile textarea
+  mobileTextarea.value = textarea.value;
+  
+  // Show overlay
+  overlay.classList.add('active');
+  
+  // Focus on mobile textarea
+  setTimeout(() => {
+    mobileTextarea.focus();
+  }, 100);
+  
+  // Sync content changes back to original textarea
+  mobileTextarea.addEventListener('input', function() {
+    textarea.value = this.value;
+  });
+}
+
+function exitMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'tsvOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  
+  // Copy content back to original textarea
+  textarea.value = mobileTextarea.value;
+  
+  // Hide overlay
+  overlay.classList.remove('active');
+}
+
+// Handle escape key for mobile fullscreen
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const inputOverlay = document.getElementById('mobileFullscreenInput');
+    const outputOverlay = document.getElementById('mobileFullscreenOutput');
+    
+    if (inputOverlay.classList.contains('active')) {
+      exitMobileFullscreen('input');
+    } else if (outputOverlay.classList.contains('active')) {
+      exitMobileFullscreen('output');
+    }
+  }
+});
+
+function copyOutput() {
+  const output = document.getElementById('tsvOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to TSV first.');
+    return;
+  }
+  navigator.clipboard.writeText(output).then(() => {
+    alert('TSV copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+    alert('Failed to copy to clipboard. Please try again.');
+  });
+}
+
+function downloadOutput() {
+  const output = document.getElementById('tsvOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to TSV first.');
+    return;
+  }
+  const blob = new Blob([output], { type: 'text/plain;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'output.txt');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>
+

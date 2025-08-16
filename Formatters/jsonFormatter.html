@@ -1,0 +1,275 @@
+---
+layout: default
+title: Best Online JSON Formatter for FREE
+permalink: /Formatters/jsonFormatter.html
+---
+
+<div class="navbar">
+    <img src="../images/logo.png" alt="Logo">
+    <a href="../index.html">HOME</a>
+    <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+    <div class="json-converter-title">JSON Formatter</div>
+    
+    <!-- Buttons Section Above Text Boxes -->
+    <div class="buttons-section">
+        <button onclick="formatJSON()">Format</button>
+        <button onclick="beautifyJSON()">Beautify</button>
+        <button onclick="validateJSON()">Validate</button>
+        <button onclick="copyJSON()">Copy JSON</button>
+        <button onclick="downloadJSON()">Download JSON</button>
+    </div>
+
+    <div class="json-converter-layout">
+      <!-- Left side: Input -->
+      <div class="json-converter-left">
+        <div class="json-converter-box">
+          <div class="toolbar">
+            <span class="toolbar-label">Input</span>
+            <div class="toolbar-options">
+              <label class="upload-option">
+                <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
+                <span class="upload-icon">📁</span>
+              </label>
+              <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+                <span class="fullscreen-icon">⛶</span>
+              </button>
+              <button class="clear-option" title="Clear" onclick="clearJSON('input')">
+                <span class="clear-icon">🗑️</span>
+              </button>
+            </div>
+          </div>
+          <div class="code-area-wrapper">
+            <textarea class="json-textarea" id="jsonInput" placeholder="Paste or type your JSON here..."></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right side: Output -->
+      <div class="json-converter-right">
+        <div class="json-converter-box">
+          <div class="toolbar">
+            <span class="toolbar-label">Output</span>
+            <div class="toolbar-options">
+              <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+                <span class="fullscreen-icon">⛶</span>
+              </button>
+              <button class="clear-option" title="Clear" onclick="clearJSON('output')">
+                <span class="clear-icon">🗑️</span>
+              </button>
+            </div>
+          </div>
+          <div class="code-area-wrapper">
+            <textarea class="json-textarea" id="jsonOutput" placeholder="Formatted/Beautified JSON will appear here..." readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div id="popupMsg" class="popup" style="display:none;"><span id="popupText"></span><button class="close-btn" onclick="closePopup()">✕</button></div>
+
+
+
+<script>
+    function showError(msg) {
+        const errorDiv = document.getElementById('errorMsg');
+        errorDiv.innerText = msg;
+        errorDiv.style.display = 'block';
+    }
+    function clearError() {
+        const errorDiv = document.getElementById('errorMsg');
+        errorDiv.innerText = '';
+        errorDiv.style.display = 'none';
+    }
+    function showPopup(msg) {
+        const popup = document.getElementById('popupMsg');
+        document.getElementById('popupText').innerText = msg;
+        popup.style.display = 'flex';
+    }
+    function closePopup() {
+        document.getElementById('popupMsg').style.display = 'none';
+    }
+    function updateInputLineNumbers() {
+        const textarea = document.getElementById('jsonInput');
+        const lineNumbers = document.getElementById('inputLineNumbers');
+        const lines = textarea.value.split('\n').length || 1;
+        let html = '';
+        for (let i = 1; i <= lines; i++) html += i + '<br>';
+        lineNumbers.innerHTML = html;
+    }
+    function updateOutputLineNumbers() {
+        const textarea = document.getElementById('jsonOutput');
+        const lineNumbers = document.getElementById('outputLineNumbers');
+        const lines = textarea.value.split('\n').length || 1;
+        let html = '';
+        for (let i = 1; i <= lines; i++) html += i + '<br>';
+        lineNumbers.innerHTML = html;
+    }
+    function syncScroll(which) {
+        if (which === 'input') {
+            const textarea = document.getElementById('jsonInput');
+            const lineNumbers = document.getElementById('inputLineNumbers');
+            lineNumbers.scrollTop = textarea.scrollTop;
+        } else {
+            const textarea = document.getElementById('jsonOutput');
+            const lineNumbers = document.getElementById('outputLineNumbers');
+            lineNumbers.scrollTop = textarea.scrollTop;
+        }
+    }
+    function formatJSON() {
+        clearError();
+        const input = document.getElementById('jsonInput').value;
+        try {
+            const obj = JSON.parse(input);
+            const formatted = JSON.stringify(obj, null, 2);
+            document.getElementById('jsonOutput').value = formatted;
+            updateOutputLineNumbers();
+        } catch (e) {
+            showError('Invalid JSON: ' + e.message);
+            document.getElementById('jsonOutput').value = '';
+            updateOutputLineNumbers();
+        }
+    }
+    function validateJSON() {
+        clearError();
+        const input = document.getElementById('jsonInput').value;
+        try {
+            JSON.parse(input);
+            showPopup('Valid JSON');
+        } catch (e) {
+            showError('Invalid JSON');
+        }
+    }
+    function beautifyJSON() {
+        clearError();
+        const input = document.getElementById('jsonInput').value;
+        try {
+            const obj = JSON.parse(input);
+            const beautified = JSON.stringify(obj, null, 4);
+            document.getElementById('jsonOutput').value = beautified;
+            updateOutputLineNumbers();
+        } catch (e) {
+            showError('Invalid JSON: ' + e.message);
+            document.getElementById('jsonOutput').value = '';
+            updateOutputLineNumbers();
+        }
+    }
+
+    function copyJSON() {
+        const output = document.getElementById('jsonOutput').value;
+        if (!output) return;
+        navigator.clipboard.writeText(output);
+        showPopup('Copied to clipboard!');
+    }
+    function downloadJSON() {
+        const output = document.getElementById('jsonOutput').value;
+        if (!output) return;
+        const blob = new Blob([output], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'formatted.json';
+        link.click();
+    }
+
+    function uploadJSONFile(which, event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                const text = JSON.stringify(json, null, 2);
+                if (which === 'input') {
+                    document.getElementById('jsonInput').value = text;
+                } else {
+                    document.getElementById('jsonOutput').value = text;
+                }
+            } catch (error) {
+                showError('Invalid JSON file: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function clearJSON(which) {
+        if (which === 'input') {
+            document.getElementById('jsonInput').value = '';
+        } else {
+            document.getElementById('jsonOutput').value = '';
+        }
+        clearError();
+    }
+
+    function toggleFullScreen(button) {
+        // Find the parent json-converter-box element
+        let box = button.closest('.json-converter-box');
+        
+        // Fallback: if closest() doesn't work, traverse up manually
+        if (!box) {
+            let parent = button.parentElement;
+            while (parent && !parent.classList.contains('json-converter-box')) {
+                parent = parent.parentElement;
+            }
+            box = parent;
+        }
+        
+        // If still no box found, try to find by looking for the textarea parent
+        if (!box) {
+            const textarea = button.closest('.toolbar-options').nextElementSibling;
+            if (textarea && textarea.classList.contains('code-area-wrapper')) {
+                box = textarea.parentElement;
+            }
+        }
+        
+        // Final fallback: if no box found, show error and return
+        if (!box) {
+            console.error('Could not find json-converter-box element');
+            alert('Fullscreen not available on this device');
+            return;
+        }
+        
+        // Check if already in fullscreen
+        if (document.fullscreenElement || 
+            document.webkitFullscreenElement || 
+            document.mozFullScreenElement || 
+            document.msFullscreenElement) {
+            
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        } else {
+            // Enter fullscreen
+            if (box.requestFullscreen) {
+                box.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            } else if (box.webkitRequestFullscreen) {
+                box.webkitRequestFullscreen().catch(err => {
+                    console.log('Error attempting to enable webkit fullscreen:', err);
+                });
+            } else if (box.mozRequestFullScreen) {
+                box.mozRequestFullScreen().catch(err => {
+                    console.log('Error attempting to enable moz fullscreen:', err);
+                });
+            } else if (box.msRequestFullscreen) {
+                box.msRequestFullscreen().catch(err => {
+                    console.log('Error attempting to enable ms fullscreen:', err);
+                });
+            } else {
+                // If no fullscreen API is available, show message
+                alert('Fullscreen not supported on this device');
+            }
+        }
+    }
+</script>

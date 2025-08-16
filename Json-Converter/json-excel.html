@@ -1,0 +1,253 @@
+---
+layout: default
+title: Best Online JSON to Excel Converter for FREE
+permalink: /Json-Converter/json-excel.html
+---
+
+<!-- TOOLBAR: remains as per your working common.css -->
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+  <div class="json-converter-title">JSON to Excel Converter</div>
+  
+  <div class="json-converter-layout">
+    <!-- Left side: Input -->
+    <div class="json-converter-left">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Input</span>
+          <div class="toolbar-options">
+            <label class="upload-option">
+              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
+              <span class="upload-icon">📁</span>
+            </label>
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearInput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Array of Objects Example: [{"name":"John","age":30,"city":"New York"}]'></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Center: Buttons and Progress -->
+    <div class="json-converter-center">
+      <div class="action-btns">
+        <button id="convertBtn" onclick="convertToExcel()">Convert to Excel</button>
+        <button id="downloadBtn" onclick="downloadOutput()" disabled>Download Excel</button>
+      </div>
+      
+      <!-- Conversion Progress Bar -->
+      <div id="progressBarContainer" style="width: 100%; display: none; flex-direction: column; align-items: center; margin-top: 20px;">
+        <div style="width: 100%; margin-top: 18px;">
+          <div style="background: #e0e0e0; border-radius: 8px; width: 100%; height: 32px; position: relative;">
+            <div id="progressBar" style="background: #2196f3; height: 100%; width: 0%; border-radius: 8px; display: flex; align-items: center; transition: width 0.4s;"><span id="progressPercent" style="margin-left: 12px; color: #fff; font-weight: bold;">0%</span></div>
+          </div>
+          <div id="progressStatus" style="text-align: center; margin-top: 8px; font-size: 1.1em; font-weight: 500; color: #222;">Pending</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right side: Output Preview -->
+    <div class="json-converter-right">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Output Preview</span>
+          <div class="toolbar-options">
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearOutput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="excelOutput" placeholder="Excel conversion preview will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let lastExcelData = null;
+
+function showProgressBar() {
+  document.getElementById('progressBarContainer').style.display = 'flex';
+  setProgress(0, 'Pending');
+  document.getElementById('downloadBtn').disabled = true;
+}
+
+function setProgress(percent, status) {
+  const bar = document.getElementById('progressBar');
+  const percentText = document.getElementById('progressPercent');
+  const statusText = document.getElementById('progressStatus');
+  bar.style.width = percent + '%';
+  percentText.textContent = percent + '%';
+  statusText.textContent = status;
+}
+
+function convertToExcel() {
+  const input = document.getElementById('jsonInput').value.trim();
+  lastExcelData = null;
+  showProgressBar();
+  setProgress(10, 'Starting...');
+
+  setTimeout(() => {
+    setProgress(35, 'Parsing JSON...');
+    setTimeout(() => {
+      try {
+        const obj = JSON.parse(input);
+        if (!Array.isArray(obj)) {
+          setProgress(0, 'Input JSON must be an array of objects.');
+          alert('Input JSON must be an array of objects.');
+          return;
+        }
+        setProgress(70, 'Preparing Excel...');
+        setTimeout(() => {
+          lastExcelData = obj;
+          setProgress(100, 'Conversion Complete!');
+          document.getElementById('downloadBtn').disabled = false;
+        }, 600);
+      } catch (e) {
+        setProgress(0, 'Invalid JSON format.');
+        alert('Invalid JSON format.');
+      }
+    }, 700);
+  }, 500);
+}
+
+function clearInput() {
+  document.getElementById('jsonInput').value = '';
+}
+
+function clearOutput() {
+  document.getElementById('excelOutput').value = '';
+}
+
+function uploadJSONFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('jsonInput').value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function toggleFullScreen(button) {
+  const box = button.closest('.json-converter-box');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function enterMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'excelOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  mobileTextarea.value = textarea ? textarea.value : '';
+  overlay.classList.add('active');
+  setTimeout(() => { mobileTextarea.focus(); }, 100);
+  mobileTextarea.addEventListener('input', function() {
+    if (textarea) textarea.value = this.value;
+  });
+}
+
+function exitMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'excelOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  if (textarea) textarea.value = mobileTextarea.value;
+  overlay.classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const inputOverlay = document.getElementById('mobileFullscreenInput');
+    const outputOverlay = document.getElementById('mobileFullscreenOutput');
+    if (inputOverlay && inputOverlay.classList.contains('active')) exitMobileFullscreen('input');
+    else if (outputOverlay && outputOverlay.classList.contains('active')) exitMobileFullscreen('output');
+  }
+});
+
+function exitFullScreen() {
+  console.log('Exit fullscreen called');
+  if (document.exitFullscreen) {
+    document.exitFullscreen().then(() => {
+      console.log('Fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Exit fullscreen error:', err);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen().then(() => {
+      console.log('Webkit fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Webkit exit fullscreen error:', err);
+    });
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen().then(() => {
+      console.log('MS fullscreen exited successfully');
+    }).catch(err => {
+      console.error('MS exit fullscreen error:', err);
+    });
+  }
+}
+
+function downloadOutput() {
+  if (!lastExcelData || !Array.isArray(lastExcelData)) {
+    alert('Please convert JSON to Excel first.');
+    return;
+  }
+  // Use SheetJS to create and download Excel file
+  const ws = XLSX.utils.json_to_sheet(lastExcelData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  XLSX.writeFile(wb, 'converted.xlsx');
+}
+</script>
+
+<!-- Mobile Fullscreen Overlays -->
+<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
+  </div>
+</div>
+<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" placeholder="Excel result will appear here..." readonly></textarea>
+  </div>
+</div>
+

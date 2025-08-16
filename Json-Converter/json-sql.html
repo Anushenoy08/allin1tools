@@ -1,0 +1,272 @@
+---
+layout: default
+title: Best Online JSON to SQL Converter for FREE
+permalink: /Json-Converter/json-sql.html
+---
+
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+  <div class="json-converter-title">JSON to SQL Insert Converter</div>
+  
+  <div class="json-converter-layout">
+    <!-- Left side: Input -->
+    <div class="json-converter-left">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Input</span>
+          <div class="toolbar-options">
+            <label class="upload-option">
+              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
+              <span class="upload-icon">📁</span>
+            </label>
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearInput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Array of Objects Example: [{"id":1,"name":"Alice","profile":{"age":30,"city":"New York"},"hobbies":["reading","swimming"]}]'></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Center: Buttons and Table Name Input -->
+    <div class="json-converter-center">
+      <div class="action-btns">
+        <button onclick="convertToSQL()">Convert to SQL</button>
+        <button onclick="copyOutput()">Copy SQL</button>
+        <button onclick="downloadOutput()">Download SQL</button>
+      </div>
+      
+      <!-- Table Name Input -->
+      <div style="margin-top: 20px; text-align: center;">
+        <label for="tableNameInput" style="font-weight: 500; color: #1565c0; margin-bottom: 8px; display: block;">Table Name</label>
+        <input id="tableNameInput" type="text" placeholder="table_name" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #b2ebf2; font-size: 1.08em; width: 100%; max-width: 250px;">
+      </div>
+    </div>
+    
+    <!-- Right side: Output -->
+    <div class="json-converter-right">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Output</span>
+          <div class="toolbar-options">
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearOutput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="sqlOutput" placeholder="SQL INSERT statements will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function convertToSQL() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const output = document.getElementById('sqlOutput');
+  const tableNameInput = document.getElementById('tableNameInput');
+  const tableName = (tableNameInput && tableNameInput.value.trim()) ? tableNameInput.value.trim() : 'table_name';
+  output.value = '';
+  try {
+    const arr = JSON.parse(input);
+    if (!Array.isArray(arr) || arr.length === 0 || typeof arr[0] !== 'object') {
+      alert('Input JSON must be a non-empty array of objects.');
+      return;
+    }
+    const sql = jsonToSQL(arr, tableName);
+    output.value = sql;
+  } catch (e) {
+    alert('Invalid JSON format.');
+  }
+}
+
+function jsonToSQL(arr, tableName) {
+  // Get all unique keys
+  const keys = Array.from(new Set(arr.flatMap(obj => Object.keys(obj))));
+  let sql = '';
+  for (const obj of arr) {
+    const columns = keys.join(', ');
+    const values = keys.map(key => sqlValue(obj[key])).join(', ');
+    sql += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
+  }
+  return sql.trim();
+}
+
+function sqlValue(val) {
+  if (val === null || val === undefined) return 'NULL';
+  if (typeof val === 'number') return val;
+  if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE';
+  if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'`;
+  return `'${String(val).replace(/'/g, "''")}'`;
+}
+
+function clearInput() {
+  document.getElementById('jsonInput').value = '';
+}
+
+function clearOutput() {
+  document.getElementById('sqlOutput').value = '';
+}
+
+function toggleFullScreen(button) {
+  if (window.innerWidth <= 1024) {
+    const which = button.closest('.json-converter-box').querySelector('.box-label').textContent.toLowerCase();
+    enterMobileFullscreen(which);
+  } else {
+    const box = button.closest('.json-converter-box');
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      if (box.requestFullscreen) {
+        box.requestFullscreen().then(() => {}).catch(err => { alert('Failed to enter fullscreen mode: ' + err.message); });
+      } else if (box.webkitRequestFullscreen) {
+        box.webkitRequestFullscreen().then(() => {}).catch(err => { alert('Failed to enter fullscreen mode: ' + err.message); });
+      } else if (box.msRequestFullscreen) {
+        box.msRequestFullscreen().then(() => {}).catch(err => { alert('Failed to enter fullscreen mode: ' + err.message); });
+      } else {
+        alert('Fullscreen is not supported in this browser');
+      }
+    } else {
+      exitFullScreen();
+    }
+  }
+}
+
+function enterMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'sqlOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  mobileTextarea.value = textarea ? textarea.value : '';
+  overlay.classList.add('active');
+  setTimeout(() => { mobileTextarea.focus(); }, 100);
+  mobileTextarea.addEventListener('input', function() {
+    if (textarea) textarea.value = this.value;
+  });
+}
+
+function exitMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'sqlOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  if (textarea) textarea.value = mobileTextarea.value;
+  overlay.classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const inputOverlay = document.getElementById('mobileFullscreenInput');
+    const outputOverlay = document.getElementById('mobileFullscreenOutput');
+    if (inputOverlay && inputOverlay.classList.contains('active')) exitMobileFullscreen('input');
+    else if (outputOverlay && outputOverlay.classList.contains('active')) exitMobileFullscreen('output');
+  }
+});
+
+function exitFullScreen() {
+  console.log('Exit fullscreen called');
+  if (document.exitFullscreen) {
+    document.exitFullscreen().then(() => {
+      console.log('Fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Exit fullscreen error:', err);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen().then(() => {
+      console.log('Webkit fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Webkit exit fullscreen error:', err);
+    });
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen().then(() => {
+      console.log('MS fullscreen exited successfully');
+    }).catch(err => {
+      console.error('MS exit fullscreen error:', err);
+    });
+  }
+}
+
+function copyOutput() {
+  const output = document.getElementById('sqlOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to SQL first.');
+    return;
+  }
+  navigator.clipboard.writeText(output).then(() => {
+    alert('SQL statements copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+    alert('Failed to copy to clipboard. Please try again.');
+  });
+}
+
+function downloadOutput() {
+  const output = document.getElementById('sqlOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to SQL first.');
+    return;
+  }
+  const blob = new Blob([output], { type: 'text/plain;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'insert_statements.sql');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function toggleFullScreen(button) {
+  const box = button.closest('.json-converter-box');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+</script>
+
+<!-- Mobile Fullscreen Overlays -->
+<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
+  </div>
+</div>
+<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" placeholder="SQL INSERT statements will appear here..." readonly></textarea>
+  </div>
+</div>
+

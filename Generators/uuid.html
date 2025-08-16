@@ -1,0 +1,89 @@
+---
+layout: default
+title: Best Online UUID Generator for FREE
+description: Generate a UUID here 
+permalink: /Generators/uuid.html
+---
+<!-- TOOLBAR: remains as per your working common.css -->
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<h1>Free UUID v4 Generator</h1>
+
+<div class="uuid-container">
+  <div class="form-group">
+    <label for="count">Number of UUIDs:</label>
+    <input type="number" id="count" min="1" max="1000" value="1">
+  </div>
+
+  <div class="form-group">
+    <label for="encoding">Encoding:</label>
+    <select id="encoding">
+      <option value="none">None</option>
+      <option value="base64">Base64</option>
+      <option value="url">URL Encode</option>
+    </select>
+  </div>
+
+  <div class="button-grid">
+    <button class="primary-btn" onclick="generateUUIDs()">Generate UUIDs</button>
+    <button class="primary-btn" onclick="copyUUIDs()">Copy to Clipboard</button>
+    <button class="unique-download" onclick="downloadUUIDs()">Download to a file</button>
+    <button class="primary-btn" onclick="generateUUIDs()">Generate Another</button>
+  </div>
+
+  <div class="output-section">
+    <div class="output-label">Generated UUIDs:</div>
+    <div id="uuidBox" class="uuid-output-box">Your generated UUIDs will appear here...</div>
+  </div>
+</div>
+
+<script>
+function generateUUIDs() {
+  const count = parseInt(document.getElementById('count').value) || 1;
+  const encoding = document.getElementById('encoding').value;
+  const output = [];
+
+  for (let i = 0; i < count; i++) {
+    let rawUUID = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+
+    if (encoding === 'base64') {
+      rawUUID = btoa(rawUUID);
+    } else if (encoding === 'url') {
+      rawUUID = encodeURIComponent(rawUUID).replace(/-/g, '%2D');
+    }
+
+    output.push(rawUUID);
+  }
+
+  document.getElementById('uuidBox').innerText = output.join('\n');
+}
+
+function copyUUIDs() {
+  const text = document.getElementById('uuidBox').innerText.trim();
+  if (!text || text.includes('Your generated UUIDs will appear here')) {
+    alert('Please generate UUIDs first.');
+    return;
+  }
+  navigator.clipboard.writeText(text);
+  alert('UUIDs copied to clipboard!');
+}
+
+function downloadUUIDs() {
+  const text = document.getElementById('uuidBox').innerText.trim();
+  if (!text || text.includes('Your generated UUIDs will appear here')) {
+    alert('Please generate UUIDs first.');
+    return;
+  }
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "uuids.txt";
+  link.click();
+}
+</script>

@@ -1,0 +1,491 @@
+---
+layout: default
+title: Best Online Regex Generator for FREE
+description: Generate a regex pattern here 
+permalink: /Generators/regex.html
+---
+
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="regex-title" style="margin-top:90px;">Regex Generator & Tester</div>
+
+<!-- Regex Generator Container - Keep as is -->
+<div class="regex-generator-container">
+  <h2 class="container-title">Regex Generator</h2>
+  <p class="container-subtitle">Enter a sample value and click Generate to create a regex pattern automatically.</p>
+  
+  <div class="generator-input-section">
+    <input id="example-input" type="text" class="input-field" placeholder="E.g. 123456, abc123, test@example.com, 2024-06-01">
+    <button class="primary-btn" id="generate-regex-btn">Generate Regex</button>
+  </div>
+  
+  <div id="generated-regex-output" class="generator-output" style="display:none;"></div>
+</div>
+
+<!-- Single Container with Left-Right Split for Tester and Results -->
+<div class="regex-tester-results-container">
+  <!-- Left Side: Regex Tester -->
+  <div class="regex-tester-left">
+    <h2 class="container-title">Regex Tester</h2>
+    <p class="container-subtitle">Test your regex patterns with real-time matching and replacement.</p>
+    
+    <!-- Presets Section -->
+    <div class="input-section">
+      <label class="section-label">Presets</label>
+      <select id="preset-selector" class="preset-dropdown">
+        <option value="">Select a preset...</option>
+        <option value="^\\d{4}-\\d{2}-\\d{2}$">Date (YYYY-MM-DD)</option>
+        <option value="^\\d{10}$">10-digit Number</option>
+        <option value="^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$">Email Address</option>
+        <option value="^(https?:\\/\\/)?([\\w-]+\\.)+[\\w-]+(\\/\\S*)?$">URL</option>
+        <option value="^\\+?\\d{1,3}?[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$">Phone Number</option>
+        <option value="^[A-Fa-f0-9]{6}$">Hex Color</option>
+        <option value="^#[A-Fa-f0-9]{6}$">CSS Hex Color</option>
+      </select>
+    </div>
+
+    <!-- Regex Pattern Section -->
+    <div class="input-section">
+      <label class="section-label">Regex Pattern</label>
+      <div class="quick-insert">
+        <button class="quick-btn" data-insert="^">^</button>
+        <button class="quick-btn" data-insert="$">$</button>
+        <button class="quick-btn" data-insert=".">.</button>
+        <button class="quick-btn" data-insert="\\d">\\d</button>
+        <button class="quick-btn" data-insert="\\w">\\w</button>
+        <button class="quick-btn" data-insert="\\s">\\s</button>
+        <button class="quick-btn" data-insert="[ ]">[ ]</button>
+        <button class="quick-btn" data-insert="( )">( )</button>
+        <button class="quick-btn" data-insert="|">|</button>
+        <button class="quick-btn" data-insert="*">*</button>
+        <button class="quick-btn" data-insert="+">+</button>
+        <button class="quick-btn" data-insert="?">?</button>
+      </div>
+    </div>
+
+    <!-- Regex Pattern Input Section -->
+    <div class="input-section">
+      <label class="section-label">Enter Regex Pattern</label>
+      <input class="regex-input-compact" id="regex" type="text" placeholder="Enter regex pattern..." autocomplete="off" spellcheck="false">
+      <div id="regex-error" class="error-msg" style="display:none;"></div>
+    </div>
+
+    <!-- Flags Section -->
+    <div class="input-section">
+      <label class="section-label">Flags</label>
+      <div class="flags-group">
+        <label class="flag-checkbox"><input type="checkbox" id="flag-g" checked>g</label>
+        <label class="flag-checkbox"><input type="checkbox" id="flag-i">i</label>
+        <label class="flag-checkbox"><input type="checkbox" id="flag-m">m</label>
+        <label class="flag-checkbox"><input type="checkbox" id="flag-s">s</label>
+        <label class="flag-checkbox"><input type="checkbox" id="flag-u">u</label>
+        <label class="flag-checkbox"><input type="checkbox" id="flag-y">y</label>
+      </div>
+    </div>
+
+    <!-- Test String Section -->
+    <div class="input-section">
+      <label class="section-label">Test String</label>
+      <textarea class="test-input" id="teststr" placeholder="Paste or type your test string here..."></textarea>
+    </div>
+
+    <!-- Replacement Section -->
+    <div class="input-section">
+      <label class="section-label">Replacement (optional)</label>
+      <textarea class="replace-input" id="replace" placeholder="Replacement string (for .replace)"></textarea>
+    </div>
+  </div>
+
+  <!-- Right Side: Results -->
+  <div class="regex-results-right">
+    <h3 class="section-title">Results</h3>
+    
+    <!-- Match Results Section -->
+    <div class="output-section">
+      <div class="section-header">
+        <h4 class="section-subtitle">Match Results</h4>
+        <div class="action-buttons-small">
+          <button class="result-btn" id="copy-matches">Copy Matches</button>
+          <button class="result-btn" id="download-matches">Download Matches</button>
+        </div>
+      </div>
+      <div class="match-results" id="match-results">Matches will appear here...</div>
+      <div style="font-size:0.98em;color:#e94391;margin-bottom:8px;" id="match-count"></div>
+    </div>
+
+    <!-- Replacement Result Section -->
+    <div class="output-section">
+      <div class="section-header">
+        <h4 class="section-subtitle">Replacement Result</h4>
+        <div class="action-buttons-small">
+          <button class="result-btn" id="copy-replace">Copy Replaced</button>
+          <button class="result-btn" id="download-replace">Download Replaced</button>
+        </div>
+      </div>
+      <div class="match-results" id="replace-results">Replacement output will appear here...</div>
+    </div>
+  </div>
+</div>
+
+<!-- How to Use Section -->
+<div class="how-to-use-section">
+  <h2 class="section-title">How to Use This Regex Tool</h2>
+  
+  <div class="usage-grid">
+    <div class="usage-card">
+      <h3>1. Auto-Generate Regex</h3>
+      <p>Enter a sample value in the generator section above and click "Generate Regex" to automatically create a pattern.</p>
+    </div>
+    
+    <div class="usage-card">
+      <h3>2. Choose a Preset</h3>
+      <p>Select from predefined patterns for common use cases like email validation, phone numbers, or URLs.</p>
+    </div>
+    
+    <div class="usage-card">
+      <h3>3. Write Custom Pattern</h3>
+      <p>Write your own regex pattern or modify existing ones. Use the quick insert buttons for common regex elements.</p>
+    </div>
+    
+    <div class="usage-card">
+      <h3>4. Set Flags</h3>
+      <p>Choose the appropriate flags: Global (g), Case Insensitive (i), Multiline (m), etc.</p>
+    </div>
+    
+    <div class="usage-card">
+      <h3>5. Test Your Pattern</h3>
+      <p>Enter text to test against your regex pattern and see matches highlighted in real-time.</p>
+    </div>
+    
+    <div class="usage-card">
+      <h3>6. Optional Replacement</h3>
+      <p>If you want to replace matches, enter replacement text to see the modified result.</p>
+    </div>
+  </div>
+  
+  <div class="regex-examples">
+    <h3>Common Regex Examples</h3>
+    <div class="examples-grid">
+      <div class="example-item">
+        <strong>Email:</strong> <code>^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$</code>
+      </div>
+      <div class="example-item">
+        <strong>Phone:</strong> <code>^\\+?\\d{1,3}?[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$</code>
+      </div>
+      <div class="example-item">
+        <strong>URL:</strong> <code>^(https?:\\/\\/)?([\\w-]+\\.)+[\\w-]+(\\/\\S*)?$</code>
+      </div>
+      <div class="example-item">
+        <strong>Date:</strong> <code>^\\d{4}-\\d{2}-\\d{2}$</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="copy-popup" style="display:none;position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:linear-gradient(90deg,#2196f3 0%,#43e97b 100%);color:#fff;padding:12px 24px;border-radius:8px;font-weight:600;z-index:1000;"></div>
+
+<script>
+// Quick insert
+document.querySelectorAll('.quick-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const regexInput = document.getElementById('regex');
+    const val = btn.getAttribute('data-insert');
+    const start = regexInput.selectionStart;
+    const end = regexInput.selectionEnd;
+    regexInput.value = regexInput.value.slice(0, start) + val + regexInput.value.slice(end);
+    regexInput.focus();
+    regexInput.selectionStart = regexInput.selectionEnd = start + val.length;
+    triggerUpdate();
+  });
+});
+
+// Preset dropdown
+document.getElementById('preset-selector').addEventListener('change', function() {
+  const val = this.value;
+  if (val) {
+    const cleanVal = val.replace(/\\\\/g, '\\');
+    document.getElementById('regex').value = cleanVal;
+    triggerUpdate();
+  }
+});
+
+// Flags
+function getFlags() {
+  let flags = '';
+  const flagElements = [
+    document.getElementById('flag-g'), document.getElementById('flag-i'), 
+    document.getElementById('flag-m'), document.getElementById('flag-s'), 
+    document.getElementById('flag-u'), document.getElementById('flag-y')
+  ];
+  
+  flagElements.forEach(flag => {
+    if (flag && flag.checked) {
+      const flagName = flag.id.split('-')[1];
+      if (!flags.includes(flagName)) {
+        flags += flagName;
+      }
+    }
+  });
+  
+  return flags;
+}
+
+// Live update
+function setupEventListeners() {
+  const elements = [
+    { id: 'regex' },
+    { id: 'teststr' },
+    { id: 'replace' }
+  ];
+  
+  elements.forEach(element => {
+    const el = document.getElementById(element.id);
+    if (el) {
+      el.addEventListener('input', triggerUpdate);
+      el.addEventListener('keyup', triggerUpdate);
+    }
+  });
+  
+  document.querySelectorAll('.flags-group input[type=checkbox]').forEach(cb => 
+    cb.addEventListener('change', triggerUpdate)
+  );
+}
+
+function triggerUpdate() {
+  const pattern = document.getElementById('regex')?.value || '';
+  const flags = getFlags();
+  const testStr = document.getElementById('teststr')?.value || '';
+  const replaceStr = document.getElementById('replace')?.value || '';
+  const errorDiv = document.getElementById('regex-error');
+  
+  if (errorDiv) {
+    errorDiv.style.display = 'none';
+    document.getElementById('regex')?.classList.remove('invalid');
+  }
+  
+  let matchHtml = '';
+  let matchCount = 0;
+  let regex;
+  
+  try {
+    regex = new RegExp(pattern, flags);
+  } catch (e) {
+    if (errorDiv) {
+      errorDiv.textContent = e.message;
+      errorDiv.style.display = 'block';
+      document.getElementById('regex')?.classList.add('invalid');
+    }
+    document.getElementById('match-results').textContent = 'No matches.';
+    document.getElementById('match-count').textContent = '';
+    document.getElementById('replace-results').textContent = '';
+    return;
+  }
+  
+  if (!pattern) {
+    document.getElementById('match-results').textContent = 'Enter a regex pattern.';
+    document.getElementById('match-count').textContent = '';
+    document.getElementById('replace-results').textContent = '';
+    return;
+  }
+  
+  if (!testStr) {
+    document.getElementById('match-results').textContent = 'Enter a test string above.';
+    document.getElementById('match-count').textContent = '';
+    document.getElementById('replace-results').textContent = '';
+    return;
+  }
+  
+  // Highlight matches
+  let lastIndex = 0;
+  let result = '';
+  let matches = [];
+  let m;
+  regex.lastIndex = 0;
+  
+  while ((m = regex.exec(testStr)) !== null) {
+    matches.push(m);
+    result += escapeHtml(testStr.slice(lastIndex, m.index)).replace(/\\n/g, '<br>');
+    result += '<span class="match-highlight">' + escapeHtml(m[0]) + '</span>';
+    
+    if (m.length > 1) {
+      for (let g = 1; g < m.length; g++) {
+        if (m[g] !== undefined) {
+          result += '<span class="group-highlight">[' + g + ': ' + escapeHtml(m[g]) + ']</span>';
+        }
+      }
+    }
+    lastIndex = m.index + (m[0].length || 1);
+    if (!regex.global) break;
+  }
+  
+  result += escapeHtml(testStr.slice(lastIndex)).replace(/\\n/g, '<br>');
+  document.getElementById('match-results').innerHTML = result || 'No matches.';
+  document.getElementById('match-count').textContent = matches.length ? 
+    (matches.length + ' match' + (matches.length > 1 ? 'es' : '')) : '';
+  
+  // Replacement
+  if (replaceStr) {
+    let replaced;
+    try {
+      replaced = testStr.replace(regex, replaceStr);
+    } catch (e) {
+      replaced = 'Error: ' + e.message;
+    }
+    document.getElementById('replace-results').textContent = replaced;
+  } else {
+    document.getElementById('replace-results').textContent = '';
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, function(tag) {
+    const charsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return charsToReplace[tag] || tag;
+  });
+}
+
+// Show a popup message at the bottom center
+function showCopyPopup() {
+  let popup = document.getElementById('copy-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'copy-popup';
+    document.body.appendChild(popup);
+  }
+  popup.textContent = 'Copied to clipboard';
+  popup.style.display = 'block';
+  popup.style.position = 'fixed';
+  popup.style.left = '50%';
+  popup.style.bottom = '40px';
+  popup.style.transform = 'translateX(-50%)';
+  popup.style.background = 'linear-gradient(90deg, #2196f3 0%, #43e97b 100%)';
+  popup.style.color = '#fff';
+  popup.style.padding = '14px 32px';
+  popup.style.borderRadius = '12px';
+  popup.style.fontSize = '1.13em';
+  popup.style.fontWeight = '600';
+  popup.style.boxShadow = '0 2px 12px rgba(52, 152, 219, 0.13)';
+  popup.style.zIndex = '9999';
+  popup.style.opacity = '1';
+  popup.style.transition = 'opacity 0.2s';
+  setTimeout(() => {
+    popup.style.opacity = '0';
+    setTimeout(() => { popup.style.display = 'none'; }, 250);
+  }, 1500);
+}
+
+// Copy/download functions
+function setupCopyFunctions() {
+  const copyFunctions = [
+    { id: 'copy-matches', resultId: 'match-results' },
+    { id: 'copy-replace', resultId: 'replace-results' }
+  ];
+  
+  copyFunctions.forEach(func => {
+    document.getElementById(func.id)?.addEventListener('click', function() {
+      const el = document.createElement('textarea');
+      el.value = document.getElementById(func.resultId).innerText;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showCopyPopup();
+    });
+  });
+  
+  const downloadFunctions = [
+    { id: 'download-matches', resultId: 'match-results', filename: 'regex-matches.txt' },
+    { id: 'download-replace', resultId: 'replace-results', filename: 'regex-replaced.txt' }
+  ];
+  
+  downloadFunctions.forEach(func => {
+    document.getElementById(func.id)?.addEventListener('click', function() {
+      const blob = new Blob([document.getElementById(func.resultId).innerText], {type: 'text/plain'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = func.filename;
+      link.click();
+    });
+  });
+}
+
+// Auto-Generate Regex from Example
+document.getElementById('generate-regex-btn')?.addEventListener('click', function() {
+  const val = document.getElementById('example-input').value.trim();
+  let regex = '';
+  let desc = '';
+  
+  function smartRegexFromExample(str) {
+    let out = '';
+    let i = 0;
+    while (i < str.length) {
+      let c = str[i];
+      let j = i;
+      if (/\d/.test(c)) {
+        while (j < str.length && /\d/.test(str[j])) j++;
+        out += `\\d{${j-i}}`;
+      } else if (/[a-z]/.test(c)) {
+        while (j < str.length && /[a-z]/.test(str[j])) j++;
+        out += `[a-z]{${j-i}}`;
+      } else if (/[A-Z]/.test(c)) {
+        while (j < str.length && /[A-Z]/.test(str[j])) j++;
+        out += `[A-Z]{${j-i}}`;
+      } else {
+        let special = '';
+        while (j < str.length && !/[a-zA-Z0-9]/.test(str[j])) {
+          special += str[j];
+          j++;
+        }
+        out += special.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      i = j;
+    }
+    return out;
+  }
+  
+  if (/^\d+$/.test(val)) {
+    regex = `\\d{${val.length}}`;
+    desc = 'Digits only';
+  } else if (/^[a-zA-Z]+$/.test(val)) {
+    regex = `[a-zA-Z]{${val.length}}`;
+    desc = 'Alphabets only';
+  } else if (/^[a-zA-Z0-9]+$/.test(val)) {
+    regex = `[a-zA-Z0-9]{${val.length}}`;
+    desc = 'Alphanumeric';
+  } else if (/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(val)) {
+    regex = `[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}`;
+    desc = 'Email address';
+  } else if (/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/\S*)?$/.test(val)) {
+    regex = `https?:\\/\\/[\\w.-]+(?:\\.[\\w\\.-]+)[/#?]?.*`;
+    desc = 'URL';
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    regex = `\\d{4}-\\d{2}-\\d{2}`;
+    desc = 'Date (YYYY-MM-DD)';
+  } else if (val.length > 0) {
+    regex = smartRegexFromExample(val);
+    desc = 'Pattern by character type';
+  } else {
+    regex = '';
+    desc = '';
+  }
+  
+  const outputDiv = document.getElementById('generated-regex-output');
+  outputDiv.textContent = regex ? `Generated: ${regex} (${desc})` : '';
+  outputDiv.style.display = regex ? 'block' : 'none';
+});
+
+// Initialize
+setupEventListeners();
+setupCopyFunctions();
+triggerUpdate();
+</script>

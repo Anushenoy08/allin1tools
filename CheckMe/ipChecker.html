@@ -1,0 +1,74 @@
+---
+layout: default
+title: Best Online IP Checker for FREE
+permalink: /CheckMe/ipChecker.html
+---
+<div class="navbar">
+    <img src="../images/logo.png" alt="Logo">
+    <a href="../index.html">HOME</a>
+    <a href="/article/">ARTICLES</a>
+</div>
+<div class="json-formatter-container">
+    <div class="json-title">WHAT'S MY IP?</div>
+    <div class="ip-box">
+        <div class="ip-item">
+            <div class="ip-label">IPv4 Address</div>
+            <div class="ip-value" id="ipv4">Loading...</div>
+            <button class="copy-btn" onclick="copyIPv4()">Copy IPv4</button>
+        </div>
+        <div class="ip-item">
+            <div class="ip-label">IPv6 Address</div>
+            <div class="ip-value" id="ipv6">Loading...</div>
+            <button class="copy-btn" onclick="copyIPv6()">Copy IPv6</button>
+        </div>
+        <div class="popup" id="ipPopup">Copied!</div>
+    </div>
+</div>
+<script>
+    function showPopup(msg) {
+        const popup = document.getElementById('ipPopup');
+        popup.textContent = msg;
+        popup.style.display = 'block';
+        setTimeout(() => { popup.style.display = 'none'; }, 1200);
+    }
+    
+    function copyIPv4() {
+        const ipv4 = document.getElementById('ipv4').textContent;
+        if (ipv4 && ipv4 !== 'Loading...' && ipv4 !== 'Error loading IPv4') {
+            navigator.clipboard.writeText(ipv4).then(() => {
+                showPopup('IPv4 Copied!');
+            });
+        }
+    }
+    
+    function copyIPv6() {
+        const ipv6 = document.getElementById('ipv6').textContent;
+        if (ipv6 && ipv6 !== 'Loading...' && ipv6 !== 'Error loading IPv6') {
+            navigator.clipboard.writeText(ipv6).then(() => {
+                showPopup('IPv6 Copied!');
+            });
+        }
+    }
+    
+    // Fetch IPv4
+    fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('ipv4').textContent = data.ip;
+        })
+        .catch(error => {
+            document.getElementById('ipv4').textContent = 'Error loading IPv4';
+            console.error('Error fetching IPv4:', error);
+        });
+    
+    // Fetch IPv6
+    fetch('https://api64.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('ipv6').textContent = data.ip;
+        })
+        .catch(error => {
+            document.getElementById('ipv6').textContent = 'Error loading IPv6';
+            console.error('Error fetching IPv6:', error);
+        });
+</script>

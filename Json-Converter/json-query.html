@@ -1,0 +1,321 @@
+---
+layout: default
+title: Best Online JSON to Query Converter for FREE
+permalink: /Json-Converter/json-query.html
+---
+
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
+  <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+  <div class="json-converter-title">JSON to URL Query Converter</div>
+  
+  <div class="json-converter-layout">
+    <!-- Left side: Input -->
+    <div class="json-converter-left">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Input</span>
+          <div class="toolbar-options">
+            <label class="upload-option">
+              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
+              <span class="upload-icon">📁</span>
+            </label>
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearInput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Object or Array Example: {"name":"John","age":30,"city":"New York"}'></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Center: Buttons and Dropdown -->
+    <div class="json-converter-center">
+      <div class="action-btns">
+        <button onclick="convertToQuery()">Convert to Query</button>
+        <button onclick="copyOutput()">Copy Query</button>
+        <button onclick="downloadOutput()">Download Query</button>
+      </div>
+      
+      <!-- Query Parameter Style Dropdown -->
+      <div style="margin-top: 20px; text-align: center;">
+        <label for="queryStyleSelect" style="font-weight: 500; color: #1565c0; margin-bottom: 8px; display: block;">Query Parameter Style</label>
+        <select id="queryStyleSelect" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #b2ebf2; font-size: 1.08em; width: 100%; max-width: 250px;">
+          <option value="simple">Simple Key-Value Pairs</option>
+          <option value="array_repeat">Array Parameters: Repeated Keys</option>
+          <option value="array_bracket">Array Parameters: Bracket Notation</option>
+          <option value="nested_bracket">Nested: Bracket Notation</option>
+          <option value="nested_flat">Nested: Flattened Underscore</option>
+          <option value="json_string">Encoded JSON as String</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Right side: Output -->
+    <div class="json-converter-right">
+      <div class="json-converter-box">
+        <div class="toolbar">
+          <span class="toolbar-label">Output</span>
+          <div class="toolbar-options">
+            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+              <span class="fullscreen-icon">⛶</span>
+            </button>
+            <button class="clear-option" title="Clear" onclick="clearOutput()">
+              <span class="clear-icon">🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-area-wrapper">
+          <textarea class="json-textarea" id="queryOutput" placeholder="Query string will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function convertToQuery() {
+  const input = document.getElementById('jsonInput').value.trim();
+  const output = document.getElementById('queryOutput');
+  const styleSelect = document.getElementById('queryStyleSelect');
+  const style = styleSelect ? styleSelect.value : 'simple';
+  output.value = '';
+  try {
+    const obj = JSON.parse(input);
+    let query = '';
+    if (style === 'json_string') {
+      query = 'data=' + encodeURIComponent(JSON.stringify(obj));
+    } else if (style === 'nested_bracket') {
+      query = jsonToQueryBracket(obj);
+    } else if (style === 'nested_flat') {
+      query = jsonToQueryFlat(obj);
+    } else if (style === 'array_bracket') {
+      query = jsonToQueryArray(obj, true);
+    } else if (style === 'array_repeat') {
+      query = jsonToQueryArray(obj, false);
+    } else {
+      query = jsonToQuerySimple(obj);
+    }
+    output.value = query;
+  } catch (e) {
+    alert('Invalid JSON format.');
+  }
+}
+
+// Simple Key-Value (no nesting, no arrays)
+function jsonToQuerySimple(obj) {
+  const str = [];
+  for (let k in obj) {
+    if (!obj.hasOwnProperty(k)) continue;
+    let v = obj[k];
+    if (typeof v === 'object' && v !== null) v = JSON.stringify(v);
+    str.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+  }
+  return str.join('&');
+}
+
+// Array Parameters: Repeated Keys or Bracket Notation
+function jsonToQueryArray(obj, useBracket) {
+  const str = [];
+  function build(key, value) {
+    if (Array.isArray(value)) {
+      value.forEach(v => build(key, v));
+    } else if (typeof value === 'object' && value !== null) {
+      for (let k in value) {
+        if (value.hasOwnProperty(k)) build(key + (useBracket ? '[' + k + ']' : '.' + k), value[k]);
+      }
+    } else {
+      let param = useBracket ? key + '[]' : key;
+      str.push(encodeURIComponent(param) + '=' + encodeURIComponent(value));
+    }
+  }
+  for (let k in obj) {
+    if (!obj.hasOwnProperty(k)) continue;
+    build(k, obj[k]);
+  }
+  return str.join('&');
+}
+
+// Nested: Bracket Notation
+function jsonToQueryBracket(obj, prefix) {
+  const str = [];
+  for (let k in obj) {
+    if (!obj.hasOwnProperty(k)) continue;
+    let v = obj[k];
+    let key = prefix ? prefix + '[' + k + ']' : k;
+    if (typeof v === 'object' && v !== null) {
+      str.push(jsonToQueryBracket(v, key));
+    } else {
+      str.push(encodeURIComponent(key) + '=' + encodeURIComponent(v));
+    }
+  }
+  return str.join('&');
+}
+
+// Nested: Flattened Underscore
+function jsonToQueryFlat(obj, prefix) {
+  const str = [];
+  for (let k in obj) {
+    if (!obj.hasOwnProperty(k)) continue;
+    let v = obj[k];
+    let key = prefix ? prefix + '_' + k : k;
+    if (typeof v === 'object' && v !== null) {
+      str.push(jsonToQueryFlat(v, key));
+    } else {
+      str.push(encodeURIComponent(key) + '=' + encodeURIComponent(v));
+    }
+  }
+  return str.join('&');
+}
+
+function clearInput() {
+  document.getElementById('jsonInput').value = '';
+}
+
+function clearOutput() {
+  document.getElementById('queryOutput').value = '';
+}
+
+function uploadJSONFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('jsonInput').value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function toggleFullScreen(button) {
+  const box = button.closest('.json-converter-box');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function enterMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'queryOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  mobileTextarea.value = textarea ? textarea.value : '';
+  overlay.classList.add('active');
+  setTimeout(() => { mobileTextarea.focus(); }, 100);
+  mobileTextarea.addEventListener('input', function() {
+    if (textarea) textarea.value = this.value;
+  });
+}
+
+function exitMobileFullscreen(which) {
+  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
+  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'queryOutput');
+  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
+  if (textarea) textarea.value = mobileTextarea.value;
+  overlay.classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const inputOverlay = document.getElementById('mobileFullscreenInput');
+    const outputOverlay = document.getElementById('mobileFullscreenOutput');
+    if (inputOverlay && inputOverlay.classList.contains('active')) exitMobileFullscreen('input');
+    else if (outputOverlay && outputOverlay.classList.contains('active')) exitMobileFullscreen('output');
+  }
+});
+
+function exitFullScreen() {
+  console.log('Exit fullscreen called');
+  if (document.exitFullscreen) {
+    document.exitFullscreen().then(() => {
+      console.log('Fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Exit fullscreen error:', err);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen().then(() => {
+      console.log('Webkit fullscreen exited successfully');
+    }).catch(err => {
+      console.error('Webkit exit fullscreen error:', err);
+    });
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen().then(() => {
+      console.log('MS fullscreen exited successfully');
+    }).catch(err => {
+      console.error('MS exit fullscreen error:', err);
+    });
+  }
+}
+
+function copyOutput() {
+  const output = document.getElementById('queryOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to Query first.');
+    return;
+  }
+  navigator.clipboard.writeText(output).then(() => {
+    alert('Query string copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+    alert('Failed to copy to clipboard. Please try again.');
+  });
+}
+
+function downloadOutput() {
+  const output = document.getElementById('queryOutput').value;
+  if (!output || output.trim() === '') {
+    alert('Please convert JSON to Query first.');
+    return;
+  }
+  const blob = new Blob([output], { type: 'text/plain;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'query.txt');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>
+
+<!-- Mobile Fullscreen Overlays -->
+<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
+  </div>
+</div>
+<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
+  <div class="mobile-fullscreen-header">
+    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
+    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
+  </div>
+  <div class="mobile-fullscreen-content">
+    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" placeholder="Query string will appear here..." readonly></textarea>
+  </div>
+</div>

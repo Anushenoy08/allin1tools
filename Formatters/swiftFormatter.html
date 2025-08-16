@@ -1,0 +1,329 @@
+---
+layout: default
+title: Best Online Swift Formatter for FREE
+permalink: /Formatters/swiftFormatter.html
+---
+
+<div class="navbar">
+    <img src="../images/logo.png" alt="Logo">
+    <a href="../index.html">HOME</a>
+    <a href="/article/">ARTICLES</a>
+</div>
+
+<div class="json-converter-container">
+    <div class="json-converter-title">SWIFT FORMATTER</div>
+        
+        <div class="buttons-section">
+            <button onclick="formatSwift()">Format</button>
+            <button onclick="beautifySwift()">Beautify</button>
+            <button onclick="validateSwift()">Validate</button>
+            <button onclick="copySwift()">Copy Swift</button>
+            <button onclick="downloadSwift()">Download Swift</button>
+        </div>
+        
+        <div class="json-converter-layout">
+            <!-- Left side: Input -->
+            <div class="json-converter-left">
+                <div class="json-converter-box">
+                    <div class="toolbar">
+                        <span class="toolbar-label">Input</span>
+                        <div class="toolbar-options">
+                                                    <label class="upload-option">
+                            <input type="file" accept=".swift,.txt" onchange="uploadSwiftFile(event)">
+                            <span class="upload-icon">📁</span>
+                        </label>
+                            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+                                <span class="fullscreen-icon">⛶</span>
+                            </button>
+                            <button class="clear-option" title="Clear" onclick="clearSwift('input')">
+                                <span class="clear-icon">🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-area-wrapper">
+                        <textarea class="json-textarea" id="swiftInput" placeholder="Paste or type your Swift code here..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side: Output -->
+            <div class="json-converter-right">
+                <div class="json-converter-box">
+                    <div class="toolbar">
+                        <span class="toolbar-label">Output</span>
+                        <div class="toolbar-options">
+                            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
+                                <span class="fullscreen-icon">⛶</span>
+                            </button>
+                            <button class="clear-option" title="Clear" onclick="clearSwift('output')">
+                                <span class="clear-icon">🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-area-wrapper">
+                        <textarea class="json-textarea" id="swiftOutput" placeholder="Formatted/Beautified Swift will appear here..." readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="popupMsg" class="popup" style="display:none;"><span id="popupText"></span><button class="close-btn" onclick="closePopup()">✕</button></div>
+
+
+
+<script>
+    function showError(msg) {
+        const errorDiv = document.getElementById('errorMsg');
+        errorDiv.innerText = msg;
+        errorDiv.style.display = 'block';
+    }
+    function clearError() {
+        const errorDiv = document.getElementById('errorMsg');
+        errorDiv.innerText = '';
+        errorDiv.style.display = 'none';
+    }
+    function showPopup(msg) {
+        const popup = document.getElementById('popupMsg');
+        document.getElementById('popupText').innerText = msg;
+        popup.style.display = 'flex';
+    }
+    function closePopup() {
+        document.getElementById('popupMsg').style.display = 'none';
+    }
+    function updateInputLineNumbers() {
+        const textarea = document.getElementById('swiftInput');
+        const lineNumbers = document.getElementById('inputLineNumbers');
+        const lines = textarea.value.split('\n').length || 1;
+        let html = '';
+        for (let i = 1; i <= lines; i++) html += i + '<br>';
+        lineNumbers.innerHTML = html;
+    }
+    function updateOutputLineNumbers() {
+        const textarea = document.getElementById('swiftOutput');
+        const lineNumbers = document.getElementById('outputLineNumbers');
+        const lines = textarea.value.split('\n').length || 1;
+        let html = '';
+        for (let i = 1; i <= lines; i++) html += i + '<br>';
+        lineNumbers.innerHTML = html;
+    }
+    function syncScroll(which) {
+        if (which === 'input') {
+            const textarea = document.getElementById('swiftInput');
+            const lineNumbers = document.getElementById('inputLineNumbers');
+            lineNumbers.scrollTop = textarea.scrollTop;
+        } else {
+            const textarea = document.getElementById('swiftOutput');
+            const lineNumbers = document.getElementById('outputLineNumbers');
+            lineNumbers.scrollTop = textarea.scrollTop;
+        }
+    }
+    function formatSwift() {
+        clearError();
+        const input = document.getElementById('swiftInput').value;
+        try {
+            // Simple Swift formatting
+            const formatted = input
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .join('\n');
+            document.getElementById('swiftOutput').value = formatted;
+            updateOutputLineNumbers();
+        } catch (e) {
+            showError('Error formatting Swift: ' + e.message);
+            document.getElementById('swiftOutput').value = '';
+            updateOutputLineNumbers();
+        }
+    }
+    function validateSwift() {
+        clearError();
+        const input = document.getElementById('swiftInput').value;
+        try {
+            // Basic Swift syntax validation
+            const lines = input.split('\n');
+            let isValid = true;
+            let errorMsg = '';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line && !line.startsWith('//') && !line.startsWith('/*') && !line.startsWith('*')) {
+                    // Basic validation - check for common syntax errors
+                    if (line.includes('func ') && !line.includes('{')) {
+                        isValid = false;
+                        errorMsg = `Line ${i + 1}: Missing opening brace for function`;
+                        break;
+                    }
+                    if (line.includes('if ') && !line.includes('{')) {
+                        isValid = false;
+                        errorMsg = `Line ${i + 1}: Missing opening brace for if statement`;
+                        break;
+                    }
+                    if (line.includes('for ') && !line.includes('{')) {
+                        isValid = false;
+                        errorMsg = `Line ${i + 1}: Missing opening brace for for loop`;
+                        break;
+                    }
+                }
+            }
+            
+            if (isValid) {
+                showPopup('Valid Swift syntax');
+            } else {
+                showError(errorMsg);
+            }
+        } catch (e) {
+            showError('Invalid Swift syntax');
+        }
+    }
+    function beautifySwift() {
+        clearError();
+        const input = document.getElementById('swiftInput').value;
+        try {
+            // Simple Swift beautification
+            const beautified = input
+                .split('\n')
+                .map(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith('func ') || trimmed.startsWith('class ') || trimmed.startsWith('struct ') || 
+                        trimmed.startsWith('enum ') || trimmed.startsWith('protocol ') || trimmed.startsWith('extension ') ||
+                        trimmed.startsWith('if ') || trimmed.startsWith('else if ') || trimmed.startsWith('else') || 
+                        trimmed.startsWith('for ') || trimmed.startsWith('while ') || trimmed.startsWith('repeat') ||
+                        trimmed.startsWith('switch ') || trimmed.startsWith('case ') || trimmed.startsWith('default') ||
+                        trimmed.startsWith('guard ') || trimmed.startsWith('defer ') || trimmed.startsWith('do ')) {
+                        return '    ' + trimmed;
+                    }
+                    return '        ' + trimmed;
+                })
+                .join('\n');
+            document.getElementById('swiftOutput').value = beautified;
+            updateOutputLineNumbers();
+        } catch (e) {
+            showError('Error beautifying Swift: ' + e.message);
+            document.getElementById('swiftOutput').value = '';
+            updateOutputLineNumbers();
+        }
+    }
+
+    function copySwift() {
+        const output = document.getElementById('swiftOutput').value;
+        if (!output) return;
+        navigator.clipboard.writeText(output);
+        showPopup('Copied to clipboard!');
+    }
+    function downloadSwift() {
+        const output = document.getElementById('swiftOutput').value;
+        if (!output) return;
+        const blob = new Blob([output], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'formatted.swift';
+        link.click();
+    }
+
+    function uploadSwiftFile(which, event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const text = e.target.result;
+                if (which === 'input') {
+                    document.getElementById('swiftInput').value = text;
+                    updateInputLineNumbers();
+                } else {
+                    document.getElementById('swiftOutput').value = text;
+                    updateOutputLineNumbers();
+                }
+            } catch (error) {
+                showError('Error reading file: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function clearSwift(which) {
+        if (which === 'input') {
+            document.getElementById('swiftInput').value = '';
+            updateInputLineNumbers();
+        } else {
+            document.getElementById('swiftOutput').value = '';
+            updateOutputLineNumbers();
+        }
+        clearError();
+    }
+
+    function toggleFullScreen(button) {
+        // Find the parent json-converter-box element
+        let box = button.closest('.json-converter-box');
+        
+        // Fallback: if closest() doesn't work, traverse up manually
+        if (!box) {
+            let parent = button.parentElement;
+            while (parent && !parent.classList.contains('json-converter-box')) {
+                parent = parent.parentElement;
+            }
+            box = parent;
+        }
+        
+        // If still no box found, try to find by looking for the textarea parent
+        if (!box) {
+            const textarea = button.closest('.toolbar-options').nextElementSibling;
+            if (textarea && textarea.classList.contains('code-area-wrapper')) {
+                box = textarea.parentElement;
+            }
+        }
+        
+        // Final fallback: if no box found, show error and return
+        if (!box) {
+            console.error('Could not find json-converter-box element');
+            alert('Fullscreen not available on this device');
+            return;
+        }
+        
+        // Check if already in fullscreen
+        if (document.fullscreenElement || 
+            document.webkitFullscreenElement || 
+            document.mozFullScreenElement || 
+            document.msFullscreenElement) {
+            
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        } else {
+            // Enter fullscreen
+            if (box.requestFullscreen) {
+                box.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            } else if (box.webkitRequestFullscreen) {
+                box.webkitRequestFullscreen().catch(err => {
+                    console.log('Error attempting to enable webkit fullscreen:', err);
+                });
+            } else if (box.mozRequestFullScreen) {
+                box.mozRequestFullScreen().catch(err => {
+                    console.log('Error attempting to enable moz fullscreen:', err);
+                });
+            } else if (box.msRequestFullscreen) {
+                box.msRequestFullscreen().catch(err => {
+                    console.log('Error attempting to enable ms fullscreen:', err);
+                });
+            } else {
+                // If no fullscreen API is available, show message
+                alert('Fullscreen not supported on this device');
+            }
+        }
+    }
+
+    // Initialize line numbers
+    updateInputLineNumbers();
+    updateOutputLineNumbers();
+</script>
