@@ -459,7 +459,7 @@
                 <!-- Test String -->
                 <div class="form-group">
                     <label for="testString">Test String</label>
-                    <textarea id="testString" placeholder="Enter text to test against your regex pattern"></textarea>
+                    <textarea id="testString" placeholder="Try: test@email.com, 2023-12-25, +1-555-123-4567, https://example.com"></textarea>
                 </div>
                 
                 <!-- Replacement -->
@@ -511,24 +511,106 @@
                 return;
             }
             
-            // Simple regex generation logic (you can enhance this)
+            // Enhanced regex generation logic
             let generatedPattern = '';
             
+            // Email pattern detection
             if (sampleValue.includes('@') && sampleValue.includes('.')) {
-                // Email pattern
-                generatedPattern = '^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$';
-            } else if (/^\d{4}-\d{2}-\d{2}$/.test(sampleValue)) {
-                // Date pattern
-                generatedPattern = '^\\d{4}-\\d{2}-\\d{2}$';
-            } else if (/^\d{10}$/.test(sampleValue)) {
-                // 10-digit number
-                generatedPattern = '^\\d{10}$';
-            } else if (sampleValue.startsWith('http')) {
-                // URL pattern
+                const parts = sampleValue.split('@');
+                const domainParts = parts[1].split('.');
+                
+                if (parts[0].length > 0 && domainParts.length >= 2) {
+                    generatedPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+                }
+            }
+            // Date pattern detection (YYYY-MM-DD)
+            else if (/^\d{4}-\d{2}-\d{2}$/.test(sampleValue)) {
+                generatedPattern = '^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$';
+            }
+            // Date pattern detection (MM/DD/YYYY)
+            else if (/^\d{2}\/\d{2}\/\d{4}$/.test(sampleValue)) {
+                generatedPattern = '^(0[1-9]|1[0-2])\\/(0[1-9]|[12]\\d|3[01])\\/\\d{4}$';
+            }
+            // Phone number pattern detection
+            else if (/^[\d\s\-\(\)\+]+$/.test(sampleValue) && sampleValue.replace(/\D/g, '').length >= 10) {
+                generatedPattern = '^[+]?[\\d\\s\\-\\(\\)]{10,}$';
+            }
+            // URL pattern detection
+            else if (sampleValue.startsWith('http') || sampleValue.includes('.') && sampleValue.includes('/')) {
                 generatedPattern = '^(https?:\\/\\/)?([\\w-]+\\.)+[\\w-]+(\\/\\S*)?$';
-            } else {
-                // Generic pattern
-                generatedPattern = sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+            // Credit card pattern detection
+            else if (/^\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}$/.test(sampleValue.replace(/\s/g, ''))) {
+                generatedPattern = '^\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}$';
+            }
+            // ZIP code pattern detection (US format)
+            else if (/^\d{5}(-\d{4})?$/.test(sampleValue)) {
+                generatedPattern = '^\\d{5}(-\\d{4})?$';
+            }
+            // Social Security Number pattern
+            else if (/^\d{3}-\d{2}-\d{4}$/.test(sampleValue)) {
+                generatedPattern = '^\\d{3}-\\d{2}-\\d{4}$';
+            }
+            // IP Address pattern
+            else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(sampleValue)) {
+                generatedPattern = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
+            }
+            // Hex color pattern
+            else if (/^#[0-9A-Fa-f]{6}$/.test(sampleValue)) {
+                generatedPattern = '^#[0-9A-Fa-f]{6}$';
+            }
+            // Hex color without # pattern
+            else if (/^[0-9A-Fa-f]{6}$/.test(sampleValue)) {
+                generatedPattern = '^[0-9A-Fa-f]{6}$';
+            }
+            // Time pattern (HH:MM or HH:MM:SS)
+            else if (/^\d{2}:\d{2}(:\d{2})?$/.test(sampleValue)) {
+                generatedPattern = '^([01]\\d|2[0-3]):([0-5]\\d)(:([0-5]\\d))?$';
+            }
+            // Currency pattern
+            else if (/^\$[\d,]+(\.\d{2})?$/.test(sampleValue)) {
+                generatedPattern = '^\\$[\\d,]+(\\.\\d{2})?$';
+            }
+            // Alphanumeric with specific length
+            else if (/^[a-zA-Z0-9]+$/.test(sampleValue)) {
+                const length = sampleValue.length;
+                if (length <= 10) {
+                    generatedPattern = `^[a-zA-Z0-9]{${length}}$`;
+                } else {
+                    generatedPattern = '^[a-zA-Z0-9]{8,}$';
+                }
+            }
+            // Alphabetic only
+            else if (/^[a-zA-Z\s]+$/.test(sampleValue)) {
+                generatedPattern = '^[a-zA-Z\\s]+$';
+            }
+            // Numeric only
+            else if (/^\d+$/.test(sampleValue)) {
+                const length = sampleValue.length;
+                if (length <= 10) {
+                    generatedPattern = `^\\d{${length}}$`;
+                } else {
+                    generatedPattern = '^\\d+$';
+                }
+            }
+            // Generic pattern with escaped special characters
+            else {
+                // Escape special regex characters and create a flexible pattern
+                const escaped = sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                
+                // Make it more flexible by allowing variations
+                if (sampleValue.length > 3) {
+                    // For longer strings, make it more flexible
+                    generatedPattern = escaped.replace(/\\s+/g, '\\s+'); // Allow flexible whitespace
+                } else {
+                    // For short strings, keep exact match
+                    generatedPattern = `^${escaped}$`;
+                }
+            }
+            
+            // If no pattern was generated, create a basic one
+            if (!generatedPattern) {
+                generatedPattern = `^${sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`;
             }
             
             document.getElementById('generatedRegex').value = generatedPattern;
@@ -536,6 +618,11 @@
             
             // Auto-fill the regex pattern in tester
             document.getElementById('regexPattern').value = generatedPattern;
+            
+            // Auto-test if there's a test string
+            if (document.getElementById('testString').value.trim()) {
+                testRegex();
+            }
         }
         
         // Copy generated regex
