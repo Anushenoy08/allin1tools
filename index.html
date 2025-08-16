@@ -1,14 +1,185 @@
----
+<!-- ---
 layout: default
 title: All-in-One Online Tools | JSON, UUID, Converters & More
 permalink: /
----
+--- -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One Online Tools | JSON, UUID, Converters & More</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Welcome title styling */
+        .welcome-title {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-title h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Section container */
+        .section-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Section cards */
+        .section-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            border-radius: 20px;
+            z-index: -1;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Card headings */
+        .section-card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        /* Card descriptions */
+        .section-card p {
+            color: #ad1457;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+        
+        /* Tool lists */
+        .section-card ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        
+        .section-card li {
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .section-card li:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(8px);
+        }
+        
+        /* Tool links */
+        .tool-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-link:hover {
+            color: #667eea;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(4px);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .welcome-title h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-container {
+                grid-template-columns: 1fr;
+                padding: 0 1rem 2rem;
+                gap: 1.5rem;
+            }
+            
+            .section-card {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .welcome-title h1 {
+                font-size: 2rem;
+            }
+            
+            .section-card {
+                padding: 1rem;
+            }
+            
+            .section-card h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
 
 <!-- TOOLBAR: remains as per your working common.css -->
 <div class="navbar">
-  <img src="/images/logo.png" alt="Logo">
-  <a href="/index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
+  <img src="images/logo.png" alt="Logo">
+  <a href="index.html">HOME</a>
+  <a href="article.html">ARTICLES</a>
 </div>
 
 <!-- WELCOME TITLE -->
@@ -22,11 +193,11 @@ permalink: /
     <h2 style="color: #2196f3;">Generators</h2>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/Generators/uuid.html" class="tool-link">➤ Free UUID v4 Generator</a></li>
-        <li><a href="/Generators/qrcode.html" class="tool-link">➤ QR code Generator</a></li>
-        <li><a href="/Generators/regex.html" class="tool-link">➤ Regex Generator</a></li>
-        <li><a href="/Generators/cronjob.html" class="tool-link">➤ Cron Job Generator</a></li>
-        <li><a href="/Generators/sha.html" class="tool-link">➤ SHA Generator</a></li>
+        <li><a href="Generators/uuid.html" class="tool-link">➤ Free UUID v4 Generator</a></li>
+        <li><a href="Generators/qrcode.html" class="tool-link">➤ QR code Generator</a></li>
+        <li><a href="Generators/regex.html" class="tool-link">➤ Regex Generator</a></li>
+        <li><a href="Generators/cronjob.html" class="tool-link">➤ Cron Job Generator</a></li>
+        <li><a href="Generators/sha.html" class="tool-link">➤ SHA Generator</a></li>
       </ul>
     </div>
   </div>
@@ -35,8 +206,8 @@ permalink: /
     <h2 style="color: #382392;">File Conversions</h2>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/File-Converter/doc-conversion.html" class="tool-link">➤ Document Converter</a></li>
-        <li><a href="/File-Converter/doc-formatter.html" class="tool-link">➤ Document Formatter</a></li>
+        <li><a href="File-Converter/doc-conversion.html" class="tool-link">➤ Document Converter</a></li>
+        <li><a href="File-Converter/doc-formatter.html" class="tool-link">➤ Document Formatter</a></li>
       </ul>
     </div>
   </div>
@@ -45,7 +216,7 @@ permalink: /
     <h2 style="color: #43e97b;">Text Utilities</h2>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/wcc.html" class="tool-link">➤ Word & Character Counter</a></li>
+        <li><a href="wcc.html" class="tool-link">➤ Word & Character Counter</a></li>
       </ul>
     </div>
   </div>
@@ -54,13 +225,13 @@ permalink: /
     <h2 style="color: #00bcd4;">Formatters</h2>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/Formatters/jsonFormatter.html" class="tool-link">➤ JSON Formatter</a></li>
-        <li><a href="/Formatters/perlFormatter.html" class="tool-link">➤ Perl Formatter</a></li>
-        <li><a href="/Formatters/phpFormatter.html" class="tool-link">➤ PHP Formatter</a></li>
-        <li><a href="/Formatters/rubyFormatter.html" class="tool-link">➤ Ruby Formatter</a></li>
-        <li><a href="/Formatters/kotlinFormatter.html" class="tool-link">➤ Kotlin Formatter</a></li>
-        <li><a href="/Formatters/pythonFormatter.html" class="tool-link">➤ Python Formatter</a></li>
-        <li><a href="/Formatters/swiftFormatter.html" class="tool-link">➤ Swift Formatter</a></li>
+        <li><a href="Formatters/jsonFormatter.html" class="tool-link">➤ JSON Formatter</a></li>
+        <li><a href="Formatters/perlFormatter.html" class="tool-link">➤ Perl Formatter</a></li>
+        <li><a href="Formatters/phpFormatter.html" class="tool-link">➤ PHP Formatter</a></li>
+        <li><a href="Formatters/rubyFormatter.html" class="tool-link">➤ Ruby Formatter</a></li>
+        <li><a href="Formatters/kotlinFormatter.html" class="tool-link">➤ Kotlin Formatter</a></li>
+        <li><a href="Formatters/pythonFormatter.html" class="tool-link">➤ Python Formatter</a></li>
+        <li><a href="Formatters/swiftFormatter.html" class="tool-link">➤ Swift Formatter</a></li>
       </ul>
     </div>
   </div>
@@ -69,8 +240,8 @@ permalink: /
     <h2 style="color: #00bcd4;">URL Formatter</h2>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/URL-Fomratter/url-encoder.html" class="tool-link">➤ URL Encoder </a></li>
-        <li><a href="/URL-Fomratter/url-shortner.html" class="tool-link">➤ URL Shortner </a></li>
+        <li><a href="URL-Fomratter/url-encoder.html" class="tool-link">➤ URL Encoder </a></li>
+        <li><a href="URL-Fomratter/url-shortner.html" class="tool-link">➤ URL Shortner </a></li>
       </ul>
     </div>
   </div>
@@ -79,8 +250,8 @@ permalink: /
     <h2 style="color: #d659bb;">Check Me</h2>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/CheckMe/ipChecker.html" class="tool-link">➤ What's my IP? </a></li>
-        <li><a href="/CheckMe/passwordChecker.html" class="tool-link">➤ Check my Password </a></li>
+        <li><a href="CheckMe/ipChecker.html" class="tool-link">➤ What's my IP? </a></li>
+        <li><a href="CheckMe/passwordChecker.html" class="tool-link">➤ Check my Password </a></li>
       </ul>
     </div>
   </div>
@@ -90,18 +261,21 @@ permalink: /
     <p style="color: #ad1457;">Convert JSON to Various Formats</p>
     <div style="margin-top: 16px;">
       <ul>
-        <li><a href="/Json-Converter/json-csv.html" class="tool-link">➤ JSON to CSV</a></li>
-        <li><a href="/Json-Converter/json-xml.html" class="tool-link">➤ JSON to XML</a></li>
-        <li><a href="/Json-Converter/json-yaml.html" class="tool-link">➤ JSON to YAML</a></li>
-        <li><a href="/Json-Converter/json-excel.html" class="tool-link">➤ JSON to Excel</a></li>
-        <li><a href="/Json-Converter/json-html.html" class="tool-link">➤ JSON to HTML Table</a></li>
-        <li><a href="/Json-Converter/json-plaintxt.html" class="tool-link">➤ JSON to Plain Text</a></li>
-        <li><a href="/Json-Converter/json-tsv.html" class="tool-link">➤ JSON to TSV(Tab-separated Values)</a></li>
-        <li><a href="/Json-Converter/json-md.html" class="tool-link">➤ JSON to Markdown Table</a></li>
-        <li><a href="/Json-Converter/json-query.html" class="tool-link">➤ JSON to URL Query Params</a></li>
-        <li><a href="/Json-Converter/json-sql.html" class="tool-link">➤ JSON to SQL Insert Statements</a></li>
-        <li><a href="/Json-Converter/json-properties.html" class="tool-link">➤ JSON to Properties File(For Java .properties files) </a></li>
+        <li><a href="Json-Converter/json-csv.html" class="tool-link">➤ JSON to CSV</a></li>
+        <li><a href="Json-Converter/json-xml.html" class="tool-link">➤ JSON to XML</a></li>
+        <li><a href="Json-Converter/json-yaml.html" class="tool-link">➤ JSON to YAML</a></li>
+        <li><a href="Json-Converter/json-excel.html" class="tool-link">➤ JSON to Excel</a></li>
+        <li><a href="Json-Converter/json-html.html" class="tool-link">➤ JSON to HTML Table</a></li>
+        <li><a href="Json-Converter/json-plaintxt.html" class="tool-link">➤ JSON to Plain Text</a></li>
+        <li><a href="Json-Converter/json-tsv.html" class="tool-link">➤ JSON to TSV(Tab-separated Values)</a></li>
+        <li><a href="Json-Converter/json-md.html" class="tool-link">➤ JSON to Markdown Table</a></li>
+        <li><a href="Json-Converter/json-query.html" class="tool-link">➤ JSON to URL Query Params</a></li>
+        <li><a href="Json-Converter/json-sql.html" class="tool-link">➤ JSON to SQL Insert Statements</a></li>
+        <li><a href="Json-Converter/json-properties.html" class="tool-link">➤ JSON to Properties File(For Java .properties files) </a></li>
       </ul>
     </div>
   </div>
 </div>
+
+</body>
+</html>
