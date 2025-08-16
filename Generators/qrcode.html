@@ -381,398 +381,248 @@
         
         <!-- Main Content Layout -->
         <div class="content-layout">
-            <!-- Left Panel -->
+            <!-- Left Panel - Input and Configuration -->
             <div class="left-panel">
-                <!-- Content Type Selection -->
-                <div class="content-types">
-                    <h3>QR code can be generated for the following :</h3>
-                    <div class="type-options">
-                        <div class="type-option active" data-type="website">
-                            <i class="fas fa-globe"></i>
-                            <span>Website</span>
-                        </div>
-                        <div class="type-option" data-type="text">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Text</span>
-                        </div>
-                        <div class="type-option" data-type="pdf">
-                            <i class="fas fa-file-pdf"></i>
-                            <span>PDF</span>
-                        </div>
-                        <div class="type-option" data-type="images">
-                            <i class="fas fa-image"></i>
-                            <span>Images</span>
-                        </div>
-                        <div class="type-option" data-type="video">
-                            <i class="fas fa-play"></i>
-                            <span>Video</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Info Box -->
-                    <div class="info-box">
-                        <i class="fas fa-info-circle"></i>
-                        <p>NOTE: For PDF, Image and Video files, upload the files to Google drive/ Dropbox/ etc. and use the sharing link</p>
+                <h2 class="section-heading">Regex Tester</h2>
+                <p class="section-subtitle">Test your regex patterns with real-time matching and replacement.</p>
+                
+                <!-- Presets -->
+                <div class="form-group">
+                    <label for="presets">Presets</label>
+                    <select id="presets" onchange="loadPreset()">
+                        <option value="">Select a preset...</option>
+                        <option value="date">Date (YYYY-MM-DD)</option>
+                        <option value="number">10-digit Number</option>
+                        <option value="email">Email Address</option>
+                        <option value="url">URL</option>
+                        <option value="phone">Phone Number</option>
+                        <option value="hex">Hex Color</option>
+                        <option value="css-hex">CSS Hex Color</option>
+                    </select>
+                </div>
+                
+                <!-- Quick Insert Buttons -->
+                <div class="quick-insert">
+                    <h4>Regex Pattern</h4>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="insertRegex('^')">^</button>
+                        <button class="quick-btn" onclick="insertRegex('$')">$</button>
+                        <button class="quick-btn" onclick="insertRegex('.')">.</button>
+                        <button class="quick-btn" onclick="insertRegex('\\d')">\\d</button>
+                        <button class="quick-btn" onclick="insertRegex('\\w')">\\w</button>
+                        <button class="quick-btn" onclick="insertRegex('\\s')">\\s</button>
+                        <button class="quick-btn" onclick="insertRegex('[')">[</button>
+                        <button class="quick-btn" onclick="insertRegex(']')">]</button>
+                        <button class="quick-btn" onclick="insertRegex('(')">(</button>
+                        <button class="quick-btn" onclick="insertRegex(')')">)</button>
+                        <button class="quick-btn" onclick="insertRegex('|')">|</button>
+                        <button class="quick-btn" onclick="insertRegex('*')">*</button>
+                        <button class="quick-btn" onclick="insertRegex('+')">+</button>
+                        <button class="quick-btn" onclick="insertRegex('?')">?</button>
                     </div>
                 </div>
                 
-                <!-- Step 1: Complete the Content -->
-                <div class="step-section">
-                    <div class="step-number">1 Complete the content</div>
-                    <div class="step-content">
-                        <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)">
+                <!-- Enter Regex Pattern Input -->
+                <div class="form-group">
+                    <label for="regexPattern">Enter Regex Pattern</label>
+                    <input type="text" id="regexPattern" placeholder="Enter regex pattern..">
+                </div>
+                
+                <!-- Flags -->
+                <div class="flags-section">
+                    <h4>Flags</h4>
+                    <div class="flag-checkboxes">
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagG" value="g" checked>
+                            <label for="flagG">g (global)</label>
+                        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagI" value="i">
+                            <label for="flagI">i (case-insensitive)</label>
+                        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagM" value="m">
+                            <label for="flagM">m (multiline)</label>
+                        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagS" value="s">
+                            <label for="flagS">s (dotall)</label>
+                        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagU" value="u">
+                            <label for="flagU">u (unicode)</label>
+                        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagY" value="y">
+                            <label for="flagY">y (sticky)</label>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Step 2: Design Your QR -->
-                <div class="step-section">
-                    <div class="step-number">2 Design your QR</div>
-                    <div class="step-content">
-                        <h4>Logo</h4>
-                        <h4>Select a logo</h4>
-                        <div class="logo-options">
-                            <div class="logo-option" data-logo="whatsapp">
-                                <img src="../images/whatsapp.png" alt="WhatsApp">
-                            </div>
-                            <div class="logo-option" data-logo="instagram">
-                                <img src="../images/instagram.png" alt="Instagram">
-                            </div>
-                            <div class="logo-option" data-logo="facebook">
-                                <img src="../images/facebook.png" alt="Facebook">
-                            </div>
-                            <div class="logo-option" data-logo="twitter">
-                                <img src="../images/twitter.png" alt="Twitter">
-                            </div>
-                            <div class="logo-option" data-logo="link">
-                                <img src="../images/link.png" alt="Link">
-                            </div>
-                            <div class="logo-option" data-logo="location">
-                                <img src="../images/location.png" alt="Location">
-                            </div>
-                            <div class="logo-option" data-logo="wifi">
-                                <img src="../images/wifi.png" alt="WiFi">
-                            </div>
-                            <div class="logo-option" data-logo="email">
-                                <img src="../images/mail.png" alt="Email">
-                            </div>
-                            <div class="logo-option" data-logo="scanner">
-                                <img src="../images/scanner.png" alt="Scanner">
-                            </div>
-                        </div>
-                    </div>
+                <!-- Test String -->
+                <div class="form-group">
+                    <label for="testString">Test String</label>
+                    <textarea id="testString"></textarea>
                 </div>
             </div>
             
-            <!-- Right Panel -->
+            <!-- Right Panel - Results -->
             <div class="right-panel">
-                <!-- QR Code Preview -->
-                <div class="qr-preview" id="qrPreview">
-                    Generated QR code appears here
+                <h3 class="results-section">Results</h3>
+                
+                <!-- Match Results -->
+                <div class="result-box">
+                    <h4>Match Results</h4>
+                    <div id="matchResults">Enter a regex pattern.</div>
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyMatches()">Copy Matches</button>
+                        <button class="btn btn-secondary" onclick="downloadMatches()">Download Matches</button>
+                    </div>
                 </div>
                 
-                <!-- Generate Button -->
-                <button class="generate-btn" onclick="generateQRCode()">Generate QR Code</button>
-                
-                <!-- Download Button -->
-                <button class="download-btn" onclick="downloadQRCode()">Download QR</button>
+                <!-- Replacement Result -->
+                <div class="result-box">
+                    <h4>Replacement Result</h4>
+                    <div id="replacementResult">No results to display.</div>
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyReplaced()">Copy Replaced</button>
+                        <button class="btn btn-secondary" onclick="downloadReplaced()">Download Replaced</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Content type selection
-        document.querySelectorAll('.type-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Update placeholder based on selection
-                const type = this.dataset.type;
-                const input = document.getElementById('qrContent');
-                
-                switch(type) {
-                    case 'website':
-                        input.placeholder = 'Enter website URL (e.g., https://example.com)';
-                        break;
-                    case 'text':
-                        input.placeholder = 'Enter text content';
-                        break;
-                    case 'pdf':
-                        input.placeholder = 'Enter Google Drive/Dropbox PDF link';
-                        break;
-                    case 'images':
-                        input.placeholder = 'Enter Google Drive/Dropbox image link';
-                        break;
-                    case 'video':
-                        input.placeholder = 'Enter Google Drive/Dropbox video link';
-                        break;
-                }
-            });
-        });
-        
-        // Logo selection
-        document.querySelectorAll('.logo-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.logo-option').forEach(opt => opt.classList.remove('selected'));
-                this.classList.add('selected');
-                
-                // Visual feedback
-                console.log('Logo selected:', this.dataset.logo);
-                
-                // If QR code already exists, update it with new logo
-                const preview = document.getElementById('qrPreview');
-                const existingCanvas = preview.querySelector('canvas');
-                if (existingCanvas) {
-                    const selectedLogo = this.dataset.logo;
-                    addLogoToQR(existingCanvas, selectedLogo);
-                }
-            });
-        });
-        
-        // Generate QR Code
-        function generateQRCode() {
-            const content = document.getElementById('qrContent').value.trim();
-            const selectedType = document.querySelector('.type-option.active').dataset.type;
-            const selectedLogo = document.querySelector('.logo-option.selected')?.dataset.logo;
+        // Load preset patterns
+        function loadPreset() {
+            const preset = document.getElementById('presets').value;
+            const patterns = {
+                'date': '^\\d{4}-\\d{2}-\\d{2}$',
+                'number': '^\\d{10}$',
+                'email': '^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$',
+                'url': '^(https?:\\/\\/)?([\\w-]+\\.)+[\\w-]+(\\/\\S*)?$',
+                'phone': '^\\+?\\d{1,3}?[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$',
+                'hex': '^[0-9A-Fa-f]{6}$',
+                'css-hex': '^#[0-9A-Fa-f]{6}$'
+            };
             
-            console.log('Generating QR Code with:', { content, selectedType, selectedLogo });
+            if (patterns[preset]) {
+                document.getElementById('regexPattern').value = patterns[preset];
+                testRegex();
+            }
+        }
+        
+        // Insert regex element
+        function insertRegex(element) {
+            const pattern = document.getElementById('regexPattern');
+            const start = pattern.selectionStart;
+            const end = pattern.selectionEnd;
+            const text = pattern.value;
             
-            if (!content) {
-                alert('Please enter content first!');
+            pattern.value = text.substring(0, start) + element + text.substring(end);
+            pattern.focus();
+            pattern.setSelectionRange(start + element.length, start + element.length);
+            
+            // Auto-test when pattern changes
+            if (document.getElementById('testString').value.trim()) {
+                testRegex();
+            }
+        }
+        
+        // Test regex pattern
+        function testRegex() {
+            const pattern = document.getElementById('regexPattern').value.trim();
+            const testString = document.getElementById('testString').value.trim();
+            
+            if (!pattern) {
+                document.getElementById('matchResults').textContent = 'Enter a regex pattern.';
+                document.getElementById('replacementResult').textContent = 'No results to display.';
                 return;
             }
             
-            const preview = document.getElementById('qrPreview');
-            preview.innerHTML = '<div style="text-align: center; color: #999;">Generating QR Code...</div>';
+            if (!testString) {
+                document.getElementById('matchResults').textContent = 'Enter a test string.';
+                document.getElementById('replacementResult').textContent = 'No results to display.';
+                return;
+            }
             
-            // Check which QRCode library is available and use the appropriate method
-            if (typeof QRCode !== 'undefined') {
-                try {
-                    // Try the newer QRCode API first
-                    if (QRCode.toDataURL) {
-                        console.log('Using QRCode.toDataURL method');
-                        generateWithNewAPI(content, selectedLogo, preview);
-                    } else if (QRCode.toCanvas) {
-                        console.log('Using QRCode.toCanvas method');
-                        generateWithOldAPI(content, selectedLogo, preview);
-                    } else {
-                        console.log('Using QRCode constructor method');
-                        generateWithConstructor(content, selectedLogo, preview);
-                    }
-                } catch (error) {
-                    console.error('QRCode generation error:', error);
-                    preview.innerHTML = '<div style="text-align: center; color: #f44336;">Error generating QR code</div>';
+            try {
+                // Get selected flags
+                const flags = getSelectedFlags();
+                const regex = new RegExp(pattern, flags);
+                
+                // Test matches
+                const matches = testString.match(regex);
+                let matchResults = 'No matches found.';
+                
+                if (matches) {
+                    matchResults = `Found ${matches.length} match(es):\n`;
+                    matches.forEach((match, index) => {
+                        matchResults += `${index + 1}. "${match}"\n`;
+                    });
                 }
-            } else {
-                preview.innerHTML = '<div style="text-align: center; color: #f44336;">QRCode library not loaded</div>';
+                
+                document.getElementById('matchResults').textContent = matchResults;
+                
+                // Show replacement result (same as test string for now)
+                document.getElementById('replacementResult').textContent = testString;
+                
+            } catch (error) {
+                document.getElementById('matchResults').textContent = 'Invalid regex pattern: ' + error.message;
+                document.getElementById('replacementResult').textContent = 'No results to display.';
             }
         }
         
-        // Generate using newer QRCode API
-        function generateWithNewAPI(content, selectedLogo, preview) {
-            QRCode.toDataURL(content, {
-                width: 256,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            }, function(error, url) {
-                if (error) {
-                    preview.innerHTML = '<div style="text-align: center; color: #f44336;">Error generating QR code</div>';
-                    return;
-                }
-                processQRCodeImage(url, selectedLogo, preview);
+        // Get selected flags
+        function getSelectedFlags() {
+            const flags = [];
+            const flagElements = document.querySelectorAll('.flag-checkbox input:checked');
+            flagElements.forEach(flag => {
+                flags.push(flag.value);
             });
+            return flags.join('');
         }
         
-        // Generate using older QRCode API
-        function generateWithOldAPI(content, selectedLogo, preview) {
-            QRCode.toCanvas(preview, content, {
-                width: 256,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            }, function(error, canvas) {
-                if (error) {
-                    preview.innerHTML = '<div style="text-align: center; color: #f44336;">Error generating QR code</div>';
-                    return;
-                }
-                processQRCodeCanvas(canvas, selectedLogo, preview);
-            });
+        // Copy functions
+        function copyMatches() {
+            const matches = document.getElementById('matchResults').textContent;
+            navigator.clipboard.writeText(matches);
+            alert('Matches copied to clipboard!');
         }
         
-        // Generate using constructor approach
-        function generateWithConstructor(content, selectedLogo, preview) {
-            // Clear preview first
-            preview.innerHTML = '';
-            
-            // Create QR code using constructor
-            const qr = new QRCode(preview, {
-                text: content,
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#FFFFFF",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            // Wait for QR code to be generated, then add logo
-            setTimeout(() => {
-                const canvas = preview.querySelector('canvas');
-                if (canvas) {
-                    console.log('Canvas found, applying logo overlay');
-                    
-                    // Create a new canvas for the final result
-                    const finalCanvas = document.createElement('canvas');
-                    const ctx = finalCanvas.getContext('2d');
-                    finalCanvas.width = 256;
-                    finalCanvas.height = 256;
-                    
-                    // Draw the QR code to the new canvas
-                    ctx.drawImage(canvas, 0, 0);
-                    
-                    // Replace the original canvas with our new one
-                    preview.innerHTML = '';
-                    preview.appendChild(finalCanvas);
-                    
-                    // Add logo overlay if selected
-                    if (selectedLogo) {
-                        console.log('Adding logo:', selectedLogo);
-                        addLogoToQR(finalCanvas, selectedLogo);
-                    }
-                    
-                    // Show download button
-                    document.querySelector('.download-btn').style.display = 'block';
-                } else {
-                    console.error('Canvas not found after QR generation');
-                }
-            }, 300); // Increased timeout to ensure QR code is fully generated
+        function copyReplaced() {
+            const replaced = document.getElementById('replacementResult').textContent;
+            navigator.clipboard.writeText(replaced);
+            alert('Replacement result copied to clipboard!');
         }
         
-        // Process QR code image from data URL
-        function processQRCodeImage(url, selectedLogo, preview) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 256;
-                canvas.height = 256;
-                
-                // Draw the QR code
-                ctx.drawImage(img, 0, 0);
-                
-                // Add logo overlay if selected
-                if (selectedLogo) {
-                    addLogoToQR(canvas, selectedLogo);
-                }
-                
-                // Display the final QR code
-                preview.innerHTML = '';
-                preview.appendChild(canvas);
-                
-                // Show download button
-                document.querySelector('.download-btn').style.display = 'block';
-            };
-            
-            img.src = url;
+        // Download functions
+        function downloadMatches() {
+            const matches = document.getElementById('matchResults').textContent;
+            downloadText(matches, 'regex_matches.txt');
         }
         
-        // Process QR code canvas
-        function processQRCodeCanvas(canvas, selectedLogo, preview) {
-            if (selectedLogo) {
-                addLogoToQR(canvas, selectedLogo);
-            }
-            
-            // Show download button
-            document.querySelector('.download-btn').style.display = 'block';
+        function downloadReplaced() {
+            const replaced = document.getElementById('replacementResult').textContent;
+            downloadText(replaced, 'regex_replacement.txt');
         }
         
-        // Add logo overlay to QR code
-        function addLogoToQR(canvas, logoName) {
-            const ctx = canvas.getContext('2d');
-            const logoImg = new Image();
-            
-            logoImg.onload = function() {
-                // Calculate logo size and position (make logo more visible)
-                const logoSize = 56; // Increased from 48 to 56 for better visibility
-                const logoX = (canvas.width - logoSize) / 2;
-                const logoY = (canvas.height - logoSize) / 2;
-                
-                // Draw larger white background for logo (better contrast)
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(logoX - 6, logoY - 6, logoSize + 12, logoSize + 12);
-                
-                // Draw logo
-                ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-                
-                console.log('Logo added successfully:', logoName, 'at position:', logoX, logoY);
-                
-                // Force canvas update
-                canvas.style.display = 'none';
-                canvas.offsetHeight; // Trigger reflow
-                canvas.style.display = 'block';
-            };
-            
-            logoImg.onerror = function() {
-                console.error('Failed to load logo:', logoName);
-                // Try alternative path
-                if (logoName === 'email') {
-                    logoImg.src = '../images/mail.png';
-                } else if (logoName === 'scanner') {
-                    logoImg.src = '../images/scanner.png';
-                }
-            };
-            
-            // Load logo image with correct path
-            let logoPath = `../images/${logoName}.png`;
-            
-            // Handle special cases for renamed images
-            if (logoName === 'email') {
-                logoPath = '../images/mail.png';
-            } else if (logoName === 'scanner') {
-                logoPath = '../images/scanner.png';
-            }
-            
-            console.log('Loading logo from:', logoPath);
-            logoImg.src = logoPath;
+        function downloadText(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
         
-        // Initialize with website type selected
-        window.onload = function() {
-            document.querySelector('[data-type="website"]').classList.add('active');
-            
-            // Pre-select WhatsApp logo
-            document.querySelector('[data-logo="whatsapp"]').classList.add('selected');
-            
-            // Auto-generate QR code with logo
-            setTimeout(() => {
-                generateQRCode();
-            }, 500);
-        };
-
-        // Download QR Code
-        function downloadQRCode() {
-            const preview = document.getElementById('qrPreview');
-            const canvas = preview.querySelector('canvas');
-            if (canvas) {
-                // Convert canvas to blob and download
-                canvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'qr_code.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 'image/png');
-            } else {
-                alert('No QR code generated yet. Please generate a QR code first.');
-            }
-        }
+        // Auto-test when pattern or test string changes
+        document.getElementById('regexPattern').addEventListener('input', testRegex);
+        document.getElementById('testString').addEventListener('input', testRegex);
     </script>
 </body>
 </html>
