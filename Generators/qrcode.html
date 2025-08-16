@@ -414,7 +414,7 @@
                 <div class="step-section">
                     <div class="step-number">1 Complete the content</div>
                     <div class="step-content">
-                        <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)">
+                        <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)" value="https://example.com">
                     </div>
                 </div>
                 
@@ -468,7 +468,7 @@
                 <button class="generate-btn" onclick="generateQRCode()">Generate QR Code</button>
                 
                 <!-- Download Button -->
-                <button class="download-btn" onclick="downloadQRCode()">Download QR Code</button>
+                <button class="download-btn" onclick="downloadQRCode()">Download QR</button>
             </div>
         </div>
     </div>
@@ -690,19 +690,19 @@
             const logoImg = new Image();
             
             logoImg.onload = function() {
-                // Calculate logo size and position
-                const logoSize = 48;
+                // Calculate logo size and position (make logo more visible)
+                const logoSize = 56; // Increased from 48 to 56 for better visibility
                 const logoX = (canvas.width - logoSize) / 2;
                 const logoY = (canvas.height - logoSize) / 2;
                 
-                // Draw white background for logo (larger to ensure good contrast)
+                // Draw larger white background for logo (better contrast)
                 ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(logoX - 4, logoY - 4, logoSize + 8, logoSize + 8);
+                ctx.fillRect(logoX - 6, logoY - 6, logoSize + 12, logoSize + 12);
                 
                 // Draw logo
                 ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
                 
-                console.log('Logo added successfully:', logoName);
+                console.log('Logo added successfully:', logoName, 'at position:', logoX, logoY);
                 
                 // Force canvas update
                 canvas.style.display = 'none';
@@ -737,6 +737,14 @@
         // Initialize with website type selected
         window.onload = function() {
             document.querySelector('[data-type="website"]').classList.add('active');
+            
+            // Pre-select WhatsApp logo
+            document.querySelector('[data-logo="whatsapp"]').classList.add('selected');
+            
+            // Auto-generate QR code with logo
+            setTimeout(() => {
+                generateQRCode();
+            }, 500);
         };
 
         // Download QR Code
