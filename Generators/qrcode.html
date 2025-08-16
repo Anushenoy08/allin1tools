@@ -518,6 +518,8 @@
             const selectedType = document.querySelector('.type-option.active').dataset.type;
             const selectedLogo = document.querySelector('.logo-option.selected')?.dataset.logo;
             
+            console.log('Generating QR Code with:', { content, selectedType, selectedLogo });
+            
             if (!content) {
                 alert('Please enter content first!');
                 return;
@@ -531,11 +533,13 @@
                 try {
                     // Try the newer QRCode API first
                     if (QRCode.toDataURL) {
+                        console.log('Using QRCode.toDataURL method');
                         generateWithNewAPI(content, selectedLogo, preview);
                     } else if (QRCode.toCanvas) {
+                        console.log('Using QRCode.toCanvas method');
                         generateWithOldAPI(content, selectedLogo, preview);
                     } else {
-                        // Use the constructor-based approach
+                        console.log('Using QRCode constructor method');
                         generateWithConstructor(content, selectedLogo, preview);
                     }
                 } catch (error) {
@@ -601,13 +605,17 @@
             // Wait for QR code to be generated, then add logo
             setTimeout(() => {
                 const canvas = preview.querySelector('canvas');
-                if (canvas && selectedLogo) {
-                    addLogoToQR(canvas, selectedLogo);
+                if (canvas) {
+                    if (selectedLogo) {
+                        addLogoToQR(canvas, selectedLogo);
+                    }
+                    
+                    // Show download button
+                    document.querySelector('.download-btn').style.display = 'block';
+                } else {
+                    console.error('Canvas not found after QR generation');
                 }
-                
-                // Show download button
-                document.querySelector('.download-btn').style.display = 'block';
-            }, 100);
+            }, 200); // Increased timeout to ensure QR code is fully generated
         }
         
         // Process QR code image from data URL
@@ -659,12 +667,18 @@
                 const logoX = (canvas.width - logoSize) / 2;
                 const logoY = (canvas.height - logoSize) / 2;
                 
-                // Draw white background for logo
+                // Draw white background for logo (larger to ensure good contrast)
                 ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(logoX - 2, logoY - 2, logoSize + 4, logoSize + 4);
+                ctx.fillRect(logoX - 4, logoY - 4, logoSize + 8, logoSize + 8);
                 
                 // Draw logo
                 ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                
+                console.log('Logo added successfully:', logoName);
+            };
+            
+            logoImg.onerror = function() {
+                console.error('Failed to load logo:', logoName);
             };
             
             // Load logo image with correct path
@@ -677,6 +691,7 @@
                 logoPath = '../images/scanner.png';
             }
             
+            console.log('Loading logo from:', logoPath);
             logoImg.src = logoPath;
         }
         
