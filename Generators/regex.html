@@ -351,12 +351,10 @@
         
         <!-- Main Content Layout -->
         <div class="content-layout">
-            <!-- Left Panel - Regex Generator -->
-            <div class="left-panel">
+            <!-- Regex Generator Section -->
+            <div class="left-panel" style="grid-column: 1 / -1; margin-bottom: 30px;">
                 <h2 class="section-heading">Regex Generator</h2>
-                <p style="text-align: center; color: #666; margin-bottom: 20px;">
-                    Enter a sample value and click Generate to create a regex pattern automatically.
-                </p>
+                <p class="section-subtitle">Enter a sample value and click Generate to create a regex pattern automatically.</p>
                 
                 <div class="form-group">
                     <label for="sampleValue">Sample Value:</label>
@@ -376,12 +374,10 @@
                 </div>
             </div>
             
-            <!-- Right Panel - Regex Tester -->
-            <div class="right-panel">
+            <!-- Regex Tester Section -->
+            <div class="left-panel">
                 <h2 class="section-heading">Regex Tester</h2>
-                <p style="text-align: center; color: #666; margin-bottom: 20px;">
-                    Test your regex patterns with real-time matching and replacement.
-                </p>
+                <p class="section-subtitle">Test your regex patterns with real-time matching and replacement.</p>
                 
                 <!-- Presets -->
                 <div class="form-group">
@@ -430,7 +426,7 @@
                     <h4>Flags:</h4>
                     <div class="flag-checkboxes">
                         <div class="flag-checkbox">
-                            <input type="checkbox" id="flagG" value="g">
+                            <input type="checkbox" id="flagG" value="g" checked>
                             <label for="flagG">g (Global)</label>
                         </div>
                         <div class="flag-checkbox">
@@ -472,29 +468,29 @@
                 <div style="text-align: center;">
                     <button class="btn btn-success" onclick="testRegex()">Test Pattern</button>
                 </div>
+            </div>
+            
+            <!-- Right Panel - Results -->
+            <div class="right-panel">
+                <h3 class="results-section">Results</h3>
                 
-                <!-- Results -->
-                <div class="results-section">
-                    <h3>Results</h3>
-                    
-                    <!-- Match Results -->
-                    <div class="result-box">
-                        <h4>Match Results</h4>
-                        <div id="matchResults">Matches will appear here...</div>
-                        <div class="result-actions">
-                            <button class="btn btn-secondary" onclick="copyMatches()">Copy Matches</button>
-                            <button class="btn btn-secondary" onclick="downloadMatches()">Download Matches</button>
-                        </div>
+                <!-- Match Results -->
+                <div class="result-box">
+                    <h4>Match Results</h4>
+                    <div id="matchResults">Enter a regex pattern.</div>
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyMatches()">Copy Matches</button>
+                        <button class="btn btn-secondary" onclick="downloadMatches()">Download Matches</button>
                     </div>
-                    
-                    <!-- Replacement Result -->
-                    <div class="result-box">
-                        <h4>Replacement Result</h4>
-                        <div id="replacementResult">Replacement output will appear here...</div>
-                        <div class="result-actions">
-                            <button class="btn btn-secondary" onclick="copyReplaced()">Copy Replaced</button>
-                            <button class="btn btn-secondary" onclick="downloadReplaced()">Download Replaced</button>
-                        </div>
+                </div>
+                
+                <!-- Replacement Result -->
+                <div class="result-box">
+                    <h4>Replacement Result</h4>
+                    <div id="replacementResult">No results to display.</div>
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyReplaced()">Copy Replaced</button>
+                        <button class="btn btn-secondary" onclick="downloadReplaced()">Download Replaced</button>
                     </div>
                 </div>
             </div>
@@ -571,6 +567,56 @@
             else if (/^\$[\d,]+(\.\d{2})?$/.test(sampleValue)) {
                 generatedPattern = '^\\$[\\d,]+(\\.\\d{2})?$';
             }
+            // Pattern with repeated special characters (like @@)
+            else if (/(.)\1+/.test(sampleValue)) {
+                // Find repeated characters and create a pattern
+                const repeatedChars = sampleValue.match(/(.)\1+/g);
+                let pattern = '^';
+                
+                // Split by repeated characters
+                let currentIndex = 0;
+                repeatedChars.forEach(repeat => {
+                    const char = repeat[0];
+                    const beforeRepeat = sampleValue.substring(currentIndex, sampleValue.indexOf(repeat, currentIndex));
+                    
+                    if (beforeRepeat) {
+                        // Handle the part before repeated characters
+                        if (/^[a-zA-Z0-9]+$/.test(beforeRepeat)) {
+                            pattern += `[a-zA-Z0-9]{${beforeRepeat.length}}`;
+                        } else {
+                            pattern += beforeRepeat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        }
+                    }
+                    
+                    // Handle repeated characters
+                    if (char === '@') {
+                        pattern += '@+';
+                    } else if (char === '.') {
+                        pattern += '\\.+';
+                    } else if (char === '-') {
+                        pattern += '-+';
+                    } else if (char === '_') {
+                        pattern += '_+';
+                    } else {
+                        pattern += `\\${char}+`;
+                    }
+                    
+                    currentIndex = sampleValue.indexOf(repeat, currentIndex) + repeat.length;
+                });
+                
+                // Handle remaining part after last repeated character
+                const remaining = sampleValue.substring(currentIndex);
+                if (remaining) {
+                    if (/^[a-zA-Z0-9]+$/.test(remaining)) {
+                        pattern += `[a-zA-Z0-9]{${remaining.length}}`;
+                    } else {
+                        pattern += remaining.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    }
+                }
+                
+                pattern += '$';
+                generatedPattern = pattern;
+            }
             // Alphanumeric with specific length
             else if (/^[a-zA-Z0-9]+$/.test(sampleValue)) {
                 const length = sampleValue.length;
@@ -593,18 +639,73 @@
                     generatedPattern = '^\\d+$';
                 }
             }
-            // Generic pattern with escaped special characters
+            // Mixed pattern with special characters
             else {
-                // Escape special regex characters and create a flexible pattern
-                const escaped = sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Analyze the pattern structure
+                const letters = sampleValue.match(/[a-zA-Z]/g) || [];
+                const numbers = sampleValue.match(/\d/g) || [];
+                const specials = sampleValue.match(/[^a-zA-Z0-9\s]/g) || [];
                 
-                // Make it more flexible by allowing variations
-                if (sampleValue.length > 3) {
-                    // For longer strings, make it more flexible
-                    generatedPattern = escaped.replace(/\\s+/g, '\\s+'); // Allow flexible whitespace
+                if (letters.length > 0 && numbers.length > 0 && specials.length > 0) {
+                    // Mixed alphanumeric with special characters
+                    let pattern = '^';
+                    
+                    // Group similar characters together
+                    let currentType = '';
+                    let currentCount = 0;
+                    
+                    for (let i = 0; i < sampleValue.length; i++) {
+                        const char = sampleValue[i];
+                        const isLetter = /[a-zA-Z]/.test(char);
+                        const isNumber = /\d/.test(char);
+                        const isSpecial = /[^a-zA-Z0-9\s]/.test(char);
+                        
+                        let charType = '';
+                        if (isLetter) charType = 'letter';
+                        else if (isNumber) charType = 'number';
+                        else if (isSpecial) charType = 'special';
+                        
+                        if (charType === currentType) {
+                            currentCount++;
+                        } else {
+                            // Add the previous group to pattern
+                            if (currentType === 'letter') {
+                                pattern += `[a-zA-Z]{${currentCount}}`;
+                            } else if (currentType === 'number') {
+                                pattern += `\\d{${currentCount}}`;
+                            } else if (currentType === 'special') {
+                                pattern += `[${currentType === 'special' ? '^a-zA-Z0-9\\s' : ''}]{${currentCount}}`;
+                            }
+                            
+                            // Start new group
+                            currentType = charType;
+                            currentCount = 1;
+                        }
+                    }
+                    
+                    // Add the last group
+                    if (currentType === 'letter') {
+                        pattern += `[a-zA-Z]{${currentCount}}`;
+                    } else if (currentType === 'number') {
+                        pattern += `\\d{${currentCount}}`;
+                    } else if (currentType === 'special') {
+                        pattern += `[^a-zA-Z0-9\\s]{${currentCount}}`;
+                    }
+                    
+                    pattern += '$';
+                    generatedPattern = pattern;
                 } else {
-                    // For short strings, keep exact match
-                    generatedPattern = `^${escaped}$`;
+                    // Generic pattern with escaped special characters
+                    const escaped = sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    
+                    // Make it more flexible by allowing variations
+                    if (sampleValue.length > 3) {
+                        // For longer strings, make it more flexible
+                        generatedPattern = escaped.replace(/\\s+/g, '\\s+'); // Allow flexible whitespace
+                    } else {
+                        // For short strings, keep exact match
+                        generatedPattern = `^${escaped}$`;
+                    }
                 }
             }
             
