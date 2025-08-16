@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator | allin1tools</title>
     <link rel="stylesheet" href="../common.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         /* Reset and base styles */
         * {
@@ -218,7 +219,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             background: white;
-            font-size: 1.2rem;
+            overflow: hidden;
         }
         
         .logo-option:hover {
@@ -230,6 +231,36 @@
             border-color: #2196f3;
             background: #e3f2fd;
             color: #2196f3;
+        }
+        
+        .logo-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        /* Download button */
+        .download-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .download-btn:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
         
         /* QR preview area */
@@ -379,34 +410,34 @@
                         <h4>Select a logo</h4>
                         <div class="logo-options">
                             <div class="logo-option" data-logo="whatsapp">
-                                <i class="fab fa-whatsapp"></i>
+                                <img src="../images/whatsapp.png" alt="WhatsApp">
                             </div>
                             <div class="logo-option" data-logo="instagram">
-                                <i class="fab fa-instagram"></i>
+                                <img src="../images/instagram.png" alt="Instagram">
                             </div>
                             <div class="logo-option" data-logo="facebook">
-                                <i class="fab fa-facebook"></i>
+                                <img src="../images/facebook.png" alt="Facebook">
                             </div>
                             <div class="logo-option" data-logo="twitter">
-                                <i class="fab fa-twitter"></i>
+                                <img src="../images/twitter.png" alt="Twitter">
                             </div>
                             <div class="logo-option" data-logo="link">
-                                <i class="fas fa-link"></i>
+                                <img src="../images/link.png" alt="Link">
                             </div>
                             <div class="logo-option" data-logo="location">
-                                <i class="fas fa-map-marker-alt"></i>
+                                <img src="../images/location.png" alt="Location">
                             </div>
                             <div class="logo-option" data-logo="wifi">
-                                <i class="fas fa-wifi"></i>
+                                <img src="../images/wifi.png" alt="WiFi">
                             </div>
                             <div class="logo-option" data-logo="email">
-                                <i class="fas fa-envelope"></i>
+                                <img src="../images/email.png" alt="Email">
                             </div>
                             <div class="logo-option" data-logo="phone">
-                                <i class="fas fa-phone"></i>
+                                <img src="../images/phone.png" alt="Phone">
                             </div>
                             <div class="logo-option" data-logo="calendar">
-                                <i class="fas fa-calendar"></i>
+                                <img src="../images/calendar.png" alt="Calendar">
                             </div>
                         </div>
                     </div>
@@ -422,6 +453,9 @@
                 
                 <!-- Generate Button -->
                 <button class="generate-btn" onclick="generateQRCode()">Generate QR Code</button>
+                
+                <!-- Download Button -->
+                <button class="download-btn" onclick="downloadQRCode()">Download QR Code</button>
             </div>
         </div>
     </div>
@@ -476,26 +510,94 @@
                 return;
             }
             
-            // For demo purposes, show a placeholder
             const preview = document.getElementById('qrPreview');
-            preview.innerHTML = `
-                <div style="text-align: center; color: #2196f3;">
-                    <i class="fas fa-qrcode" style="font-size: 4rem; margin-bottom: 15px;"></i>
-                    <p>QR Code Generated!</p>
-                    <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">Content: ${content}</p>
-                    <p style="font-size: 0.8rem; color: #666;">Type: ${selectedType}</p>
-                    ${selectedLogo ? `<p style="font-size: 0.8rem; color: #666;">Logo: ${selectedLogo}</p>` : ''}
-                </div>
-            `;
+            preview.innerHTML = '<div style="text-align: center; color: #999;">Generating QR Code...</div>';
             
-            // In a real implementation, you would use a QR code library here
-            // For example: new QRCode(preview, content);
+            // Generate QR code
+            QRCode.toCanvas(preview, content, {
+                width: 256,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function(error, canvas) {
+                if (error) {
+                    preview.innerHTML = '<div style="text-align: center; color: #f44336;">Error generating QR code</div>';
+                    return;
+                }
+                
+                // Create a new canvas for logo overlay
+                const finalCanvas = document.createElement('canvas');
+                const ctx = finalCanvas.getContext('2d');
+                finalCanvas.width = 256;
+                finalCanvas.height = 256;
+                
+                // Draw the QR code
+                ctx.drawImage(canvas, 0, 0);
+                
+                // Add logo overlay if selected
+                if (selectedLogo) {
+                    const logoImg = new Image();
+                    logoImg.onload = function() {
+                        // Calculate logo size and position
+                        const logoSize = 48; // Logo size in pixels
+                        const logoX = (256 - logoSize) / 2;
+                        const logoY = (256 - logoSize) / 2;
+                        
+                        // Draw white background for logo
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(logoX - 2, logoY - 2, logoSize + 4, logoSize + 4);
+                        
+                        // Draw logo
+                        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                        
+                        // Display the final QR code
+                        preview.innerHTML = '';
+                        preview.appendChild(finalCanvas);
+                        
+                        // Show download button
+                        document.querySelector('.download-btn').style.display = 'block';
+                    };
+                    
+                    // Load logo image
+                    logoImg.src = `../images/${selectedLogo}.png`;
+                } else {
+                    // No logo selected, just show QR code
+                    preview.innerHTML = '';
+                    preview.appendChild(finalCanvas);
+                    
+                    // Show download button
+                    document.querySelector('.download-btn').style.display = 'block';
+                }
+            });
         }
         
         // Initialize with website type selected
         window.onload = function() {
             document.querySelector('[data-type="website"]').classList.add('active');
         };
+
+        // Download QR Code
+        function downloadQRCode() {
+            const preview = document.getElementById('qrPreview');
+            const canvas = preview.querySelector('canvas');
+            if (canvas) {
+                // Convert canvas to blob and download
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'qr_code.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            } else {
+                alert('No QR code generated yet. Please generate a QR code first.');
+            }
+        }
     </script>
 </body>
 </html>
