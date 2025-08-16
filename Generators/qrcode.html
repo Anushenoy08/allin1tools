@@ -1,373 +1,501 @@
----
-layout: default
-title: Best Online QR Code Generator for FREE
-permalink: /Generators/qrcode.html
----
-
-<div class="navbar">
-  <img src="../images/logo.png" alt="Logo">
-  <a href="../index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
-<div class="qr-title">Generate your fancy QR code here!</div>
-<div class="qr-main-container">
-  <div class="qr-left">
-    <div style="margin-bottom: 18px;">
-      <div style="font-size:1.13em;font-weight:700;margin-bottom:10px;">QR code can be generated for the following :</div>
-      <div class="qr-selector-bar">
-        <div class="qr-selector selected" data-type="website" onclick="selectType(this)">
-          <i class="fa-solid fa-globe"></i>
-          <span class="qr-selector-label">Website</span>
-        </div>
-        <div class="qr-selector" data-type="text" onclick="selectType(this)">
-          <i class="fa-solid fa-file-lines"></i>
-          <span class="qr-selector-label">Text</span>
-        </div>
-        <div class="qr-selector" data-type="pdf" onclick="selectType(this)">
-          <i class="fa-regular fa-file-pdf"></i>
-          <span class="qr-selector-label">PDF</span>
-        </div>
-        <div class="qr-selector" data-type="image" onclick="selectType(this)">
-          <i class="fa-regular fa-image"></i>
-          <span class="qr-selector-label">Images</span>
-        </div>
-        <div class="qr-selector" data-type="video" onclick="selectType(this)">
-          <i class="fa-regular fa-circle-play"></i>
-          <span class="qr-selector-label">Video</span>
-        </div>
-        <div class="url-info">
-          <p><i class="fa-solid fa-info-circle"></i> NOTE: For PDF, Image and Video files, upload the files to Google drive/ Dropbox/ etc. and use the sharing link</p>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="qr-step-title"><span class="step-num">1</span>Complete the content</div>
-      
-      <!-- Website Input -->
-      <div id="website-input" class="qr-input-container">
-        <input class="qr-input" id="websiteUrl" type="url" placeholder="Enter website URL (e.g., https://example.com)" />
-      </div>
-      
-      <!-- Text Input -->
-      <div id="text-input" class="qr-input-container" style="display: none;">
-        <textarea class="qr-textarea" id="textContent" placeholder="Enter your text content here..." rows="4"></textarea>
-      </div>
-      
-      <!-- File Upload Inputs -->
-      <div id="file-input" class="qr-input-container" style="display: none;">
-        <input class="qr-input" id="fileUrl" type="url" placeholder="Enter the file URL" />
-      </div>
-    </div>
-    <div>
-      <div class="qr-step-title"><span class="step-num">2</span>Design your QR</div>
-      <div class="qr-tabs">
-        <div class="qr-tab active">Logo</div>
-      </div>
-      <div class="qr-tab-content" id="tab-logo">
-        <div style="font-weight: 500; margin-bottom: 10px;">Select a logo</div>
-        <div class="qr-logo-options" id="logoOptions">
-          <div class="qr-logo-option" data-logo="whatsapp" onclick="selectLogo(this)"><img src="../images/whatsapp.png" alt="whatsapp" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="instagram" onclick="selectLogo(this)"><img src="../images/instagram.png" alt="instagram" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="facebook" onclick="selectLogo(this)"><img src="../images/facebook.png" alt="facebook" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="twitter" onclick="selectLogo(this)"><img src="../images/twitter.png" alt="twitter" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="link" onclick="selectLogo(this)"><img src="../images/link.png" alt="link" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="location" onclick="selectLogo(this)"><img src="../images/location.png" alt="location" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="wifi" onclick="selectLogo(this)"><img src="../images/wifi.png" alt="wifi" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="mail" onclick="selectLogo(this)"><img src="../images/mail.png" alt="mail" style="width:32px;height:32px;"></div>
-          <div class="qr-logo-option" data-logo="scanner" onclick="selectLogo(this)"><img src="../images/scanner.png" alt="scanner" style="width:32px;height:32px;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="qr-right">
-    <div class="qr-code-box" id="qrCodeBox">
-      <div id="qrcode-hidden" style="display:none"></div>
-      <canvas id="qrcode-preview" width="220" height="220"></canvas>
-      <div id="qr-placeholder" class="qr-placeholder-text">
-        Generated QR code appears here 
-      </div>
-    </div>
-    <button class="qr-generate-btn" onclick="generateQR()">Generate QR Code</button>
-    <button class="qr-download-btn" onclick="downloadQR()" style="display: none;">Download QR</button>
-  </div>
-</div>
-
-<script>
-let selectedLogo = 'none';
-let selectedType = 'website';
-let qrGenerated = false;
-
-function selectType(el) {
-  document.querySelectorAll('.qr-selector').forEach(opt => opt.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedType = el.getAttribute('data-type');
-  
-  // Show/hide appropriate input containers
-  document.querySelectorAll('.qr-input-container').forEach(container => {
-    container.style.display = 'none';
-  });
-  
-  if (selectedType === 'website') {
-    document.getElementById('website-input').style.display = 'block';
-  } else if (selectedType === 'text') {
-    document.getElementById('text-input').style.display = 'block';
-  } else {
-    document.getElementById('file-input').style.display = 'block';
-    const fileUrlInput = document.getElementById('fileUrl');
-    
-    if (selectedType === 'pdf') {
-      fileUrlInput.placeholder = 'Enter the PDF URL (e.g., https://example.com/document.pdf)';
-    } else if (selectedType === 'image') {
-      fileUrlInput.placeholder = 'Enter the Image URL (e.g., https://example.com/image.jpg)';
-    } else if (selectedType === 'video') {
-      fileUrlInput.placeholder = 'Enter the Video URL (e.g., https://example.com/video.mp4)';
-    }
-  }
-}
-
-function selectLogo(el) {
-  document.querySelectorAll('.qr-logo-option').forEach(opt => opt.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedLogo = el.getAttribute('data-logo');
-}
-
-function getLogoUrl(logo) {
-  const icons = {
-    whatsapp: '../images/whatsapp.png',
-    instagram: '../images/instagram.png',
-    facebook: '../images/facebook.png',
-    twitter: '../images/twitter.png',
-    link: '../images/link.png',
-    location: '../images/location.png',
-    wifi: '../images/wifi.png',
-    mail: '../images/mail.png',
-    scanner: '../images/scanner.png'
-  };
-  return icons[logo] || '';
-}
-
-function generateQR() {
-  let content = '';
-  
-  // Get content based on selected type
-  if (selectedType === 'website') {
-    content = document.getElementById('websiteUrl').value.trim();
-    if (!content) {
-      alert('Please enter a website URL.');
-      return;
-    }
-    if (!content.startsWith('http://') && !content.startsWith('https://')) {
-      content = 'https://' + content;
-    }
-  } else if (selectedType === 'text') {
-    content = document.getElementById('textContent').value.trim();
-    if (!content) {
-      alert('Please enter some text content.');
-      return;
-    }
-  } else {
-    content = document.getElementById('fileUrl').value.trim();
-    if (!content) {
-      if (selectedType === 'pdf') {
-        alert('Please enter a PDF URL.');
-      } else if (selectedType === 'image') {
-        alert('Please enter an Image URL.');
-      } else if (selectedType === 'video') {
-        alert('Please enter a Video URL.');
-      }
-      return;
-    }
-    if (!content.startsWith('http://') && !content.startsWith('https://')) {
-      content = 'https://' + content;
-    }
-  }
-  
-  generateQRCodeWithContent(content);
-}
-
-function generateQRCodeWithContent(content) {
-  const qrBox = document.getElementById('qrcode-hidden');
-  const previewCanvas = document.getElementById('qrcode-preview');
-  const placeholder = document.getElementById('qr-placeholder');
-  const downloadBtn = document.querySelector('.qr-download-btn');
-  const generateBtn = document.querySelector('.qr-generate-btn');
-  
-  if (!qrBox || !previewCanvas) {
-    console.error('QR elements not found');
-    return;
-  }
-  
-  // Clear previous QR code
-  qrBox.innerHTML = '';
-  
-  try {
-    // Show loading state
-    generateBtn.textContent = 'Generating...';
-    generateBtn.disabled = true;
-    
-    // Check if QRCode library is available
-    if (typeof QRCode === 'undefined') {
-      // Try to load the library dynamically
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      script.onload = function() {
-        // Retry generation after library loads
-        setTimeout(() => generateQRCodeWithContent(content), 100);
-      };
-      script.onerror = function() {
-        throw new Error('QRCode library failed to load. Please check your internet connection and try again.');
-      };
-      document.head.appendChild(script);
-      return; // Exit early, will be handled by onload
-    }
-    
-    // Generate QR code
-    new QRCode(qrBox, {
-      text: content,
-      width: 220,
-      height: 220,
-      colorDark: '#222',
-      colorLight: '#fff',
-      correctLevel: QRCode.CorrectLevel.H
-    });
-    
-    // Wait for QR code to be generated, then copy to preview canvas
-    setTimeout(function() {
-      const qrCanvas = qrBox.querySelector('canvas');
-      if (qrCanvas) {
-        const ctx = previewCanvas.getContext('2d');
-        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-        ctx.drawImage(qrCanvas, 0, 0);
-        
-        // Draw logo if selected
-        if (selectedLogo !== 'none') {
-          const img = new Image();
-          img.onload = function() {
-            const size = 60;
-            const centerX = previewCanvas.width / 2;
-            const centerY = previewCanvas.height / 2;
-            
-            // Draw white background circle
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, size/2 + 6, 0, 2*Math.PI);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.restore();
-            
-            // Draw logo
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, size/2, 0, 2*Math.PI);
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(img, centerX-size/2, centerY-size/2, size, size);
-            ctx.restore();
-          };
-          img.onerror = function() {
-            console.error('Failed to load logo image:', getLogoUrl(selectedLogo));
-          };
-          img.src = getLogoUrl(selectedLogo) + '?cb=' + new Date().getTime();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator | allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        // Show success state
-        placeholder.style.display = 'none';
-        downloadBtn.style.display = 'block';
-        generateBtn.textContent = 'Generate QR Code';
-        generateBtn.disabled = false;
-        qrGenerated = true;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
         
-      } else {
-        console.error('QR canvas not found');
-        generateBtn.textContent = 'Generate QR Code';
-        generateBtn.disabled = false;
-      }
-    }, 100);
-  } catch (error) {
-    console.error('Error generating QR code:', error);
-    generateBtn.textContent = 'Generate QR Code';
-    generateBtn.disabled = false;
-    alert('Error generating QR code. Please try again. Error: ' + error.message);
-  }
-}
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
+        
+        /* Main container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Main content layout */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        /* Left panel */
+        .left-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Right panel */
+        .right-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        
+        /* Section headings */
+        .section-heading {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* Content type options */
+        .content-types {
+            margin-bottom: 30px;
+        }
+        
+        .content-types h3 {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .type-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .type-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .type-option:hover {
+            border-color: #2196f3;
+            transform: translateY(-2px);
+        }
+        
+        .type-option.active {
+            border-color: #2196f3;
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+        
+        .type-option i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .type-option span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        /* Info box */
+        .info-box {
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-box i {
+            color: #4caf50;
+            font-size: 1.2rem;
+        }
+        
+        .info-box p {
+            color: #2e7d32;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* Step sections */
+        .step-section {
+            margin-bottom: 30px;
+        }
+        
+        .step-number {
+            color: #2196f3;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .step-content {
+            margin-bottom: 20px;
+        }
+        
+        .step-content h4 {
+            color: #555;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Input field */
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        /* Logo selection */
+        .logo-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .logo-option {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 1.2rem;
+        }
+        
+        .logo-option:hover {
+            border-color: #2196f3;
+            transform: scale(1.1);
+        }
+        
+        .logo-option.selected {
+            border-color: #2196f3;
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+        
+        /* QR preview area */
+        .qr-preview {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            margin-bottom: 30px;
+            color: #999;
+            font-size: 1rem;
+        }
+        
+        .qr-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+        
+        /* Generate button */
+        .generate-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .generate-btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .main-container {
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .type-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .logo-options {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .type-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .logo-options {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <a href="../index.html">HOME</a>
+        <a href="../article.html">ARTICLES</a>
+    </div>
 
-function downloadQR() {
-  if (!qrGenerated) {
-    alert('Please generate a QR code first.');
-    return;
-  }
-  
-  const previewCanvas = document.getElementById('qrcode-preview');
-  if (!previewCanvas) {
-    alert('QR code not found.');
-    return;
-  }
-  
-  try {
-    const link = document.createElement('a');
-    link.href = previewCanvas.toDataURL('image/png');
-    link.download = 'qrcode.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error('Error downloading QR code:', error);
-    alert('Error downloading QR code. Please try again.');
-  }
-}
+    <div class="main-container">
+        <!-- Page Title -->
+        <h1 class="page-title">Generate your fancy QR code here!</h1>
+        
+        <!-- Main Content Layout -->
+        <div class="content-layout">
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <!-- Content Type Selection -->
+                <div class="content-types">
+                    <h3>QR code can be generated for the following :</h3>
+                    <div class="type-options">
+                        <div class="type-option active" data-type="website">
+                            <i class="fas fa-globe"></i>
+                            <span>Website</span>
+                        </div>
+                        <div class="type-option" data-type="text">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Text</span>
+                        </div>
+                        <div class="type-option" data-type="pdf">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>PDF</span>
+                        </div>
+                        <div class="type-option" data-type="images">
+                            <i class="fas fa-image"></i>
+                            <span>Images</span>
+                        </div>
+                        <div class="type-option" data-type="video">
+                            <i class="fas fa-play"></i>
+                            <span>Video</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>NOTE: For PDF, Image and Video files, upload the files to Google drive/ Dropbox/ etc. and use the sharing link</p>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Complete the Content -->
+                <div class="step-section">
+                    <div class="step-number">1 Complete the content</div>
+                    <div class="step-content">
+                        <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)">
+                    </div>
+                </div>
+                
+                <!-- Step 2: Design Your QR -->
+                <div class="step-section">
+                    <div class="step-number">2 Design your QR</div>
+                    <div class="step-content">
+                        <h4>Logo</h4>
+                        <h4>Select a logo</h4>
+                        <div class="logo-options">
+                            <div class="logo-option" data-logo="whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="logo-option" data-logo="instagram">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <div class="logo-option" data-logo="facebook">
+                                <i class="fab fa-facebook"></i>
+                            </div>
+                            <div class="logo-option" data-logo="twitter">
+                                <i class="fab fa-twitter"></i>
+                            </div>
+                            <div class="logo-option" data-logo="link">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <div class="logo-option" data-logo="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="logo-option" data-logo="wifi">
+                                <i class="fas fa-wifi"></i>
+                            </div>
+                            <div class="logo-option" data-logo="email">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="logo-option" data-logo="phone">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="logo-option" data-logo="calendar">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <!-- QR Code Preview -->
+                <div class="qr-preview" id="qrPreview">
+                    Generated QR code appears here
+                </div>
+                
+                <!-- Generate Button -->
+                <button class="generate-btn" onclick="generateQRCode()">Generate QR Code</button>
+            </div>
+        </div>
+    </div>
 
-// Event listeners
-document.addEventListener('DOMContentLoaded', function() {
-  // Enter key handling
-  const websiteUrl = document.getElementById('websiteUrl');
-  const textContent = document.getElementById('textContent');
-  const fileUrl = document.getElementById('fileUrl');
-  
-  if (websiteUrl) {
-    websiteUrl.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        generateQR();
-      }
-    });
-  }
-  
-  if (textContent) {
-    textContent.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter' && e.ctrlKey) {
-        generateQR();
-      }
-    });
-  }
-  
-  if (fileUrl) {
-    fileUrl.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        generateQR();
-      }
-    });
-  }
-  
-  // Check if QRCode library is loaded with multiple attempts
-  let attempts = 0;
-  const maxAttempts = 5;
-  
-  function checkQRCodeLibrary() {
-    attempts++;
-    if (typeof QRCode !== 'undefined') {
-      console.log('QRCode library loaded successfully');
-      return;
-    }
-    
-    if (attempts < maxAttempts) {
-      console.log(`QRCode library not loaded, attempt ${attempts}/${maxAttempts}`);
-      setTimeout(checkQRCodeLibrary, 1000);
-    } else {
-      console.error('QRCode library failed to load after multiple attempts');
-      // Don't show alert immediately, let user try to use the tool first
-    }
-  }
-  
-  // Start checking after a short delay
-  setTimeout(checkQRCodeLibrary, 500);
-});
-</script>
+    <script>
+        // Content type selection
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update placeholder based on selection
+                const type = this.dataset.type;
+                const input = document.getElementById('qrContent');
+                
+                switch(type) {
+                    case 'website':
+                        input.placeholder = 'Enter website URL (e.g., https://example.com)';
+                        break;
+                    case 'text':
+                        input.placeholder = 'Enter text content';
+                        break;
+                    case 'pdf':
+                        input.placeholder = 'Enter Google Drive/Dropbox PDF link';
+                        break;
+                    case 'images':
+                        input.placeholder = 'Enter Google Drive/Dropbox image link';
+                        break;
+                    case 'video':
+                        input.placeholder = 'Enter Google Drive/Dropbox video link';
+                        break;
+                }
+            });
+        });
+        
+        // Logo selection
+        document.querySelectorAll('.logo-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.logo-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+        
+        // Generate QR Code
+        function generateQRCode() {
+            const content = document.getElementById('qrContent').value.trim();
+            const selectedType = document.querySelector('.type-option.active').dataset.type;
+            const selectedLogo = document.querySelector('.logo-option.selected')?.dataset.logo;
+            
+            if (!content) {
+                alert('Please enter content first!');
+                return;
+            }
+            
+            // For demo purposes, show a placeholder
+            const preview = document.getElementById('qrPreview');
+            preview.innerHTML = `
+                <div style="text-align: center; color: #2196f3;">
+                    <i class="fas fa-qrcode" style="font-size: 4rem; margin-bottom: 15px;"></i>
+                    <p>QR Code Generated!</p>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">Content: ${content}</p>
+                    <p style="font-size: 0.8rem; color: #666;">Type: ${selectedType}</p>
+                    ${selectedLogo ? `<p style="font-size: 0.8rem; color: #666;">Logo: ${selectedLogo}</p>` : ''}
+                </div>
+            `;
+            
+            // In a real implementation, you would use a QR code library here
+            // For example: new QRCode(preview, content);
+        }
+        
+        // Initialize with website type selected
+        window.onload = function() {
+            document.querySelector('[data-type="website"]').classList.add('active');
+        };
+    </script>
+</body>
+</html>
