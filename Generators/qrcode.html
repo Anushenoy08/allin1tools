@@ -256,6 +256,28 @@
             border-radius: 50%;
         }
         
+        /* Generate button */
+        .generate-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 15px;
+        }
+        
+        .generate-btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
         /* Download button */
         .download-btn {
             background: #4caf50;
@@ -269,7 +291,7 @@
             transition: all 0.3s ease;
             width: 100%;
             max-width: 300px;
-            margin-top: 20px;
+            margin-top: 0;
             display: none;
         }
         
@@ -298,27 +320,6 @@
             max-width: 100%;
             max-height: 100%;
             border-radius: 10px;
-        }
-        
-        /* Generate button */
-        .generate-btn {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .generate-btn:hover {
-            background: #1976d2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
         }
         
         /* Responsive design */
@@ -414,7 +415,7 @@
                 <div class="step-section">
                     <div class="step-number">1 Complete the content</div>
                     <div class="step-content">
-                        <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)" value="https://example.com">
+                        <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)">
                     </div>
                 </div>
                 
