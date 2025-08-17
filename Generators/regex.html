@@ -269,7 +269,6 @@
             padding: 20px;
             margin-bottom: 20px;
             min-height: 120px;
-            position: relative;
         }
         
         .result-box h4 {
@@ -278,18 +277,30 @@
             margin-bottom: 15px;
         }
         
+        .result-content {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 15px;
+        }
+        
         .result-actions {
-            position: absolute;
-            top: 15px;
-            right: 15px;
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            justify-content: center;
         }
         
         .result-actions .btn {
             margin: 0;
-            padding: 6px 12px;
-            font-size: 0.8rem;
+            padding: 8px 16px;
+            font-size: 0.9rem;
             background: #6c757d;
         }
         
@@ -426,7 +437,7 @@
                     <h4>Flags:</h4>
                     <div class="flag-checkboxes">
                         <div class="flag-checkbox">
-                            <input type="checkbox" id="flagG" value="g" checked>
+                            <input type="checkbox" id="flagG" value="g">
                             <label for="flagG">g (Global)</label>
                         </div>
                         <div class="flag-checkbox">
@@ -455,7 +466,7 @@
                 <!-- Test String -->
                 <div class="form-group">
                     <label for="testString">Test String</label>
-                    <textarea id="testString" placeholder="Try: test@email.com, 2023-12-25, +1-555-123-4567, https://example.com"></textarea>
+                    <textarea id="testString" placeholder="Enter your test string here..."></textarea>
                 </div>
                 
                 <!-- Replacement -->
@@ -477,7 +488,7 @@
                 <!-- Match Results -->
                 <div class="result-box">
                     <h4>Match Results</h4>
-                    <div id="matchResults">Enter a regex pattern.</div>
+                    <div id="matchResults" class="result-content">Enter a regex pattern.</div>
                     <div class="result-actions">
                         <button class="btn btn-secondary" onclick="copyMatches()">Copy Matches</button>
                         <button class="btn btn-secondary" onclick="downloadMatches()">Download Matches</button>
@@ -487,7 +498,7 @@
                 <!-- Replacement Result -->
                 <div class="result-box">
                     <h4>Replacement Result</h4>
-                    <div id="replacementResult">No results to display.</div>
+                    <div id="replacementResult" class="result-content">No results to display.</div>
                     <div class="result-actions">
                         <button class="btn btn-secondary" onclick="copyReplaced()">Copy Replaced</button>
                         <button class="btn btn-secondary" onclick="downloadReplaced()">Download Replaced</button>
@@ -769,8 +780,15 @@
             const testString = document.getElementById('testString').value.trim();
             const replacement = document.getElementById('replacement').value.trim();
             
-            if (!pattern || !testString) {
-                alert('Please enter both regex pattern and test string!');
+            if (!pattern) {
+                document.getElementById('matchResults').textContent = 'Enter a regex pattern.';
+                document.getElementById('replacementResult').textContent = 'No results to display.';
+                return;
+            }
+            
+            if (!testString) {
+                document.getElementById('matchResults').textContent = 'Enter a test string.';
+                document.getElementById('replacementResult').textContent = 'No results to display.';
                 return;
             }
             
@@ -786,7 +804,7 @@
                 if (matches) {
                     matchResults = `Found ${matches.length} match(es):\n`;
                     matches.forEach((match, index) => {
-                        matchResults += `${index + 1}. "${match}"\n`;
+                        matchResults += `${index + 1}. '${match}'\n`;
                     });
                 }
                 
