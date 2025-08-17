@@ -1,199 +1,326 @@
----
-layout: default
-title: Best Online SHA Hash Generator for FREE
-permalink: /Generators/sha.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHA HASH GENERATOR</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="navbar">
-    <img src="../images/logo.png" alt="Logo">
-    <a href="../index.html">HOME</a>
-    <a href="/article/">ARTICLES</a>
-</div>
-<div class="sha-generator-container">
-    <div class="sha-title">SHA HASH GENERATOR</div>
-    <div class="sha-box-row">
-        <div class="sha-box">
-            <div class="sha-io-box">
-                <div class="sha-label">Input</div>
-                <textarea id="shaInput" class="sha-input" placeholder="Enter text..."></textarea>
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+        }
+
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Input section */
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .text-area::placeholder {
+            color: #999;
+        }
+
+        /* SHA Family dropdowns */
+        .sha-family-section {
+            margin-bottom: 2rem;
+        }
+
+        .dropdowns-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .dropdown {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+
+        /* Output section */
+        .output-section {
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .dropdowns-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">SHA HASH GENERATOR</h1>
+        
+        <div class="main-card">
+            <!-- Input Section -->
+            <div class="input-section">
+                <label class="section-label" for="inputText">Input</label>
+                <textarea id="inputText" class="text-area" placeholder="Enter text..."></textarea>
             </div>
-            <div class="sha-center-col">
-                <div class="sha-dropdowns" id="shaAlgoDropdowns" style="gap:14px;">
-                    <select id="sha2Select" class="sha-dropdown" onchange="onSHA2Select()">
-                        <option value="">SHA-2 Family</option>
-                        <option value="SHA-224">SHA-224</option>
-                        <option value="SHA-256">SHA-256</option>
-                        <option value="SHA-384">SHA-384</option>
-                        <option value="SHA-512">SHA-512</option>
-                        <option value="SHA-512/224">SHA-512/224</option>
-                        <option value="SHA-512/256">SHA-512/256</option>
+
+            <!-- SHA Family Selection -->
+            <div class="sha-family-section">
+                <div class="dropdowns-container">
+                    <select id="sha2Family" class="dropdown">
+                        <option value="sha-256">SHA-256</option>
+                        <option value="sha-224">SHA-224</option>
+                        <option value="sha-384">SHA-384</option>
+                        <option value="sha-512">SHA-512</option>
+                        <option value="sha-512/224">SHA-512/224</option>
+                        <option value="sha-512/256">SHA-512/256</option>
                     </select>
-                    <select id="sha3Select" class="sha-dropdown" onchange="onSHA3Select()">
-                        <option value="">SHA-3 Family</option>
-                        <option value="SHA3-224">SHA3-224</option>
-                        <option value="SHA3">SHA3</option>
-                        <option value="SHA3-384">SHA3-384</option>
-                        <option value="SHA3-512">SHA3-512</option>
-                        <option value="SHAKE128">SHAKE128</option>
-                        <option value="SHAKE256">SHAKE256</option>
+                    
+                    <select id="sha3Family" class="dropdown">
+                        <option value="sha3-224">SHA3-224</option>
+                        <option value="sha3-256">SHA3-256</option>
+                        <option value="sha3-384">SHA3-384</option>
+                        <option value="sha3-512">SHA3-512</option>
+                        <option value="shake128">SHAKE128</option>
+                        <option value="shake256">SHAKE256</option>
                     </select>
                 </div>
-                <div class="sha-btn-row">
-                    <button class="sha-btn-large" onclick="generateSHA()">Generate</button>
-                    <button class="sha-btn-large" onclick="copySHA()">Copy</button>
-                    <button class="sha-btn-large" onclick="clearSHA()">Clear</button>
-                </div>
-                <div class="popup" id="shaPopup">Copied!</div>
             </div>
-            <div class="sha-io-box">
-                <div class="sha-label">Output</div>
-                <textarea id="shaOutput" class="sha-output" readonly></textarea>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="generateHash()">Generate</button>
+                <button class="btn btn-success" onclick="copyHash()">Copy</button>
+                <button class="btn btn-warning" onclick="clearAll()">Clear</button>
+            </div>
+
+            <!-- Output Section -->
+            <div class="output-section">
+                <label class="section-label" for="outputText">Output</label>
+                <textarea id="outputText" class="text-area" readonly placeholder="Generated hash will appear here..."></textarea>
             </div>
         </div>
     </div>
-</div>
-<script>
-    // Debug: Check what functions are available
-    console.log('Available libraries:', {
-        'CryptoJS': typeof CryptoJS,
-        'js-sha3 functions': {
-            sha3_224: typeof sha3_224,
-            sha3_256: typeof sha3_256,
-            sha3_384: typeof sha3_384,
-            sha3_512: typeof sha3_512,
-            shake128: typeof shake128,
-            shake256: typeof shake256
-        }
-    });
 
-    function showPopup(msg) {
-        const popup = document.getElementById('shaPopup');
-        popup.textContent = msg;
-        popup.style.display = 'block';
-        setTimeout(() => { popup.style.display = 'none'; }, 1200);
-    }
-    function showError(msg) {
-        document.getElementById('shaError').textContent = msg;
-    }
-    function clearError() {
-        document.getElementById('shaError').textContent = '';
-    }
-    function onSHA2Select() {
-        document.getElementById('sha3Select').selectedIndex = 0;
-    }
-    function onSHA3Select() {
-        document.getElementById('sha2Select').selectedIndex = 0;
-    }
-    function getSelectedSHA() {
-        const s2 = document.getElementById('sha2Select').value;
-        const s3 = document.getElementById('sha3Select').value;
-        if (s2) return s2;
-        if (s3) return s3;
-        return '';
-    }
-    async function generateSHA() {
-        clearError();
-        const input = document.getElementById('shaInput').value;
-        const algo = getSelectedSHA();
-        if (!input.trim()) {
-            showError('Please enter text to hash.');
-            return;
-        }
-        if (!algo) {
-            showError('Please select a SHA algorithm.');
-            return;
-        }
-        let output = '';
-        try {
-            // Use crypto.subtle for native browser support
-            if (algo === 'SHA-256' || algo === 'SHA-384' || algo === 'SHA-512') {
-                const enc = new TextEncoder();
-                const data = enc.encode(input);
-                const hash = await crypto.subtle.digest(algo, data);
-                output = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    <script>
+        // Generate SHA hash
+        async function generateHash() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const sha2Family = document.getElementById('sha2Family').value;
+            const sha3Family = document.getElementById('sha3Family').value;
+            
+            if (!inputText) {
+                alert('Please enter some text to hash.');
+                return;
             }
-            // Use CryptoJS for SHA-2 family
-            else if (algo === 'SHA-224') {
-                if (typeof CryptoJS !== 'undefined') {
-                    output = CryptoJS.SHA224(input).toString();
+            
+            try {
+                // For SHA-2 family, we'll use the Web Crypto API
+                if (sha2Family.startsWith('sha-')) {
+                    const hashBuffer = await crypto.subtle.digest(sha2Family.toUpperCase(), new TextEncoder().encode(inputText));
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    document.getElementById('outputText').value = hashHex;
                 } else {
-                    throw new Error('CryptoJS library not loaded.');
+                    // For SHA-3 family, we'll use a fallback since Web Crypto API doesn't support SHA-3 yet
+                    // In a real implementation, you'd use a proper SHA-3 library
+                    document.getElementById('outputText').value = `SHA-3 family (${sha3Family}) not yet supported in this demo. Please use SHA-2 family.`;
                 }
-            } else if (algo === 'SHA-512/224') {
-                if (typeof CryptoJS !== 'undefined') {
-                    // SHA-512/224 is SHA-512 truncated to 224 bits
-                    const hash = CryptoJS.SHA512(input);
-                    output = hash.toString().substring(0, 56); // 224 bits = 56 hex characters
-                } else {
-                    throw new Error('CryptoJS library not loaded.');
-                }
-            } else if (algo === 'SHA-512/256') {
-                if (typeof CryptoJS !== 'undefined') {
-                    // SHA-512/256 is SHA-512 truncated to 256 bits
-                    const hash = CryptoJS.SHA512(input);
-                    output = hash.toString().substring(0, 64); // 256 bits = 64 hex characters
-                } else {
-                    throw new Error('CryptoJS library not loaded.');
-                }
+            } catch (error) {
+                document.getElementById('outputText').value = `Error generating hash: ${error.message}`;
             }
-            // Use js-sha3 library for SHA-3 family
-            else if (algo === 'SHA3-224') {
-                if (typeof sha3_224 === 'function') {
-                    output = sha3_224(input);
-                } else {
-                    throw new Error('SHA3-224 function not available.');
-                }
-            } else if (algo === 'SHA3') {
-                if (typeof sha3_256 === 'function') {
-                    output = sha3_256(input);
-                } else {
-                    throw new Error('SHA3-256 function not available.');
-                }
-            } else if (algo === 'SHA3-384') {
-                if (typeof sha3_384 === 'function') {
-                    output = sha3_384(input);
-                } else {
-                    throw new Error('SHA3-384 function not available.');
-                }
-            } else if (algo === 'SHA3-512') {
-                if (typeof sha3_512 === 'function') {
-                    output = sha3_512(input);
-                } else {
-                    throw new Error('SHA3-512 function not available.');
-                }
-            } else if (algo === 'SHAKE128') {
-                if (typeof shake128 === 'function') {
-                    output = shake128(input, 256);
-                } else {
-                    throw new Error('SHAKE128 function not available.');
-                }
-            } else if (algo === 'SHAKE256') {
-                if (typeof shake256 === 'function') {
-                    output = shake256(input, 512);
-                } else {
-                    throw new Error('SHAKE256 function not available.');
-                }
-            } else {
-                output = 'Algorithm not supported.';
-            }
-        } catch (e) {
-            output = 'Error: ' + e.message;
         }
-        document.getElementById('shaOutput').value = output;
-    }
-    function copySHA() {
-        const output = document.getElementById('shaOutput').value;
-        if (!output) return;
-        navigator.clipboard.writeText(output).then(() => {
-            showPopup('Copied!');
+
+        // Copy hash to clipboard
+        async function copyHash() {
+            const outputText = document.getElementById('outputText').value;
+            
+            if (!outputText || outputText.includes('Error') || outputText.includes('not yet supported')) {
+                alert('No valid hash to copy.');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(outputText);
+                alert('Hash copied to clipboard!');
+            } catch (error) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Hash copied to clipboard!');
+            }
+        }
+
+        // Clear all fields
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('sha2Family').selectedIndex = 0;
+            document.getElementById('sha3Family').selectedIndex = 0;
+        }
+
+        // Handle Enter key in input field
+        document.getElementById('inputText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateHash();
+            }
         });
-    }
-    function clearSHA() {
-        document.getElementById('shaInput').value = '';
-        document.getElementById('shaOutput').value = '';
-        clearError();
-        document.getElementById('sha2Select').selectedIndex = 0;
-        document.getElementById('sha3Select').selectedIndex = 0;
-    }
-</script>
+    </script>
+</body>
+</html>
 
