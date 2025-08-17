@@ -816,22 +816,27 @@
                 const pdf = await PDFDocument.load(arrayBuffer);
 
                 // Embed font
-                const font = await pdf.embedFont(StandardFonts.HelveticaBold);
-                const fontSize = 24;
-                const color = rgb(0.8, 0.8, 0.8); // Light grey
-                const opacity = 0.3;
+                const font = await pdf.embedFont(StandardFonts.Helvetica);
+                const fontSize = 16;
+                const color = rgb(0.6, 0.6, 0.6); // Darker grey for better visibility
+                const opacity = 0.7; // Higher opacity for better visibility
 
                 // Add annotation to each page
                 const pages = pdf.getPages();
                 for (const page of pages) {
                     const { width, height } = page.getSize();
-                    const textWidth = font.widthOfTextAtSize(text, fontSize);
                     
-                    // Position text in bottom-right corner
-                    const x = width - textWidth - 30;
-                    const y = 30;
+                    // Add copyright symbol and format text
+                    const watermarkText = `© ${text}`;
+                    const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
                     
-                    page.drawText(text, {
+                    // Position text in bottom-right corner with proper margins
+                    const margin = 20;
+                    const x = width - textWidth - margin;
+                    const y = margin + fontSize; // Account for font height
+                    
+                    // Draw the watermark text
+                    page.drawText(watermarkText, {
                         x: x,
                         y: y,
                         size: fontSize,
@@ -853,6 +858,7 @@
                 annotateBtn.textContent = 'Add & Download';
 
             } catch (error) {
+                console.error('Annotation error:', error);
                 alert('Error adding annotation: ' + error.message);
                 const annotateBtn = document.getElementById('annotateBtn');
                 annotateBtn.disabled = false;
