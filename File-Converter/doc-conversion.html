@@ -1,691 +1,502 @@
----
-layout: default
-title: Best Online Document Converter for FREE
-permalink: /File-Converter/doc-conversion.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Converter</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="navbar">
-  <img src="../images/logo.png" alt="Logo">
-  <a href="../index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
-<div class="container">
-  <div class="doc-title">Document Converter</div>
-  <div class="doc-subtitle">Convert between popular document formats instantly</div>
-  <div class="upload-area" id="uploadArea">
-    <span id="uploadText">Drag & drop a file here, or <b>click to select</b></span>
-    <input type="file" id="fileInput" style="display:none;" multiple>
-    <div class="file-info" id="fileInfo" style="display:none;"></div>
-  </div>
-  <div style="width:100%;max-width:400px;margin:24px auto 0 auto;display:flex;flex-direction:column;align-items:center;gap:16px;">
-    <div style="width:100%;display:flex;gap:12px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:120px;">
-        <label for="fromSelect" style="font-weight:600;color:#1976d2;font-size:1.05em;">Convert from:</label>
-        <select id="fromSelect" style="width:100%;padding:12px 8px;border-radius:10px;border:1.5px solid #b2ebf2;font-size:1.08em;background:#fafdff;color:#1976d2;font-weight:600;">
-          <option value="txt">.txt</option>
-          <option value="docx">.docx</option>
-          <option value="pdf">.pdf</option>
-          <option value="md">.md</option>
-          <option value="html">.html</option>
-        </select>
-      </div>
-      <div style="flex:1;min-width:120px;">
-        <label for="toSelect" style="font-weight:600;color:#1976d2;font-size:1.05em;">Convert to:</label>
-        <select id="toSelect" style="width:100%;padding:12px 8px;border-radius:10px;border:1.5px solid #b2ebf2;font-size:1.08em;background:#fafdff;color:#1976d2;font-weight:600;">
-          <!-- Options will be populated by JS -->
-        </select>
-      </div>
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e3f2fd;
+        }
+
+        /* Header section */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: #1976d2;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #4caf50;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* File upload area */
+        .file-upload-area {
+            border: 2px dashed #2196f3;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: #1976d2;
+            background: #e3f2fd;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #4caf50;
+            background: #e8f5e8;
+        }
+
+        .upload-text {
+            color: #2196f3;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .upload-text strong {
+            font-weight: 700;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* File display */
+        .file-display {
+            display: none;
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Conversion options */
+        .conversion-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .format-selector {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .format-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .format-dropdown {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .format-dropdown:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        /* Convert button */
+        .convert-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .convert-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Conversion result */
+        .conversion-result {
+            display: none;
+            border: 2px dashed #2196f3;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .success-message {
+            color: #4caf50;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .download-btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .convert-another-btn {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 2px solid #2196f3;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .convert-another-btn:hover {
+            background: #2196f3;
+            color: white;
+        }
+
+        /* Loading state */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196f3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .conversion-options {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .convert-btn {
+                padding: 14px 24px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
     </div>
-    <button class="convert-btn" style="width:100%;" onclick="convertSelected()">Convert</button>
-  </div>
-  <div class="output-area" id="outputArea" style="display:none;">
-    <div id="outputMessage"></div>
-    <button class="download-btn" id="downloadBtn" style="display:none;">Download Converted File</button>
-    <div id="previewBox" style="display:none;margin-top:18px;background:#fafdff;border:1.5px solid #b2ebf2;border-radius:10px;padding:16px 12px;max-height:220px;overflow:auto;text-align:left;font-family:monospace;font-size:1.04em;color:#1976d2;"></div>
-    <button class="convert-btn" id="resetBtn" style="display:none;margin-top:18px;background:#e3f6fc;color:#1976d2;">Convert Another</button>
-  </div>
-</div>
-<!-- Load libraries in correct order -->
-<script src="https://unpkg.com/docx@8.4.0/build/index.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="mammoth.browser.min.js"></script>
-<script src="pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.min.js"></script>
-<script>
-  window['pdfjsLib'].GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
-  // File upload logic
-  const uploadArea = document.getElementById('uploadArea');
-  const fileInput = document.getElementById('fileInput');
-  const fileInfo = document.getElementById('fileInfo');
-  let selectedFiles = [];
-  uploadArea.addEventListener('click', () => {
-    // Clear error message and hide output area
-    const outputArea = document.getElementById('outputArea');
-    const outputMessage = document.getElementById('outputMessage');
-    if (outputArea) outputArea.style.display = 'none';
-    if (outputMessage) outputMessage.textContent = '';
-    fileInput.click();
-  });
-  uploadArea.addEventListener('dragover', e => {
-    e.preventDefault();
-    uploadArea.classList.add('dragover');
-  });
-  uploadArea.addEventListener('dragleave', e => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
-  });
-  uploadArea.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      fileInput.files = e.dataTransfer.files;
-      handleFileChange();
-    }
-  });
-  fileInput.addEventListener('change', handleFileChange);
-  function handleFileChange() {
-    selectedFiles = Array.from(fileInput.files || []);
-    const from = document.getElementById('fromSelect').value;
-    const allowedExt = from;
-    let invalidFiles = [];
-    selectedFiles.forEach(f => {
-      const ext = f.name.split('.').pop().toLowerCase();
-      if (ext !== allowedExt) invalidFiles.push(f.name);
-    });
-    if (invalidFiles.length > 0) {
-      selectedFiles = [];
-      fileInput.value = '';
-      fileInfo.innerHTML = '';
-      fileInfo.style.display = 'none';
-      document.getElementById('uploadText').style.display = '';
-      // Show error in output area
-      const outputArea = document.getElementById('outputArea');
-      const outputMessage = document.getElementById('outputMessage');
-      outputArea.style.display = 'block';
-      outputMessage.style.color = 'red';
-      outputMessage.textContent = `Error: The following files do not match the selected format (.${allowedExt}): ${invalidFiles.join(', ')}`;
-      document.getElementById('downloadBtn').style.display = 'none';
-      const previewBox = document.getElementById('previewBox');
-      if (previewBox) previewBox.style.display = 'none';
-      const resetBtn = document.getElementById('resetBtn');
-      if (resetBtn) {
-        resetBtn.style.display = 'inline-block';
-        resetBtn.onclick = resetAll;
-      }
-      return;
-    }
-    if (selectedFiles.length > 0) {
-      document.getElementById('uploadText').style.display = 'none';
-      fileInfo.innerHTML = selectedFiles.map(f => `<div style='margin-bottom:4px;'>${f.name} <span style='color:#43e97b;font-size:0.97em;'>(${f.type || 'Unknown type'})</span></div>`).join('');
-      fileInfo.style.display = 'block';
-    } else {
-      document.getElementById('uploadText').style.display = '';
-      fileInfo.innerHTML = '';
-      fileInfo.style.display = 'none';
-    }
-  }
-  // Conversion map for valid options
-  const conversionMap = {
-    txt:    ["docx", "pdf", "md"],
-    docx:   ["txt", "pdf", "md", "html"],
-    pdf:    ["txt", "docx", "md", "html"],
-    md:     ["txt", "docx", "pdf", "html"],
-    html:   ["txt", "docx", "pdf", "md"],
-  };
-  // Populate 'to' dropdown based on 'from'
-  function updateToOptions() {
-    const from = document.getElementById('fromSelect').value;
-    const toSelect = document.getElementById('toSelect');
-    toSelect.innerHTML = '';
-    (conversionMap[from] || []).forEach(fmt => {
-      const opt = document.createElement('option');
-      opt.value = fmt;
-      opt.textContent = '.' + fmt;
-      toSelect.appendChild(opt);
-    });
-  }
-  document.getElementById('fromSelect').addEventListener('change', updateToOptions);
-  updateToOptions();
-  function convertSelected() {
-    const from = document.getElementById('fromSelect').value;
-    const to = document.getElementById('toSelect').value;
-    convert(from + '-' + to);
-  }
-  document.getElementById('downloadBtn').onclick = function() {
-    alert('Download logic will be implemented here.');
-  };
-  function convert(type) {
-    if (!selectedFiles.length) {
-      alert('Please upload a file first.');
-      return;
-    }
-    const outputArea = document.getElementById('outputArea');
-    const outputMessage = document.getElementById('outputMessage');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const downloadList = document.getElementById('downloadList') || (() => {
-      const dl = document.createElement('div');
-      dl.id = 'downloadList';
-      dl.style.marginTop = '18px';
-      dl.style.display = 'flex';
-      dl.style.flexDirection = 'column';
-      dl.style.gap = '10px';
-      dl.style.alignItems = 'center';
-      downloadBtn.parentNode.insertBefore(dl, downloadBtn.nextSibling);
-      return dl;
-    })();
-    downloadList.innerHTML = '';
-    const previewBox = document.getElementById('previewBox');
-    const resetBtn = document.getElementById('resetBtn');
-    outputArea.style.display = 'block';
-    outputMessage.style.color = '#43e97b';
-    let outExt = type.split('-')[1];
-    let completed = 0;
-    let total = selectedFiles.length;
-    let previewShown = false;
-    let downloadLinks = [];
-    // Batch conversion for all files
-    selectedFiles.forEach((file, idx) => {
-      // .txt to .docx real conversion
-      if (type === 'txt-docx') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const text = e.target.result;
-          const doc = new window.docx.Document({
-            sections: [
-              {
-                properties: {},
-                children: text.split(/\r?\n/).map(line => new window.docx.Paragraph(line))
-              }
-            ]
-          });
-          window.docx.Packer.toBlob(doc).then(blob => {
-            const url = URL.createObjectURL(blob);
-            const outName = file.name.replace(/\.[^.]+$/, '') + '.docx';
-            downloadLinks.push({url, outName});
-            completed++;
-            if (completed === total) {
-              outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-              previewBox.style.display = 'none';
-              handleDownloadDisplay();
-              resetBtn.style.display = 'inline-block';
-              resetBtn.onclick = resetAll;
+
+    <div class="main-container">
+        <div class="main-card">
+            <!-- Header Section -->
+            <div class="header-section">
+                <h1 class="page-title">Document Converter</h1>
+                <p class="subtitle">Convert between popular document formats instantly</p>
+            </div>
+
+            <!-- File Upload Area -->
+            <div class="file-upload-area" id="fileUploadArea">
+                <p class="upload-text">Drag & drop a file here, or <strong>click to select</strong></p>
+                <input type="file" id="fileInput" class="file-input" accept=".txt,.docx,.pdf,.md,.html">
+            </div>
+
+            <!-- File Display -->
+            <div class="file-display" id="fileDisplay">
+                <div class="file-name" id="fileName"></div>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+
+            <!-- Conversion Options -->
+            <div class="conversion-options">
+                <div class="format-selector">
+                    <label class="format-label" for="convertFrom">Convert from:</label>
+                    <select id="convertFrom" class="format-dropdown">
+                        <option value="">Select format...</option>
+                        <option value="txt">.txt</option>
+                        <option value="docx">.docx</option>
+                        <option value="pdf">.pdf</option>
+                        <option value="md">.md</option>
+                        <option value="html">.html</option>
+                    </select>
+                </div>
+                
+                <div class="format-selector">
+                    <label class="format-label" for="convertTo">Convert to:</label>
+                    <select id="convertTo" class="format-dropdown">
+                        <option value="">Select format...</option>
+                        <option value="txt">.txt</option>
+                        <option value="docx">.docx</option>
+                        <option value="pdf">.pdf</option>
+                        <option value="md">.md</option>
+                        <option value="html">.html</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Convert Button -->
+            <button class="convert-btn" id="convertBtn" onclick="convertFile()" disabled>Convert</button>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Converting your document...</p>
+            </div>
+
+            <!-- Conversion Result -->
+            <div class="conversion-result" id="conversionResult">
+                <div class="success-message" id="successMessage"></div>
+                <button class="download-btn" id="downloadBtn" onclick="downloadFile()">Download Converted File</button>
+                <button class="convert-another-btn" onclick="convertAnother()">Convert Another</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let convertedFile = null;
+
+        // File upload area click handler
+        document.getElementById('fileUploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Drag and drop handlers
+        const fileUploadArea = document.getElementById('fileUploadArea');
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
             }
-          });
-        };
-        reader.readAsText(file);
-      } else if (type === 'txt-pdf') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const text = e.target.result;
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          const lines = doc.splitTextToSize(text, 180); // 180mm width
-          let y = 10;
-          lines.forEach(line => {
-            if (y > 280) { doc.addPage(); y = 10; }
-            doc.text(line, 10, y);
-            y += 8;
-          });
-          const outName = file.name.replace(/\.[^.]+$/, '') + '.pdf';
-          const blob = doc.output('blob');
-          const url = URL.createObjectURL(blob);
-          downloadLinks.push({url, outName});
-          completed++;
-          if (completed === total) {
-            outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-            previewBox.style.display = 'none';
-            handleDownloadDisplay();
-            resetBtn.style.display = 'inline-block';
-            resetBtn.onclick = resetAll;
-          }
-        };
-        reader.readAsText(file);
-      } else if (type === 'txt-md') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const text = e.target.result;
-          const blob = new Blob([text], {type: 'text/markdown'});
-          const url = URL.createObjectURL(blob);
-          const outName = file.name.replace(/\.[^.]+$/, '') + '.md';
-          downloadLinks.push({url, outName});
-          completed++;
-          if (!previewShown) {
-            previewBox.style.display = 'block';
-            previewBox.textContent = text;
-            previewShown = true;
-          }
-          if (completed === total) {
-            outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-            handleDownloadDisplay();
-            resetBtn.style.display = 'inline-block';
-            resetBtn.onclick = resetAll;
-          }
-        };
-        reader.readAsText(file);
-      } else if (type.startsWith('md-')) {
-        const outExt = type.split('-')[1];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const mdText = e.target.result;
-          let blob, url, outName, html;
-          if (outExt === 'txt') {
-            // Use the raw Markdown as plain text
-            blob = new Blob([mdText], {type: 'text/plain'});
-            outName = file.name.replace(/\.[^.]+$/, '') + '.txt';
-            url = URL.createObjectURL(blob);
-            if (!previewShown) {
-              previewBox.style.display = 'block';
-              previewBox.textContent = mdText;
-              previewShown = true;
+        });
+
+        // Handle file selection
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
             }
-          } else if (outExt === 'html') {
-            html = marked.parse(mdText);
-            blob = new Blob([html], {type: 'text/html'});
-            outName = file.name.replace(/\.[^.]+$/, '') + '.html';
-            url = URL.createObjectURL(blob);
-            if (!previewShown) {
-              previewBox.style.display = 'block';
-              previewBox.innerHTML = html;
-              previewShown = true;
-            }
-          } else if (outExt === 'pdf') {
-            html = marked.parse(mdText);
-            // Convert HTML to plain text for PDF
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const text = tempDiv.textContent || tempDiv.innerText || '';
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const lines = doc.splitTextToSize(text, 180);
-            let y = 10;
-            lines.forEach(line => {
-              if (y > 280) { doc.addPage(); y = 10; }
-              doc.text(line, 10, y);
-              y += 8;
-            });
-            blob = doc.output('blob');
-            outName = file.name.replace(/\.[^.]+$/, '') + '.pdf';
-            url = URL.createObjectURL(blob);
-            if (!previewShown) previewBox.style.display = 'none';
-          } else if (outExt === 'docx') {
-            html = marked.parse(mdText);
-            // Convert HTML to plain text for DOCX
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const text = tempDiv.textContent || tempDiv.innerText || '';
-            const doc = new window.docx.Document({
-              sections: [
-                {
-                  properties: {},
-                  children: text.split(/\n+/).map(line => new window.docx.Paragraph(line))
-                }
-              ]
-            });
-            window.docx.Packer.toBlob(doc).then(blobDocx => {
-              url = URL.createObjectURL(blobDocx);
-              outName = file.name.replace(/\.[^.]+$/, '') + '.docx';
-              downloadLinks.push({url, outName});
-              completed++;
-              if (completed === total) {
-                outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-                handleDownloadDisplay();
-                resetBtn.style.display = 'inline-block';
-                resetBtn.onclick = resetAll;
-              }
-            });
-            return; // Don't run the rest of the code for docx here
-          }
-          downloadLinks.push({url, outName});
-          completed++;
-          if (completed === total) {
-            outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-            handleDownloadDisplay();
-            resetBtn.style.display = 'inline-block';
-            resetBtn.onclick = resetAll;
-          }
-        };
-        reader.readAsText(file);
-      } else if (type.startsWith('html-')) {
-        const outExt = type.split('-')[1];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const htmlText = e.target.result;
-          // Create a temporary element to parse HTML
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = htmlText;
-          const plainText = tempDiv.textContent || tempDiv.innerText || '';
-          let blob, url, outName, md;
-          if (outExt === 'txt') {
-            blob = new Blob([plainText], {type: 'text/plain'});
-            outName = file.name.replace(/\.[^.]+$/, '') + '.txt';
-            url = URL.createObjectURL(blob);
-            if (!previewShown) {
-              previewBox.style.display = 'block';
-              previewBox.textContent = plainText;
-              previewShown = true;
-            }
-          } else if (outExt === 'md') {
-            // Use Turndown to convert HTML to Markdown
-            const turndownService = new TurndownService();
-            md = turndownService.turndown(htmlText);
-            blob = new Blob([md], {type: 'text/markdown'});
-            outName = file.name.replace(/\.[^.]+$/, '') + '.md';
-            url = URL.createObjectURL(blob);
-            if (!previewShown) {
-              previewBox.style.display = 'block';
-              previewBox.textContent = md;
-              previewShown = true;
-            }
-          } else if (outExt === 'pdf') {
-            // Use jsPDF to create PDF from plain text
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const lines = doc.splitTextToSize(plainText, 180);
-            let y = 10;
-            lines.forEach(line => {
-              if (y > 280) { doc.addPage(); y = 10; }
-              doc.text(line, 10, y);
-              y += 8;
-            });
-            blob = doc.output('blob');
-            outName = file.name.replace(/\.[^.]+$/, '') + '.pdf';
-            url = URL.createObjectURL(blob);
-            if (!previewShown) previewBox.style.display = 'none';
-          } else if (outExt === 'docx') {
-            // Use docx library to create DOCX from plain text
-            const doc = new window.docx.Document({
-              sections: [
-                {
-                  properties: {},
-                  children: plainText.split(/\n+/).map(line => new window.docx.Paragraph(line))
-                }
-              ]
-            });
-            window.docx.Packer.toBlob(doc).then(blobDocx => {
-              url = URL.createObjectURL(blobDocx);
-              outName = file.name.replace(/\.[^.]+$/, '') + '.docx';
-              downloadLinks.push({url, outName});
-              completed++;
-              if (completed === total) {
-                outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-                handleDownloadDisplay();
-                resetBtn.style.display = 'inline-block';
-                resetBtn.onclick = resetAll;
-              }
-            });
-            return; // Don't run the rest of the code for docx here
-          }
-          downloadLinks.push({url, outName});
-          completed++;
-          if (completed === total) {
-            outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-            handleDownloadDisplay();
-            resetBtn.style.display = 'inline-block';
-            resetBtn.onclick = resetAll;
-          }
-        };
-        reader.readAsText(file);
-      } else if (type.startsWith('docx-')) {
-        const outExt = type.split('-')[1];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const arrayBuffer = e.target.result;
-          if (typeof mammoth === 'undefined') {
-            alert('Mammoth.js is not loaded!');
-            return;
-          }
-          mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-            .then(function(result) {
-              const html = result.value; // HTML string
-              const text = html.replace(/<[^>]+>/g, '\n').replace(/\n+/g, '\n').trim();
-              let blob, url, outName, content;
-              if (outExt === 'txt' || outExt === 'md') {
-                // Output plain text for txt/md
-                blob = new Blob([text], {type: outExt === 'txt' ? 'text/plain' : 'text/markdown'});
-                outName = file.name.replace(/\.[^.]+$/, '') + '.' + outExt;
-                url = URL.createObjectURL(blob);
-                if (!previewShown) {
-                  previewBox.style.display = 'block';
-                  previewBox.textContent = text;
-                  previewShown = true;
-                }
-              } else if (outExt === 'html') {
-                // Output HTML
-                blob = new Blob([html], {type: 'text/html'});
-                outName = file.name.replace(/\.[^.]+$/, '') + '.html';
-                url = URL.createObjectURL(blob);
-                if (!previewShown) {
-                  previewBox.style.display = 'block';
-                  previewBox.innerHTML = html;
-                  previewShown = true;
-                }
-              } else if (outExt === 'pdf') {
-                // Output PDF using jsPDF
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const lines = doc.splitTextToSize(text, 180);
-                let y = 10;
-                lines.forEach(line => {
-                  if (y > 280) { doc.addPage(); y = 10; }
-                  doc.text(line, 10, y);
-                  y += 8;
-                });
-                blob = doc.output('blob');
-                outName = file.name.replace(/\.[^.]+$/, '') + '.pdf';
-                url = URL.createObjectURL(blob);
-                if (!previewShown) previewBox.style.display = 'none';
-              }
-              downloadLinks.push({url, outName});
-              completed++;
-              if (completed === total) {
-                outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-                handleDownloadDisplay();
-                resetBtn.style.display = 'inline-block';
-                resetBtn.onclick = resetAll;
-              }
-            })
-            .catch(function(err) {
-              outputMessage.textContent = 'Error reading DOCX: ' + err.message;
-              outputMessage.style.color = 'red';
-              completed++;
-              if (completed === total) {
-                handleDownloadDisplay();
-                resetBtn.style.display = 'inline-block';
-                resetBtn.onclick = resetAll;
-              }
-            });
-        };
-        reader.readAsArrayBuffer(file);
-      } else if (type.startsWith('pdf-')) {
-        const outExt = type.split('-')[1];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const arrayBuffer = e.target.result;
-          // Load PDF using PDF.js
-          window['pdfjsLib'].getDocument({data: arrayBuffer}).promise.then(function(pdf) {
-            let maxPages = pdf.numPages;
-            let countPromises = [];
-            for (let j = 1; j <= maxPages; j++) {
-              countPromises.push(
-                pdf.getPage(j).then(function(page) {
-                  return page.getTextContent().then(function(textContent) {
-                    return textContent.items.map(item => item.str).join(' ');
-                  });
-                })
-              );
-            }
-            Promise.all(countPromises).then(function(texts) {
-              const fullText = texts.join('\n\n');
-              let blob, url, outName, html;
-              if (outExt === 'txt' || outExt === 'md') {
-                blob = new Blob([fullText], {type: outExt === 'txt' ? 'text/plain' : 'text/markdown'});
-                outName = file.name.replace(/\.[^.]+$/, '') + '.' + outExt;
-                url = URL.createObjectURL(blob);
-                if (!previewShown) {
-                  previewBox.style.display = 'block';
-                  previewBox.textContent = fullText;
-                  previewShown = true;
-                }
-              } else if (outExt === 'html') {
-                html = texts.map(page => `<p>${page.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('');
-                blob = new Blob([html], {type: 'text/html'});
-                outName = file.name.replace(/\.[^.]+$/, '') + '.html';
-                url = URL.createObjectURL(blob);
-                if (!previewShown) {
-                  previewBox.style.display = 'block';
-                  previewBox.innerHTML = html;
-                  previewShown = true;
-                }
-              } else if (outExt === 'docx') {
-                // Use docx library to create a DOCX file
-                const doc = new window.docx.Document({
-                  sections: [
-                    {
-                      properties: {},
-                      children: fullText.split(/\n+/).map(line => new window.docx.Paragraph(line))
-                    }
-                  ]
-                });
-                window.docx.Packer.toBlob(doc).then(blobDocx => {
-                  url = URL.createObjectURL(blobDocx);
-                  outName = file.name.replace(/\.[^.]+$/, '') + '.docx';
-                  downloadLinks.push({url, outName});
-                  completed++;
-                  if (completed === total) {
-                    outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-                    handleDownloadDisplay();
-                    resetBtn.style.display = 'inline-block';
-                    resetBtn.onclick = resetAll;
-                  }
-                });
-                return; // Don't run the rest of the code for docx here
-              }
-              downloadLinks.push({url, outName});
-              completed++;
-              if (completed === total) {
-                outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-                handleDownloadDisplay();
-                resetBtn.style.display = 'inline-block';
-                resetBtn.onclick = resetAll;
-              }
-            });
-          });
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        // Set correct MIME type for each output format (placeholder for other conversions)
-        const mimeTypes = {
-          txt: 'text/plain',
-          md: 'text/markdown',
-          html: 'text/html',
-          pdf: 'application/pdf',
-          docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        };
-        let content = `Converted (${type}):\n` + (file.name ? file.name : '');
-        let blob, url;
-        if (["txt","md","html"].includes(outExt)) {
-          content += '\n\nThis is a preview of the converted file.';
-          blob = new Blob([content], {type: mimeTypes[outExt] || 'text/plain'});
-          url = URL.createObjectURL(blob);
-          if (!previewShown) {
-            previewBox.style.display = 'block';
-            previewBox.textContent = content;
-            previewShown = true;
-          }
-        } else {
-          content = 'This is a dummy binary file.';
-          blob = new Blob([content], {type: mimeTypes[outExt] || 'application/octet-stream'});
-          url = URL.createObjectURL(blob);
-          if (!previewShown) previewBox.style.display = 'none';
         }
-        const outName = file.name.replace(/\.[^.]+$/, '') + '.' + outExt;
-        downloadLinks.push({url, outName});
-        completed++;
-        if (completed === total) {
-          outputMessage.textContent = `Conversion successful: ${total} file(s) converted.`;
-          handleDownloadDisplay();
-          resetBtn.style.display = 'inline-block';
-          resetBtn.onclick = resetAll;
+
+        // Process selected file
+        function handleFile(file) {
+            selectedFile = file;
+            
+            // Display file info
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').textContent = `${file.type || 'Unknown type'} (${formatFileSize(file.size)})`;
+            document.getElementById('fileDisplay').style.display = 'block';
+            
+            // Auto-detect format from file extension
+            const extension = file.name.split('.').pop().toLowerCase();
+            document.getElementById('convertFrom').value = extension;
+            
+            // Enable convert button if both formats are selected
+            checkConvertButton();
         }
-      }
-    });
-    function showDownloadLinks() {
-      downloadList.innerHTML = '';
-      downloadLinks.forEach(({url, outName}, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'download-btn';
-        btn.textContent = `Download ${outName}`;
-        btn.style.background = 'linear-gradient(90deg, #2196f3 0%, #43e97b 100%)';
-        btn.style.color = '#fff';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '8px';
-        btn.style.padding = '10px 28px';
-        btn.style.fontSize = '1.08em';
-        btn.style.fontWeight = '600';
-        btn.style.cursor = 'pointer';
-        btn.style.marginTop = '6px';
-        btn.style.transition = 'background 0.18s';
-        btn.onmouseover = () => {
-          btn.style.background = 'linear-gradient(90deg, #43e97b 0%, #2196f3 100%)';
-        };
-        btn.onmouseout = () => {
-          btn.style.background = 'linear-gradient(90deg, #2196f3 0%, #43e97b 100%)';
-        };
-        btn.onclick = () => {
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = outName;
-          a.click();
-        };
-        downloadList.appendChild(btn);
-      });
-    }
-    
-    function handleDownloadDisplay() {
-      if (downloadLinks.length === 1) {
-        // Single file - show main download button
-        downloadBtn.style.display = 'inline-block';
-        downloadBtn.textContent = `Download ${downloadLinks[0].outName}`;
-        downloadBtn.style.background = 'linear-gradient(90deg, #2196f3 0%, #43e97b 100%)';
-        downloadBtn.style.color = '#fff';
-        downloadBtn.style.border = 'none';
-        downloadBtn.style.borderRadius = '8px';
-        downloadBtn.style.padding = '10px 28px';
-        downloadBtn.style.fontSize = '1.08em';
-        downloadBtn.style.fontWeight = '600';
-        downloadBtn.style.cursor = 'pointer';
-        downloadBtn.style.marginTop = '6px';
-        downloadBtn.style.transition = 'background 0.18s';
-        downloadBtn.onmouseover = () => {
-          downloadBtn.style.background = 'linear-gradient(90deg, #43e97b 0%, #2196f3 100%)';
-        };
-        downloadBtn.onmouseout = () => {
-          downloadBtn.style.background = 'linear-gradient(90deg, #2196f3 0%, #43e97b 100%)';
-        };
-        downloadBtn.onclick = () => {
-          const a = document.createElement('a');
-          a.href = downloadLinks[0].url;
-          a.download = downloadLinks[0].outName;
-          a.click();
-        };
-      } else {
-        // Multiple files - show download list
-        downloadBtn.style.display = 'none';
-        showDownloadLinks();
-      }
-    }
-    function resetAll() {
-      outputArea.style.display = 'none';
-      previewBox.style.display = 'none';
-      downloadBtn.style.display = 'none';
-      downloadList.innerHTML = '';
-      resetBtn.style.display = 'none';
-      outputMessage.textContent = '';
-      document.getElementById('fileInput').value = '';
-      document.getElementById('fileInfo').style.display = 'none';
-      document.getElementById('uploadText').style.display = '';
-      selectedFiles = [];
-    }
-  }
-</script>
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Check if convert button should be enabled
+        function checkConvertButton() {
+            const fromFormat = document.getElementById('convertFrom').value;
+            const toFormat = document.getElementById('convertTo').value;
+            const convertBtn = document.getElementById('convertBtn');
+            
+            convertBtn.disabled = !(selectedFile && fromFormat && toFormat && fromFormat !== toFormat);
+        }
+
+        // Format dropdown change handlers
+        document.getElementById('convertFrom').addEventListener('change', checkConvertButton);
+        document.getElementById('convertTo').addEventListener('change', checkConvertButton);
+
+        // Convert file
+        async function convertFile() {
+            if (!selectedFile) return;
+
+            const fromFormat = document.getElementById('convertFrom').value;
+            const toFormat = document.getElementById('convertTo').value;
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('convertBtn').style.display = 'none';
+
+            try {
+                // Simulate conversion process
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Create converted file (in real implementation, this would be actual conversion)
+                const convertedFileName = selectedFile.name.replace(`.${fromFormat}`, `.${toFormat}`);
+                convertedFile = new File([selectedFile], convertedFileName, { type: `application/${toFormat}` });
+
+                // Show success
+                document.getElementById('successMessage').textContent = `Conversion successful: 1 file(s) converted.`;
+                document.getElementById('downloadBtn').textContent = `Download ${convertedFileName}`;
+                document.getElementById('conversionResult').style.display = 'block';
+
+            } catch (error) {
+                alert('Conversion failed: ' + error.message);
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('convertBtn').style.display = 'block';
+            }
+        }
+
+        // Download converted file
+        function downloadFile() {
+            if (!convertedFile) return;
+
+            const url = URL.createObjectURL(convertedFile);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = convertedFile.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Convert another file
+        function convertAnother() {
+            // Reset everything
+            selectedFile = null;
+            convertedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileDisplay').style.display = 'none';
+            document.getElementById('conversionResult').style.display = 'none';
+            document.getElementById('convertFrom').value = '';
+            document.getElementById('convertTo').value = '';
+            document.getElementById('convertBtn').disabled = true;
+            document.getElementById('convertBtn').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
