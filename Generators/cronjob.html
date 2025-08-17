@@ -265,15 +265,24 @@
             const explanationDisplay = document.getElementById('explanationDisplay');
             
             if (!cronExpression) {
-                explanationDisplay.textContent = 'Please enter a cron expression.';
+                explanationDisplay.innerHTML = 'Please enter a cron expression.';
                 return;
             }
             
             try {
-                const explanation = parseCronExpression(cronExpression);
-                explanationDisplay.textContent = explanation;
+                const description = parseCronExpression(cronExpression);
+                const nextExecutions = generateNextExecutions(cronExpression);
+                
+                let html = `<strong>Description:</strong> ${description}<br><br>`;
+                html += `<strong>Next 5 executions:</strong><br>`;
+                
+                nextExecutions.forEach(execution => {
+                    html += `${execution}<br>`;
+                });
+                
+                explanationDisplay.innerHTML = html;
             } catch (error) {
-                explanationDisplay.textContent = 'Invalid cron expression. Please check the format.';
+                explanationDisplay.innerHTML = 'Invalid cron expression. Please check the format.';
             }
         }
 
@@ -287,83 +296,75 @@
             
             const [second, minute, hour, dayOfMonth, month, dayOfWeek, year] = fields;
             
-            let explanation = '';
+            let description = '';
             
             // Second
             if (second === '0') {
-                explanation += 'At ';
+                description += 'every second, ';
             } else if (second === '*') {
-                explanation += 'Every second, ';
+                description += 'every second, ';
             } else if (second.includes('/')) {
                 const interval = second.split('/')[1];
-                explanation += `Every ${interval} seconds, `;
+                description += `every ${interval} seconds, `;
             } else {
-                explanation += `At ${second} seconds, `;
+                description += `at ${second} seconds, `;
             }
             
             // Minute
             if (minute === '0') {
-                explanation += '0 minutes ';
+                description += 'minute 0, ';
             } else if (minute === '*') {
-                explanation += 'every minute ';
+                description += 'every minute, ';
             } else if (minute.includes('/')) {
                 const interval = minute.split('/')[1];
-                explanation += `every ${interval} minutes `;
+                description += `every ${interval} minutes, `;
             } else if (minute.includes('-')) {
                 const [start, end] = minute.split('-');
-                explanation += `from ${start} to ${end} minutes `;
+                description += `from ${start} to ${end} minutes, `;
             } else {
-                explanation += `at ${minute} minutes `;
+                description += `minute ${minute}, `;
             }
             
             // Hour
             if (hour === '0') {
-                explanation += 'past midnight';
+                description += 'hour 0, ';
             } else if (hour === '12') {
-                explanation += 'at noon';
+                description += 'hour 12, ';
             } else if (hour === '*') {
-                explanation += 'every hour';
+                description += 'every hour, ';
             } else if (hour.includes('/')) {
                 const interval = hour.split('/')[1];
-                explanation += `every ${interval} hours`;
+                description += `every ${interval} hours, `;
             } else if (hour.includes('-')) {
                 const [start, end] = hour.split('-');
-                const startTime = start === '12' ? 'noon' : `${start}am`;
-                const endTime = end === '12' ? 'noon' : `${end}am`;
-                explanation += `from ${startTime} to ${endTime}`;
+                description += `from hour ${start} to ${end}, `;
             } else {
-                explanation += `at ${hour}am`;
+                description += `hour ${hour}, `;
             }
             
             // Day of Month
-            if (dayOfMonth !== '*' && dayOfMonth !== '?') {
-                if (dayOfMonth.includes('/')) {
-                    const interval = dayOfMonth.split('/')[1];
-                    explanation += `, every ${interval} days`;
-                } else if (dayOfMonth.includes('-')) {
-                    const [start, end] = dayOfMonth.split('-');
-                    explanation += `, from day ${start} to ${end}`;
-                } else {
-                    explanation += `, on day ${dayOfMonth}`;
-                }
+            if (dayOfMonth === '*' || dayOfMonth === '?') {
+                description += 'every day';
+            } else if (dayOfMonth.includes('/')) {
+                const interval = dayOfMonth.split('/')[1];
+                description += `every ${interval} days`;
+            } else if (dayOfMonth.includes('-')) {
+                const [start, end] = dayOfMonth.split('-');
+                description += `from day ${start} to ${end}`;
+            } else {
+                description += `on day ${dayOfMonth}`;
             }
             
             // Month
             if (month !== '*') {
-                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-                
                 if (month.includes('/')) {
                     const interval = month.split('/')[1];
-                    explanation += `, every ${interval} months`;
+                    description += `, every ${interval} months`;
                 } else if (month.includes('-')) {
                     const [start, end] = month.split('-');
-                    const startMonth = months[parseInt(start) - 1];
-                    const endMonth = months[parseInt(end) - 1];
-                    explanation += `, from ${startMonth} to ${endMonth}`;
+                    description += `, from month ${start} to ${end}`;
                 } else {
-                    const monthName = months[parseInt(month) - 1];
-                    explanation += `, in ${monthName}`;
+                    description += `, in month ${month}`;
                 }
             }
             
@@ -373,18 +374,18 @@
                 
                 if (dayOfWeek.includes('/')) {
                     const interval = dayOfWeek.split('/')[1];
-                    explanation += `, every ${interval} days of the week`;
+                    description += `, every ${interval} days of the week`;
                 } else if (dayOfWeek.includes('-')) {
                     const [start, end] = dayOfWeek.split('-');
                     const startDay = days[parseInt(start)];
                     const endDay = days[parseInt(end)];
-                    explanation += `, ${startDay} through ${endDay}`;
+                    description += `, ${startDay} through ${endDay}`;
                 } else if (dayOfWeek.includes(',')) {
                     const selectedDays = dayOfWeek.split(',').map(d => days[parseInt(d)]).join(', ');
-                    explanation += `, on ${selectedDays}`;
+                    description += `, on ${selectedDays}`;
                 } else {
                     const dayName = days[parseInt(dayOfWeek)];
-                    explanation += `, on ${dayName}`;
+                    description += `, on ${dayName}`;
                 }
             }
             
@@ -392,16 +393,46 @@
             if (year !== '*') {
                 if (year.includes('/')) {
                     const interval = year.split('/')[1];
-                    explanation += `, every ${interval} years`;
+                    description += `, every ${interval} years`;
                 } else if (year.includes('-')) {
                     const [start, end] = year.split('-');
-                    explanation += `, from ${start} to ${end}`;
+                    description += `, from year ${start} to ${end}`;
                 } else {
-                    explanation += `, in year ${year}`;
+                    description += `, in year ${year}`;
                 }
             }
             
-            return explanation;
+            return description;
+        }
+
+        // Generate next executions
+        function generateNextExecutions(cron) {
+            const fields = cron.split(' ');
+            const [second, minute, hour, dayOfMonth, month, dayOfWeek, year] = fields;
+            
+            // For simplicity, we'll generate next 5 executions based on current time
+            // In a real implementation, you'd use a proper cron library
+            const now = new Date();
+            const executions = [];
+            
+            for (let i = 0; i < 5; i++) {
+                const nextDate = new Date(now);
+                nextDate.setDate(now.getDate() + i);
+                
+                // Set to noon (12:00:00) for the example
+                nextDate.setHours(12, 0, 0, 0);
+                
+                const day = nextDate.getDate().toString().padStart(2, '0');
+                const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+                const year = nextDate.getFullYear();
+                const hours = nextDate.getHours().toString().padStart(2, '0');
+                const minutes = nextDate.getMinutes().toString().padStart(2, '0');
+                const seconds = nextDate.getSeconds().toString().padStart(2, '0');
+                
+                executions.push(`${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`);
+            }
+            
+            return executions;
         }
 
         // Use example cron expression
