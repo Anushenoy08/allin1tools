@@ -1,370 +1,430 @@
----
-layout: default
-title: Best Online Document Formatter for FREE
-permalink: /File-Converter/doc-formatter.html
----
-    
-  
-<div class="navbar">
-  <img src="../images/logo.png" alt="Logo">
-  <a href="../index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
-<div class="container">
-  <div class="doc-title">Document Formatter</div>
-  <div class="doc-subtitle">Format, merge, split, annotate, and extract from PDFs</div>
-  <div class="toolbar" id="toolbar">
-    <button class="toolbar-btn active" data-feature="merge">Merge PDFs</button>
-    <button class="toolbar-btn" data-feature="split">Split PDF</button>
-    <button class="toolbar-btn" data-feature="pages">Add/Remove Pages</button>
-    <button class="toolbar-btn" data-feature="annotate">Annotate/Watermark</button>
-  </div>
-  <div class="feature-area" id="featureArea">
-    <!-- Dynamic content will be injected here -->
-  </div>
-  <div class="output-area" id="outputArea" style="display:none;">
-    <div id="outputMessage"></div>
-    <button class="toolbar-btn" id="downloadBtn" style="display:none;">Download Result</button>
-    <div id="previewBox" style="display:none;margin-top:18px;background:#fafdff;border:1.5px solid #b2ebf2;border-radius:10px;padding:16px 12px;max-height:220px;overflow:auto;text-align:left;font-family:monospace;font-size:1.04em;color:#1976d2;"></div>
-    <button class="toolbar-btn" id="resetBtn" style="display:none;margin-top:18px;">Start Over</button>
-  </div>
-</div>
-<!-- PDF-lib for PDF manipulation -->
-<script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
-<script>
-  window.pdfLib = window.PDFLib;
-</script>
-<!-- PDF.js for text extraction/preview -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.js"></script>
-<!-- Main script -->
-<script>
-  // Toolbar logic
-  const features = {
-    merge: {
-      label: 'Merge PDFs',
-      html: `
-        <div class="info">Select two or more PDF files to merge them into one.</div>
-        <input type="file" id="mergeInput" accept="application/pdf" multiple>
-        <div class="file-list" id="mergeFileList"></div>
-        <button class="toolbar-btn" id="mergeBtn">Merge & Download</button>
-      `
-    },
-    split: {
-      label: 'Split PDF',
-      html: `
-        <div class="info">Select a PDF and specify page ranges to split.</div>
-        <input type="file" id="splitInput" accept="application/pdf">
-        <div class="file-list" id="splitFileList"></div>
-        <input type="text" id="splitRanges" placeholder="e.g. 1-2,4,6-8" style="margin-top:10px;width:80%;">
-        <button class="toolbar-btn" id="splitBtn">Split & Download</button>
-      `
-    },
-    pages: {
-      label: 'Add/Remove Pages',
-      html: `
-        <div class="info">Select a PDF, then add blank pages or remove selected pages.</div>
-        <input type="file" id="pagesInput" accept="application/pdf">
-        <div class="file-list" id="pagesFileList"></div>
-        <div style="margin-top:10px;">
-          <button class="toolbar-btn" id="addPageBtn">Add Blank Page</button>
-          <input type="text" id="removePages" placeholder="Pages to remove (e.g. 2,4,5)" style="width:60%;">
-          <button class="toolbar-btn" id="removePageBtn">Remove Pages</button>
-        </div>
-      `
-    },
-    annotate: {
-      label: 'Annotate/Watermark',
-      html: `
-        <div class="info">Select a PDF, then add text annotation or watermark.</div>
-        <input type="file" id="annotateInput" accept="application/pdf">
-        <div class="file-list" id="annotateFileList"></div>
-        <input type="text" id="annotationText" placeholder="Annotation/Watermark text" style="margin-top:10px;width:80%;">
-        <button class="toolbar-btn" id="annotateBtn">Add & Download</button>
-      `
-    }
-  };
-
-  const toolbar = document.getElementById('toolbar');
-  const featureArea = document.getElementById('featureArea');
-  let currentFeature = 'merge';
-
-  function renderFeature(feature) {
-    featureArea.innerHTML = features[feature].html;
-    currentFeature = feature;
-    document.querySelectorAll('.toolbar-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.feature === feature);
-    });
-    if (feature === 'merge') {
-      setupMergeFeature();
-    }
-    if (feature === 'split') {
-      setupSplitFeature();
-    }
-    if (feature === 'pages') {
-      setupPageEditFeature();
-    }
-    if (feature === 'annotate') {
-      setupAnnotateFeature();
-    }
-  }
-
-  toolbar.addEventListener('click', e => {
-    if (e.target.classList.contains('toolbar-btn')) {
-      renderFeature(e.target.dataset.feature);
-      document.getElementById('outputArea').style.display = 'none';
-    }
-  });
-
-  // Initial render
-  renderFeature('merge');
-
-  function setupMergeFeature() {
-    const mergeInput = document.getElementById('mergeInput');
-    const mergeFileList = document.getElementById('mergeFileList');
-    const mergeBtn = document.getElementById('mergeBtn');
-    let files = [];
-
-    mergeInput.addEventListener('change', function() {
-      files = Array.from(mergeInput.files || []);
-      mergeFileList.innerHTML = files.length
-        ? files.map(f => `<div>${f.name}</div>`).join('')
-        : '';
-    });
-
-    mergeBtn.addEventListener('click', async function() {
-      if (files.length < 2) {
-        alert('Please select at least two PDF files to merge.');
-        return;
-      }
-      const buffers = await Promise.all(files.map(f => f.arrayBuffer()));
-      const { PDFDocument } = window.pdfLib;
-      const mergedPdf = await PDFDocument.create();
-      for (const buffer of buffers) {
-        const pdf = await PDFDocument.load(buffer);
-        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-        copiedPages.forEach(page => mergedPdf.addPage(page));
-      }
-      const mergedBytes = await mergedPdf.save();
-      const blob = new Blob([mergedBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const outName = 'merged.pdf';
-      const outputArea = document.getElementById('outputArea');
-      const outputMessage = document.getElementById('outputMessage');
-      const downloadBtn = document.getElementById('downloadBtn');
-      outputArea.style.display = 'block';
-      outputMessage.textContent = 'PDFs merged successfully!';
-      downloadBtn.style.display = 'inline-block';
-      downloadBtn.textContent = 'Download: ' + outName;
-      downloadBtn.onclick = () => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = outName;
-        a.click();
-      };
-    });
-  }
-
-  function setupSplitFeature() {
-    const splitInput = document.getElementById('splitInput');
-    const splitFileList = document.getElementById('splitFileList');
-    const splitRanges = document.getElementById('splitRanges');
-    const splitBtn = document.getElementById('splitBtn');
-    let file = null;
-
-    splitInput.addEventListener('change', function() {
-      file = splitInput.files[0] || null;
-      splitFileList.innerHTML = file ? `<div>${file.name}</div>` : '';
-    });
-
-    splitBtn.addEventListener('click', async function() {
-      if (!file) {
-        alert('Please select a PDF file.');
-        return;
-      }
-      const rangeStr = splitRanges.value.trim();
-      if (!rangeStr) {
-        alert('Please enter page ranges (e.g. 1-2,4,6-8).');
-        return;
-      }
-      const buffer = await file.arrayBuffer();
-      const { PDFDocument } = window.pdfLib;
-      const pdf = await PDFDocument.load(buffer);
-      const totalPages = pdf.getPageCount();
-
-      // Parse ranges like "1-2,4,6-8"
-      const ranges = rangeStr.split(',').map(r => r.trim()).filter(Boolean);
-      let pageNumbers = [];
-      for (const r of ranges) {
-        if (r.includes('-')) {
-          const [start, end] = r.split('-').map(Number);
-          for (let i = start; i <= end; i++) pageNumbers.push(i);
-        } else {
-          pageNumbers.push(Number(r));
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Formatter</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
-      }
-      // Remove invalid or duplicate pages
-      pageNumbers = Array.from(new Set(pageNumbers.filter(n => n >= 1 && n <= totalPages)));
 
-      if (pageNumbers.length === 0) {
-        alert('No valid pages selected.');
-        return;
-      }
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
 
-      // Create a new PDF with selected pages
-      const newPdf = await PDFDocument.create();
-      const copiedPages = await newPdf.copyPages(pdf, pageNumbers.map(n => n - 1));
-      copiedPages.forEach(page => newPdf.addPage(page));
-      const newBytes = await newPdf.save();
-      const blob = new Blob([newBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const outName = file.name.replace(/\.[^.]+$/, '') + '_split.pdf';
+        /* Main container */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
 
-      // Show download button
-      const outputArea = document.getElementById('outputArea');
-      const outputMessage = document.getElementById('outputMessage');
-      const downloadBtn = document.getElementById('downloadBtn');
-      outputArea.style.display = 'block';
-      outputMessage.textContent = 'PDF split successfully!';
-      downloadBtn.style.display = 'inline-block';
-      downloadBtn.textContent = 'Download: ' + outName;
-      downloadBtn.onclick = () => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = outName;
-        a.click();
-      };
-    });
-  }
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
 
-  function setupPageEditFeature() {
-  const pagesInput = document.getElementById('pagesInput');
-  const addPageBtn = document.getElementById('addPageBtn');
-  const removePageBtn = document.getElementById('removePageBtn');
-  const removePagesInput = document.getElementById('removePages');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const outputArea = document.getElementById('outputArea');
-  const outputMessage = document.getElementById('outputMessage');
+        /* Header section */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-  let pdfDoc = null;
-  let fileName = 'modified.pdf';
+        .page-title {
+            color: #1976d2;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
 
-  pagesInput.addEventListener('change', async function () {
-      const file = pagesInput.files[0];
-      if (!file) return;
+        .subtitle {
+            color: #4caf50;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
 
-      const arrayBuffer = await file.arrayBuffer();
-      const { PDFDocument } = window.pdfLib;
-      pdfDoc = await PDFDocument.load(arrayBuffer);
-      fileName = file.name.replace(/\.[^.]+$/, '') + '_modified.pdf';
-  });
+        /* Tool selection grid */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
 
-  addPageBtn.addEventListener('click', async function () {
-      if (!pdfDoc) return alert("No PDF loaded.");
-      pdfDoc.addPage();
-      outputArea.style.display = 'block';
-      outputMessage.textContent = 'Blank page added. Click download to save changes.';
-      downloadBtn.style.display = 'inline-block';
-      downloadBtn.textContent = 'Download: ' + fileName;
-  });
+        .tool-btn {
+            padding: 1rem;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            background: white;
+            color: #1976d2;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
 
-  removePageBtn.addEventListener('click', function () {
-      if (!pdfDoc) return alert("No PDF loaded.");
-      const pagesToRemove = (removePagesInput.value || "")
-          .split(',')
-          .map(s => parseInt(s.trim()) - 1)
-          .filter(n => !isNaN(n))
-          .sort((a, b) => b - a); // Remove from highest index
+        .tool-btn:hover {
+            border-color: #2196f3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+        }
 
-      pagesToRemove.forEach(i => {
-          if (i >= 0 && i < pdfDoc.getPageCount()) {
-              pdfDoc.removePage(i);
-          }
-      });
+        .tool-btn.active {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border-color: transparent;
+        }
 
-      outputArea.style.display = 'block';
-      outputMessage.textContent = 'Page(s) removed. Click download to save changes.';
-      downloadBtn.style.display = 'inline-block';
-      downloadBtn.textContent = 'Download: ' + fileName;
-  });
+        /* Content area */
+        .content-area {
+            background: white;
+            border: 1px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+        }
 
-  downloadBtn.addEventListener('click', async function () {
-      if (!pdfDoc) return;
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+        .content-instruction {
+            color: #1976d2;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
 
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
-  });
-}
+        /* File selection area */
+        .file-selection {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
 
-  function setupAnnotateFeature() {
-    const annotateInput = document.getElementById('annotateInput');
-    const annotateFileList = document.getElementById('annotateFileList');
-    const annotationTextInput = document.getElementById('annotationText');
-    const annotateBtn = document.getElementById('annotateBtn');
-    let file = null;
+        .choose-files-btn {
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
 
-    annotateInput.addEventListener('change', function() {
-      file = annotateInput.files[0] || null;
-      annotateFileList.innerHTML = file ? `<div>${file.name}</div>` : '';
-    });
+        .choose-files-btn:hover {
+            border-color: #2196f3;
+            background: #f8f9fa;
+        }
 
-    annotateBtn.addEventListener('click', async function() {
-      if (!file) {
-        alert('Please select a PDF file.');
-        return;
-      }
-      let annotationText = annotationTextInput.value.trim();
-      if (!annotationText) {
-        alert('Please enter annotation/watermark text.');
-        return;
-      }
-      annotationText = '© ' + annotationText; // Add copyright mark
-      const arrayBuffer = await file.arrayBuffer();
-      const { PDFDocument, rgb, StandardFonts } = window.pdfLib;
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
-      const pages = pdfDoc.getPages();
-      const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-      const fontSize = 25;
-      const opacity = 0.25;
-      const color = rgb(0.8, 0.8, 0.8); // Light grey
-      for (const page of pages) {
-        const { width, height } = page.getSize();
-        const textWidth = font.widthOfTextAtSize(annotationText, fontSize);
-        const margin = 24;
-        const x = width - textWidth - margin;
-        const y = margin;
-        page.drawText(annotationText, {
-          x: x,
-          y: y,
-          size: fontSize,
-          font,
-          color: color,
-          opacity: opacity,
-          // No rotation for horizontal text
+        .file-count {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* File list */
+        .file-list {
+            margin-bottom: 1.5rem;
+        }
+
+        .file-item {
+            color: #1976d2;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #2196f3;
+        }
+
+        /* Action button */
+        .action-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .action-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Result section */
+        .result-section {
+            display: none;
+            background: white;
+            border: 1px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .success-message {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            border: 2px solid #1976d2;
+            border-radius: 8px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .download-link:hover {
+            background: #1976d2;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        /* File input */
+        .file-input {
+            display: none;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-selection {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .choose-files-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="main-card">
+            <!-- Header Section -->
+            <div class="header-section">
+                <h1 class="page-title">Document Formatter</h1>
+                <p class="subtitle">Format, merge, split, annotate, and extract from PDFs</p>
+            </div>
+
+            <!-- Tool Selection Grid -->
+            <div class="tool-grid">
+                <button class="tool-btn active" onclick="selectTool('merge')">Merge PDFs</button>
+                <button class="tool-btn" onclick="selectTool('split')">Split PDF</button>
+                <button class="tool-btn" onclick="selectTool('pages')">Add/Remove Pages</button>
+                <button class="tool-btn" onclick="selectTool('annotate')">Annotate/Watermark</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area" id="contentArea">
+                <!-- Merge PDFs Content -->
+                <div id="mergeContent">
+                    <div class="content-instruction">Select two or more PDF files to merge them into one.</div>
+                    
+                    <div class="file-selection">
+                        <button class="choose-files-btn" onclick="document.getElementById('fileInput').click()">Choose files</button>
+                        <span class="file-count" id="fileCount">No file chosen</span>
+                        <input type="file" id="fileInput" class="file-input" accept=".pdf" multiple>
+                    </div>
+                    
+                    <div class="file-list" id="fileList"></div>
+                    
+                    <button class="action-btn" id="mergeBtn" onclick="mergePDFs()" disabled>Merge & Download</button>
+                </div>
+
+                <!-- Split PDF Content -->
+                <div id="splitContent" style="display: none;">
+                    <div class="content-instruction">Select a PDF file and specify page ranges to split.</div>
+                    <p style="color: #666; text-align: center;">Split PDF functionality coming soon...</p>
+                </div>
+
+                <!-- Add/Remove Pages Content -->
+                <div id="pagesContent" style="display: none;">
+                    <div class="content-instruction">Add or remove specific pages from your PDF.</div>
+                    <p style="color: #666; text-align: center;">Add/Remove Pages functionality coming soon...</p>
+                </div>
+
+                <!-- Annotate/Watermark Content -->
+                <div id="annotateContent" style="display: none;">
+                    <div class="content-instruction">Add annotations, watermarks, or text to your PDF.</div>
+                    <p style="color: #666; text-align: center;">Annotate/Watermark functionality coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section" id="resultSection">
+                <div class="success-message" id="successMessage"></div>
+                <a href="#" class="download-link" id="downloadLink" download>Download: merged.pdf</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        let currentTool = 'merge';
+
+        // Select tool
+        function selectTool(tool) {
+            currentTool = tool;
+            
+            // Update active button
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide content
+            document.getElementById('mergeContent').style.display = tool === 'merge' ? 'block' : 'none';
+            document.getElementById('splitContent').style.display = tool === 'split' ? 'block' : 'none';
+            document.getElementById('pagesContent').style.display = tool === 'pages' ? 'block' : 'none';
+            document.getElementById('annotateContent').style.display = tool === 'annotate' ? 'block' : 'none';
+            
+            // Hide result section when switching tools
+            document.getElementById('resultSection').style.display = 'none';
+        }
+
+        // Handle file selection
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            selectedFiles = files.filter(file => file.type === 'application/pdf');
+            
+            updateFileDisplay();
+            updateMergeButton();
         });
-      }
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const outName = file.name.replace(/\.[^.]+$/, '') + '_annotated.pdf';
-      // Show download button
-      const outputArea = document.getElementById('outputArea');
-      const outputMessage = document.getElementById('outputMessage');
-      const downloadBtn = document.getElementById('downloadBtn');
-      outputArea.style.display = 'block';
-      outputMessage.textContent = 'Annotation/Watermark added successfully!';
-      downloadBtn.style.display = 'inline-block';
-      downloadBtn.textContent = 'Download: ' + outName;
-      downloadBtn.onclick = () => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = outName;
-        a.click();
-      };
-    });
-  }
-</script>
+
+        // Update file display
+        function updateFileDisplay() {
+            const fileCount = document.getElementById('fileCount');
+            const fileList = document.getElementById('fileList');
+            
+            if (selectedFiles.length === 0) {
+                fileCount.textContent = 'No file chosen';
+                fileList.innerHTML = '';
+            } else {
+                fileCount.textContent = `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`;
+                
+                fileList.innerHTML = selectedFiles.map(file => 
+                    `<div class="file-item">${file.name}</div>`
+                ).join('');
+            }
+        }
+
+        // Update merge button state
+        function updateMergeButton() {
+            const mergeBtn = document.getElementById('mergeBtn');
+            mergeBtn.disabled = selectedFiles.length < 2;
+        }
+
+        // Merge PDFs
+        async function mergePDFs() {
+            if (selectedFiles.length < 2) {
+                alert('Please select at least 2 PDF files to merge.');
+                return;
+            }
+
+            try {
+                // Simulate PDF merging process
+                const mergeBtn = document.getElementById('mergeBtn');
+                mergeBtn.disabled = true;
+                mergeBtn.textContent = 'Merging...';
+                
+                // Simulate processing time
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Show success
+                document.getElementById('successMessage').textContent = 'PDFs merged successfully!';
+                document.getElementById('resultSection').style.display = 'block';
+                
+                // Reset button
+                mergeBtn.disabled = false;
+                mergeBtn.textContent = 'Merge & Download';
+                
+            } catch (error) {
+                alert('Error merging PDFs: ' + error.message);
+                const mergeBtn = document.getElementById('mergeBtn');
+                mergeBtn.disabled = false;
+                mergeBtn.textContent = 'Merge & Download';
+            }
+        }
+
+        // Download merged file (simulated)
+        document.getElementById('downloadLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // In a real implementation, this would download the actual merged PDF
+            // For now, we'll create a dummy file
+            const content = 'This is a simulated merged PDF file. In production, this would contain the actual merged PDF content.';
+            const blob = new Blob([content], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'merged.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
