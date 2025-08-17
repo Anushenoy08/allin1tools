@@ -369,11 +369,11 @@
 </head>
 <body>
     <!-- Toolbar from common.css -->
-    <div class="navbar">
-        <img src="../images/logo.png" alt="Logo">
-        <a href="../index.html">HOME</a>
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
         <a href="../article.html">ARTICLES</a>
-    </div>
+</div>
 
     <div class="main-container">
         <!-- Page Title -->
@@ -390,40 +390,40 @@
                         <div class="type-option active" data-type="website">
                             <i class="fas fa-globe"></i>
                             <span>Website</span>
-                        </div>
+        </div>
                         <div class="type-option" data-type="text">
                             <i class="fas fa-file-alt"></i>
                             <span>Text</span>
-                        </div>
+        </div>
                         <div class="type-option" data-type="pdf">
                             <i class="fas fa-file-pdf"></i>
                             <span>PDF</span>
-                        </div>
+        </div>
                         <div class="type-option" data-type="images">
                             <i class="fas fa-image"></i>
                             <span>Images</span>
-                        </div>
+        </div>
                         <div class="type-option" data-type="video">
                             <i class="fas fa-play"></i>
                             <span>Video</span>
-                        </div>
-                    </div>
+        </div>
+      </div>
                     
                     <!-- Info Box -->
                     <div class="info-box">
                         <i class="fas fa-info-circle"></i>
                         <p>NOTE: For PDF, Image and Video files, upload the files to Google drive/ Dropbox/ etc. and use the sharing link</p>
-                    </div>
-                </div>
-                
+    </div>
+      </div>
+      
                 <!-- Step 1: Complete the Content -->
                 <div class="step-section">
                     <div class="step-number">1 Complete the content</div>
                     <div class="step-content">
                         <input type="text" class="input-field" id="qrContent" placeholder="Enter website URL (e.g., https://example.com)">
                     </div>
-                </div>
-                
+      </div>
+      
                 <!-- Step 2: Design Your QR -->
                 <div class="step-section">
                     <div class="step-number">2 Design your QR</div>
@@ -451,35 +451,35 @@
                             </div>
                             <div class="logo-option" data-logo="wifi">
                                 <img src="../images/wifi.png" alt="WiFi">
-                            </div>
+      </div>
                             <div class="logo-option" data-logo="email">
                                 <img src="../images/mail.png" alt="Email">
-                            </div>
+    </div>
                             <div class="logo-option" data-logo="scanner">
                                 <img src="../images/scanner.png" alt="Scanner">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
             
             <!-- Right Panel -->
             <div class="right-panel">
                 <!-- QR Code Preview -->
                 <div class="qr-preview" id="qrPreview">
-                    Generated QR code appears here
-                </div>
+        Generated QR code appears here 
+      </div>
                 
                 <!-- Generate Button -->
                 <button class="generate-btn" onclick="generateQRCode()">Generate QR Code</button>
                 
                 <!-- Download Button -->
                 <button class="download-btn" onclick="downloadQRCode()">Download QR</button>
-            </div>
-        </div>
     </div>
+  </div>
+</div>
 
-    <script>
+<script>
         // Content type selection
         document.querySelectorAll('.type-option').forEach(option => {
             option.addEventListener('click', function() {
@@ -537,10 +537,10 @@
             
             console.log('Generating QR Code with:', { content, selectedType, selectedLogo });
             
-            if (!content) {
+    if (!content) {
                 alert('Please enter content first!');
-                return;
-            }
+      return;
+    }
             
             const preview = document.getElementById('qrPreview');
             preview.innerHTML = '<div style="text-align: center; color: #999;">Generating QR Code...</div>';
@@ -562,8 +562,8 @@
                 } catch (error) {
                     console.error('QRCode generation error:', error);
                     preview.innerHTML = '<div style="text-align: center; color: #f44336;">Error generating QR code</div>';
-                }
-            } else {
+    }
+  } else {
                 preview.innerHTML = '<div style="text-align: center; color: #f44336;">QRCode library not loaded</div>';
             }
         }
@@ -598,8 +598,8 @@
             }, function(error, canvas) {
                 if (error) {
                     preview.innerHTML = '<div style="text-align: center; color: #f44336;">Error generating QR code</div>';
-                    return;
-                }
+    return;
+  }
                 processQRCodeCanvas(canvas, selectedLogo, preview);
             });
         }
@@ -611,14 +611,14 @@
             
             // Create QR code using constructor
             const qr = new QRCode(preview, {
-                text: content,
+      text: content,
                 width: 256,
                 height: 256,
                 colorDark: "#000000",
                 colorLight: "#FFFFFF",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    
             // Wait for QR code to be generated, then add logo
             setTimeout(() => {
                 const canvas = preview.querySelector('canvas');
@@ -654,8 +654,8 @@
         
         // Process QR code image from data URL
         function processQRCodeImage(url, selectedLogo, preview) {
-            const img = new Image();
-            img.onload = function() {
+          const img = new Image();
+          img.onload = function() {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = 256;
@@ -769,10 +769,10 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 'image/png');
-            } else {
+    } else {
                 alert('No QR code generated yet. Please generate a QR code first.');
-            }
-        }
-    </script>
+    }
+  }
+</script>
 </body>
 </html>

@@ -1,284 +1,421 @@
----
-layout: default
-title: Best Online Cron Job Generator for FREE
-permalink: /Generators/cronjob.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRON EXPRESSION GENERATOR & EXPLAINER</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="navbar">
-    <img src="../images/logo.png" alt="Logo">
-    <a href="../index.html">HOME</a>
-    <a href="/article/">ARTICLES</a>
-</div>
-<div class="json-formatter-container">
-    <div class="json-title">CRON EXPRESSION GENERATOR & EXPLAINER</div>
-    <div class="cron-box-row">
-        <div class="cron-box">
-            <div class="cron-label">Enter a Quartz cron expression (7 fields):</div>
-            <div class="cron-input-row">
-                <input type="text" id="cronInput" class="cron-input" placeholder="e.g. 0 0 12 * * ? *">
-                <button class="cron-btn" onclick="explainCron()">Explain</button>
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+        }
+
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Input section */
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .explain-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .explain-btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Explanation display */
+        .explanation-display {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #1565c0;
+            font-size: 1rem;
+            line-height: 1.5;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Examples section */
+        .examples-section {
+            margin-top: 2rem;
+        }
+
+        .examples-title {
+            color: #2196f3;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .example-item {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .example-item:hover {
+            background: #bbdefb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+            border-color: #2196f3;
+        }
+
+        .example-cron {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .example-description {
+            color: #1976d2;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .explain-btn {
+                width: 100%;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <a href="../index.html">HOME</a>
+        <a href="../article.html">ARTICLES</a>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">CRON EXPRESSION GENERATOR & EXPLAINER</h1>
+        
+        <div class="main-card">
+            <!-- Main Input Section -->
+            <div class="input-section">
+                <label for="cronExpression">Enter a Quartz cron expression (7 fields):</label>
+                <div class="input-group">
+                    <input type="text" id="cronExpression" class="input-field" placeholder="e.g. 0 0 12 * * ? *">
+                    <button class="explain-btn" onclick="explainCron()">Explain</button>
+                </div>
+                <div class="explanation-display" id="explanationDisplay">
+                    Enter a cron expression and click Explain.
+                </div>
             </div>
-            <div class="cron-output" id="cronOutput">Enter a cron expression and click Explain.</div>
-            <div class="cron-examples" style="text-align:left;">
-                <div class="cron-examples-title" style="text-align:left;">Examples (click to use):</div>
-                <ul class="cron-example-list">
-                    <li><span>0 0 12 * * ? *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 0 12 * * ? *')">Every day at noon</button></li>
-                    <li><span>0 0/5 14 * * ? *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 0/5 14 * * ? *')">Every 5 minutes, 2pm-2:55pm</button></li>
-                    <li><span>0 15 10 ? * MON-FRI *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 15 10 ? * MON-FRI *')">10:15am, Mon-Fri</button></li>
-                    <li><span>0 0 0 1 1 ? *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 0 0 1 1 ? *')">Midnight, Jan 1st</button></li>
-                    <li><span>0 0/10 * * * ? *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 0/10 * * * ? *')">Every 10 minutes</button></li>
-                    <li><span>0 0 12 ? * SUN *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 0 12 ? * SUN *')">Every Sunday at noon</button></li>
-                    <li><span>0 0 12 1/2 * ? *</span> <button class="cron-example-btn" style="text-align:left;" onclick="setExample('0 0 12 1/2 * ? *')">Every 2 days at noon</button></li>
-                </ul>
+
+            <!-- Examples Section -->
+            <div class="examples-section">
+                <h3 class="examples-title">Examples (click to use):</h3>
+                <div class="examples-grid">
+                    <div class="example-item" onclick="useExample('0 0 12 * * ? *')">
+                        <div class="example-cron">0 0 12 * * ? *</div>
+                        <div class="example-description">Every day at noon</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0/5 14 * * ? *')">
+                        <div class="example-cron">0 0/5 14 * * ? *</div>
+                        <div class="example-description">Every 5 minutes, 2pm-2:55pm</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 15 10 ? * MON-FRI *')">
+                        <div class="example-cron">0 15 10 ? * MON-FRI *</div>
+                        <div class="example-description">10:15am, Mon-Fri</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0 0 1 1 ? *')">
+                        <div class="example-cron">0 0 0 1 1 ? *</div>
+                        <div class="example-description">Midnight, Jan 1st</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0/10 * * * ? *')">
+                        <div class="example-cron">0 0/10 * * * ? *</div>
+                        <div class="example-description">Every 10 minutes</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0 12 ? * SUN *')">
+                        <div class="example-cron">0 0 12 ? * SUN *</div>
+                        <div class="example-description">Every Sunday at noon</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0 12 1/2 * ? *')">
+                        <div class="example-cron">0 0 12 1/2 * ? *</div>
+                        <div class="example-description">Every 2 days at noon</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    function setExample(expr) {
-        document.getElementById('cronInput').value = expr;
-        explainCron();
-    }
-    function explainCron() {
-        const input = document.getElementById('cronInput').value.trim();
-        const output = document.getElementById('cronOutput');
-        if (!input) {
-            output.textContent = 'Please enter a cron expression.';
-            return;
-        }
-        const fields = input.split(/\s+/);
-        if (fields.length !== 7) {
-            output.textContent = 'Invalid cron expression. Quartz cron must have 7 fields (sec min hour day month dayOfWeek year).';
-            return;
-        }
-        let [sec, min, hour, day, month, dow, year] = fields;
-        let desc = '';
-        try {
-            desc = cronToText(sec, min, hour, day, month, dow, year);
-        } catch (e) {
-            output.textContent = 'Could not parse cron expression.';
-            return;
-        }
-        // Show warning if advanced features are present
-        let warning = '';
-        if (hasAdvancedQuartzFeatures(fields)) {
-            warning = '<div style="color:#d32f2f;font-weight:bold;margin-top:8px;">Warning: Next execution calculation for advanced Quartz features (L, LW, #, W, etc.) is not supported in this browser tool.</div>';
-        }
-        // Try to show next 5 execution times (only for simple cases)
-        let nextTimes = '';
-        if (!hasAdvancedQuartzFeatures(fields)) {
+
+    <script>
+        // Explain cron expression
+        function explainCron() {
+            const cronExpression = document.getElementById('cronExpression').value.trim();
+            const explanationDisplay = document.getElementById('explanationDisplay');
+            
+            if (!cronExpression) {
+                explanationDisplay.textContent = 'Please enter a cron expression.';
+                return;
+            }
+            
             try {
-                nextTimes = getNextExecutions(fields, 5);
-            } catch (e) {
-                nextTimes = '<i>Could not compute next execution times in browser.</i>';
+                const explanation = parseCronExpression(cronExpression);
+                explanationDisplay.textContent = explanation;
+            } catch (error) {
+                explanationDisplay.textContent = 'Invalid cron expression. Please check the format.';
             }
-        } else {
-            nextTimes = '<i>Not supported for advanced Quartz features.</i>';
         }
-        output.innerHTML = `<b>Description:</b> ${desc}${warning}<br><b>Next 5 executions:</b><br>${nextTimes}`;
-    }
-    // Best-effort human-readable description
-    function cronToText(sec, min, hour, day, month, dow, year) {
-        function pad(n) { return n.toString().padStart(2, '0'); }
-        function timeText(h, m, s) {
-            if (/[^0-9]/.test(h) || /[^0-9]/.test(m) || /[^0-9]/.test(s)) return '';
-            let hourNum = parseInt(h, 10);
-            let ampm = hourNum >= 12 ? 'PM' : 'AM';
-            let hour12 = hourNum % 12;
-            if (hour12 === 0) hour12 = 12;
-            return `${hour12}:${pad(m)}:${pad(s)} ${ampm}`;
-        }
-        const days = {
-            '1': 'Sunday', '2': 'Monday', '3': 'Tuesday', '4': 'Wednesday', '5': 'Thursday', '6': 'Friday', '7': 'Saturday',
-            'SUN': 'Sunday', 'MON': 'Monday', 'TUE': 'Tuesday', 'WED': 'Wednesday', 'THU': 'Thursday', 'FRI': 'Friday', 'SAT': 'Saturday'
-        };
-        const dayRanges = {
-            'MON-FRI': 'weekdays (Mon–Fri)',
-            'SAT-SUN': 'weekends (Sat–Sun)'
-        };
-        const months = {
-            '1': 'January', '2': 'February', '3': 'March', '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', '9': 'September', '10': 'October', '11': 'November', '12': 'December',
-            'JAN': 'January', 'FEB': 'February', 'MAR': 'March', 'APR': 'April', 'MAY': 'May', 'JUN': 'June', 'JUL': 'July', 'AUG': 'August', 'SEP': 'September', 'OCT': 'October', 'NOV': 'November', 'DEC': 'December'
-        };
-        // Advanced Quartz features
-        if (day === 'L' && month === '*' && dow === '?') {
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `At ${time} on the last day of every month${yearText}`;
-        }
-        if (day === 'LW' && month === '*' && dow === '?') {
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `At ${time} on the last weekday of every month${yearText}`;
-        }
-        if (/^L-\d+$/.test(day) && month === '*' && dow === '?') {
-            let n = day.split('-')[1];
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `At ${time} ${n} day(s) before the last day of every month${yearText}`;
-        }
-        if (/^\d+W$/.test(day) && month === '*' && dow === '?') {
-            let d = day.replace('W', '');
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `At ${time} on the weekday nearest to the ${d}${d==='1'?'st':d==='2'?'nd':d==='3'?'rd':'th'} day of every month${yearText}`;
-        }
-        if (dow && /^(SUN|MON|TUE|WED|THU|FRI|SAT)#\d+$/.test(dow) && day === '?') {
-            let [weekday, nth] = dow.split('#');
-            let nthText = nth==='1'?'1st':nth==='2'?'2nd':nth==='3'?'3rd':nth+'th';
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `At ${time} on the ${nthText} ${days[weekday]||weekday} of every month${yearText}`;
-        }
-        if (dow && /^(SUN|MON|TUE|WED|THU|FRI|SAT)L$/.test(dow) && day === '?') {
-            let weekday = dow.replace('L','');
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `At ${time} on the last ${days[weekday]||weekday} of every month${yearText}`;
-        }
-        // Step value in seconds, minutes, hours
-        if (/^\d+\/\d+$/.test(sec) && min === '*' && hour === '*' && day === '?' && dow !== '*' && dow !== '?' && dow in dayRanges) {
-            let step = sec.split('/')[1];
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${step} seconds on ${dayRanges[dow]}${yearText}`;
-        }
-        if (/^\d+\/\d+$/.test(sec) && min === '*' && hour === '*' && day === '?' && (dow === '*' || dow === '?')) {
-            let step = sec.split('/')[1];
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${step} seconds${yearText}`;
-        }
-        if (dow && dow in dayRanges && day === '?') {
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${dayRanges[dow]}${time ? ' at ' + time : ''}${yearText}`;
-        }
-        if (/^\d+\/\d+$/.test(min) && hour !== '*' && day === '?' && (dow === '*' || dow === '?')) {
-            let step = min.split('/')[1];
-            let time = timeText(hour, min.split('/')[0], sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${step} minutes at ${time}${yearText}`;
-        }
-        if (/^\d+\/\d+$/.test(hour) && day === '?' && (dow === '*' || dow === '?')) {
-            let step = hour.split('/')[1];
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${step} hours${yearText}`;
-        }
-        if (dow !== '?' && dow !== '*' && day === '?') {
-            let dowText = days[dow] || dow;
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${dowText} at ${time}${yearText}`;
-        }
-        if (day !== '?' && day !== '*' && day !== 'L' && dow === '?') {
-            let dayText = (day === '1') ? '1st' : (day === '2') ? '2nd' : (day === '3') ? '3rd' : `${day}th`;
-            let monthText = (month !== '*' ? (months[month] || month) : 'month');
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every ${dayText} of ${monthText} at ${time}${yearText}`;
-        }
-        if (month !== '*' && day === '1' && dow === '?') {
-            let monthText = months[month] || month;
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every 1st of ${monthText} at ${time}${yearText}`;
-        }
-        if (month !== '*' && day === '*' && dow === '?') {
-            let monthText = months[month] || month;
-            let time = timeText(hour, min, sec);
-            let yearText = (year !== '*' && year !== '?') ? ` in ${year}` : '';
-            return `Every day of ${monthText} at ${time}${yearText}`;
-        }
-        // Fallback: field-by-field
-        function fieldText(field, name, allVal, unit) {
-            if (field === allVal) return `every ${unit}`;
-            if (/^\d+$/.test(field)) return `${name} ${field}`;
-            if (/^\d+\/\d+$/.test(field)) {
-                let [start, step] = field.split('/');
-                return `every ${step} ${unit}s starting at ${name} ${start}`;
-            }
-            if (/^\d+,/.test(field) || /,\d+/.test(field)) {
-                return `${unit}s ${field.split(',').join(', ')}`;
-            }
-            if (field === '?') return '';
-            return `${unit} ${field}`;
-        }
-        let text = '';
-        text += fieldText(sec, 'second', '0', 'second') + ', ';
-        text += fieldText(min, 'minute', '*', 'minute') + ', ';
-        text += fieldText(hour, 'hour', '*', 'hour') + ', ';
-        if (day !== '?') text += fieldText(day, 'day', '*', 'day') + ', ';
-        if (month !== '*') text += fieldText(month, 'month', '*', 'month') + ', ';
-        if (dow !== '?') text += fieldText(dow, 'day of week', '*', 'day of week') + ', ';
-        if (year !== '*') text += fieldText(year, 'year', '*', 'year');
-        return text.replace(/, $/, '');
-    }
 
-    // Helper: detect unsupported features for next-date calculation
-    function hasAdvancedQuartzFeatures(fields) {
-        // Returns true if any field uses L, LW, #, W, or L- in day/dow
-        const [sec, min, hour, day, month, dow, year] = fields;
-        if (/L|LW|W|#|-/.test(day) || /L|#/.test(dow)) return true;
-        return false;
-    }
-
-    // Best-effort: compute next N execution times (browser-only, limited)
-    function getNextExecutions(fields, n) {
-        // Only supports simple patterns: fixed times, wildcards, and step values
-        let [sec, min, hour, day, month, dow, year] = fields;
-        let results = [];
-        let now = new Date();
-        let count = 0;
-        let maxTries = 100000; // avoid infinite loop
-        let test = new Date(now.getTime());
-        test.setMilliseconds(0);
-        while (results.length < n && count < maxTries) {
-            // Check if this time matches the cron
-            if (matchesCron(test, sec, min, hour, day, month, dow, year)) {
-                results.push(test.toLocaleString());
-                // Move forward one second
-                test.setSeconds(test.getSeconds() + 1);
+        // Parse and explain cron expression
+        function parseCronExpression(cron) {
+            const fields = cron.split(' ');
+            
+            if (fields.length !== 7) {
+                throw new Error('Cron expression must have exactly 7 fields');
+            }
+            
+            const [second, minute, hour, dayOfMonth, month, dayOfWeek, year] = fields;
+            
+            let explanation = '';
+            
+            // Second
+            if (second === '0') {
+                explanation += 'At ';
+            } else if (second === '*') {
+                explanation += 'Every second, ';
+            } else if (second.includes('/')) {
+                const interval = second.split('/')[1];
+                explanation += `Every ${interval} seconds, `;
             } else {
-                // Move forward one second
-                test.setSeconds(test.getSeconds() + 1);
+                explanation += `At ${second} seconds, `;
             }
-            count++;
-        }
-        if (results.length === 0) return '<i>No matches found in the next few years (try a simpler cron).</i>';
-        return results.map(t => `<span style='font-family:monospace'>${t}</span>`).join('<br>');
-    }
-    // Best-effort: check if a date matches the cron fields
-    function matchesCron(date, sec, min, hour, day, month, dow, year) {
-        function matchField(val, field, minVal, maxVal) {
-            if (field === '*' || field === '?') return true;
-            if (/^\d+$/.test(field)) return val === parseInt(field);
-            if (/^\d+\/\d+$/.test(field)) {
-                let [start, step] = field.split('/').map(Number);
-                return val >= start && (val - start) % step === 0;
+            
+            // Minute
+            if (minute === '0') {
+                explanation += '0 minutes ';
+            } else if (minute === '*') {
+                explanation += 'every minute ';
+            } else if (minute.includes('/')) {
+                const interval = minute.split('/')[1];
+                explanation += `every ${interval} minutes `;
+            } else if (minute.includes('-')) {
+                const [start, end] = minute.split('-');
+                explanation += `from ${start} to ${end} minutes `;
+            } else {
+                explanation += `at ${minute} minutes `;
             }
-            if (field.indexOf(',') !== -1) {
-                return field.split(',').map(Number).includes(val);
+            
+            // Hour
+            if (hour === '0') {
+                explanation += 'past midnight';
+            } else if (hour === '12') {
+                explanation += 'at noon';
+            } else if (hour === '*') {
+                explanation += 'every hour';
+            } else if (hour.includes('/')) {
+                const interval = hour.split('/')[1];
+                explanation += `every ${interval} hours`;
+            } else if (hour.includes('-')) {
+                const [start, end] = hour.split('-');
+                const startTime = start === '12' ? 'noon' : `${start}am`;
+                const endTime = end === '12' ? 'noon' : `${end}am`;
+                explanation += `from ${startTime} to ${endTime}`;
+            } else {
+                explanation += `at ${hour}am`;
             }
-            return false;
+            
+            // Day of Month
+            if (dayOfMonth !== '*' && dayOfMonth !== '?') {
+                if (dayOfMonth.includes('/')) {
+                    const interval = dayOfMonth.split('/')[1];
+                    explanation += `, every ${interval} days`;
+                } else if (dayOfMonth.includes('-')) {
+                    const [start, end] = dayOfMonth.split('-');
+                    explanation += `, from day ${start} to ${end}`;
+                } else {
+                    explanation += `, on day ${dayOfMonth}`;
+                }
+            }
+            
+            // Month
+            if (month !== '*') {
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                if (month.includes('/')) {
+                    const interval = month.split('/')[1];
+                    explanation += `, every ${interval} months`;
+                } else if (month.includes('-')) {
+                    const [start, end] = month.split('-');
+                    const startMonth = months[parseInt(start) - 1];
+                    const endMonth = months[parseInt(end) - 1];
+                    explanation += `, from ${startMonth} to ${endMonth}`;
+                } else {
+                    const monthName = months[parseInt(month) - 1];
+                    explanation += `, in ${monthName}`;
+                }
+            }
+            
+            // Day of Week
+            if (dayOfWeek !== '*' && dayOfWeek !== '?') {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                
+                if (dayOfWeek.includes('/')) {
+                    const interval = dayOfWeek.split('/')[1];
+                    explanation += `, every ${interval} days of the week`;
+                } else if (dayOfWeek.includes('-')) {
+                    const [start, end] = dayOfWeek.split('-');
+                    const startDay = days[parseInt(start)];
+                    const endDay = days[parseInt(end)];
+                    explanation += `, ${startDay} through ${endDay}`;
+                } else if (dayOfWeek.includes(',')) {
+                    const selectedDays = dayOfWeek.split(',').map(d => days[parseInt(d)]).join(', ');
+                    explanation += `, on ${selectedDays}`;
+                } else {
+                    const dayName = days[parseInt(dayOfWeek)];
+                    explanation += `, on ${dayName}`;
+                }
+            }
+            
+            // Year
+            if (year !== '*') {
+                if (year.includes('/')) {
+                    const interval = year.split('/')[1];
+                    explanation += `, every ${interval} years`;
+                } else if (year.includes('-')) {
+                    const [start, end] = year.split('-');
+                    explanation += `, from ${start} to ${end}`;
+                } else {
+                    explanation += `, in year ${year}`;
+                }
+            }
+            
+            return explanation;
         }
-        if (!matchField(date.getSeconds(), sec, 0, 59)) return false;
-        if (!matchField(date.getMinutes(), min, 0, 59)) return false;
-        if (!matchField(date.getHours(), hour, 0, 23)) return false;
-        if (!matchField(date.getDate(), day, 1, 31)) return false;
-        if (!matchField(date.getMonth() + 1, month, 1, 12)) return false;
-        // JS: 0=Sun, 6=Sat; Quartz: 1=Sun, 7=Sat, but allow both
-        let jsDow = date.getDay();
-        let cronDow = dow;
-        if (cronDow === '*') ;
-        else if (cronDow === '?') ;
-        else if (/^\d+$/.test(cronDow)) {
-            let cronNum = parseInt(cronDow);
-            if (cronNum === 7) cronNum = 0;
-            if (jsDow !== cronNum) return false;
-        } else if (cronDow.indexOf(',') !== -1) {
-            let dows = cronDow.split(',').map(Number).map(d => d === 7 ? 0 : d);
-            if (!dows.includes(jsDow)) return false;
+
+        // Use example cron expression
+        function useExample(cron) {
+            document.getElementById('cronExpression').value = cron;
+            explainCron();
         }
-        if (year !== '*' && year !== '?' && year !== '' && date.getFullYear() !== parseInt(year)) return false;
-        return true;
-    }
-</script>
+
+        // Handle Enter key in input field
+        document.getElementById('cronExpression').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                explainCron();
+            }
+        });
+    </script>
+</body>
+</html>

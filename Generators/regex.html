@@ -301,11 +301,27 @@
             margin: 0;
             padding: 8px 16px;
             font-size: 0.9rem;
-            background: #6c757d;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
         
         .result-actions .btn:hover {
-            background: #5a6268;
+            background: #1976d2;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        /* Alternate button colors for variety */
+        .result-actions .btn:nth-child(2) {
+            background: #4caf50;
+        }
+        
+        .result-actions .btn:nth-child(2):hover {
+            background: #388e3c;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
         }
         
         /* Responsive design */
@@ -350,11 +366,11 @@
 </head>
 <body>
     <!-- Toolbar from common.css -->
-    <div class="navbar">
-        <img src="../images/logo.png" alt="Logo">
-        <a href="../index.html">HOME</a>
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+  <a href="../index.html">HOME</a>
         <a href="../article.html">ARTICLES</a>
-    </div>
+</div>
 
     <div class="main-container">
         <!-- Page Title -->
@@ -370,21 +386,21 @@
                 <div class="form-group">
                     <label for="sampleValue">Sample Value:</label>
                     <input type="text" id="sampleValue" placeholder="Enter a sample value (e.g., test@email.com)">
-                </div>
-                
+  </div>
+  
                 <div style="text-align: center;">
                     <button class="btn btn-primary" onclick="generateRegex()">Generate Regex</button>
-                </div>
-                
+</div>
+
                 <div class="form-group" id="generatedRegexGroup" style="display: none;">
                     <label for="generatedRegex">Generated Regex:</label>
                     <input type="text" id="generatedRegex" readonly>
                     <div style="text-align: center; margin-top: 10px;">
                         <button class="btn btn-secondary" onclick="copyGeneratedRegex()">Copy Regex</button>
-                    </div>
-                </div>
-            </div>
-            
+    </div>
+      </div>
+    </div>
+
             <!-- Regex Tester Section -->
             <div class="left-panel">
                 <h2 class="section-heading">Regex Tester</h2>
@@ -403,14 +419,14 @@
                         <option value="hex">Hex Color</option>
                         <option value="css-hex">CSS Hex Color</option>
                     </select>
-                </div>
-                
+    </div>
+
                 <!-- Regex Pattern -->
                 <div class="form-group">
                     <label for="regexPattern">Regex Pattern</label>
                     <input type="text" id="regexPattern" placeholder="Enter your regex pattern">
-                </div>
-                
+    </div>
+
                 <!-- Quick Insert Buttons -->
                 <div class="quick-insert">
                     <h4>Quick Insert:</h4>
@@ -429,9 +445,9 @@
                         <button class="quick-btn" onclick="insertRegex('*')">*</button>
                         <button class="quick-btn" onclick="insertRegex('+')">+</button>
                         <button class="quick-btn" onclick="insertRegex('?')">?</button>
-                    </div>
-                </div>
-                
+    </div>
+  </div>
+
                 <!-- Flags -->
                 <div class="flags-section">
                     <h4>Flags:</h4>
@@ -439,48 +455,48 @@
                         <div class="flag-checkbox">
                             <input type="checkbox" id="flagG" value="g">
                             <label for="flagG">g (Global)</label>
-                        </div>
+        </div>
                         <div class="flag-checkbox">
                             <input type="checkbox" id="flagI" value="i">
                             <label for="flagI">i (Case Insensitive)</label>
-                        </div>
+      </div>
                         <div class="flag-checkbox">
                             <input type="checkbox" id="flagM" value="m">
                             <label for="flagM">m (Multiline)</label>
-                        </div>
+    </div>
                         <div class="flag-checkbox">
                             <input type="checkbox" id="flagS" value="s">
                             <label for="flagS">s (Dot All)</label>
-                        </div>
+        </div>
                         <div class="flag-checkbox">
                             <input type="checkbox" id="flagU" value="u">
                             <label for="flagU">u (Unicode)</label>
-                        </div>
+      </div>
                         <div class="flag-checkbox">
                             <input type="checkbox" id="flagY" value="y">
                             <label for="flagY">y (Sticky)</label>
-                        </div>
-                    </div>
-                </div>
-                
+    </div>
+  </div>
+</div>
+
                 <!-- Test String -->
                 <div class="form-group">
                     <label for="testString">Test String</label>
                     <textarea id="testString" placeholder="Enter your test string here..."></textarea>
-                </div>
-                
+    </div>
+    
                 <!-- Replacement -->
                 <div class="form-group">
                     <label for="replacement">Replacement (optional)</label>
                     <input type="text" id="replacement" placeholder="Enter replacement text">
-                </div>
-                
+    </div>
+    
                 <!-- Test Button -->
                 <div style="text-align: center;">
                     <button class="btn btn-success" onclick="testRegex()">Test Pattern</button>
-                </div>
-            </div>
-            
+    </div>
+    </div>
+    
             <!-- Right Panel - Results -->
             <div class="right-panel">
                 <h3 class="results-section">Results</h3>
@@ -492,9 +508,9 @@
                     <div class="result-actions">
                         <button class="btn btn-secondary" onclick="copyMatches()">Copy Matches</button>
                         <button class="btn btn-secondary" onclick="downloadMatches()">Download Matches</button>
-                    </div>
-                </div>
-                
+    </div>
+  </div>
+  
                 <!-- Replacement Result -->
                 <div class="result-box">
                     <h4>Replacement Result</h4>
@@ -502,13 +518,13 @@
                     <div class="result-actions">
                         <button class="btn btn-secondary" onclick="copyReplaced()">Copy Replaced</button>
                         <button class="btn btn-secondary" onclick="downloadReplaced()">Download Replaced</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
+<script>
         // Generate Regex from sample value
         function generateRegex() {
             const sampleValue = document.getElementById('sampleValue').value.trim();
@@ -814,7 +830,7 @@
                 if (replacement) {
                     const replaced = testString.replace(regex, replacement);
                     document.getElementById('replacementResult').textContent = replaced;
-                } else {
+      } else {
                     document.getElementById('replacementResult').textContent = 'No replacement text provided.';
                 }
                 
@@ -875,6 +891,6 @@
             // Set default test string
             document.getElementById('testString').value = 'test@email.com\n2023-12-25\n1234567890\nhttps://example.com';
         };
-    </script>
+</script>
 </body>
 </html>
