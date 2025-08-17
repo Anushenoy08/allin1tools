@@ -218,22 +218,19 @@
             <!-- SHA Family Selection -->
             <div class="sha-family-section">
                 <div class="dropdowns-container">
-                    <select id="sha2Family" class="dropdown">
-                        <option value="sha-256">SHA-256</option>
-                        <option value="sha-224">SHA-224</option>
-                        <option value="sha-384">SHA-384</option>
-                        <option value="sha-512">SHA-512</option>
-                        <option value="sha-512/224">SHA-512/224</option>
-                        <option value="sha-512/256">SHA-512/256</option>
+                    <select id="sha2Family" class="dropdown" onchange="onSHA2Select()">
+                        <option value="">SHA-2 Family</option>
+                        <option value="SHA-256">SHA-256</option>
+                        <option value="SHA-384">SHA-384</option>
+                        <option value="SHA-512">SHA-512</option>
                     </select>
                     
-                    <select id="sha3Family" class="dropdown">
-                        <option value="sha3-224">SHA3-224</option>
-                        <option value="sha3-256">SHA3-256</option>
-                        <option value="sha3-384">SHA3-384</option>
-                        <option value="sha3-512">SHA3-512</option>
-                        <option value="shake128">SHAKE128</option>
-                        <option value="shake256">SHAKE256</option>
+                    <select id="sha3Family" class="dropdown" onchange="onSHA3Select()">
+                        <option value="">SHA-3 Family</option>
+                        <option value="SHA3-224">SHA3-224</option>
+                        <option value="SHA3-256">SHA3-256</option>
+                        <option value="SHA3-384">SHA3-384</option>
+                        <option value="SHA3-512">SHA3-512</option>
                     </select>
                 </div>
             </div>
@@ -254,29 +251,72 @@
     </div>
 
     <script>
+        // Handle SHA-2 family selection
+        function onSHA2Select() {
+            const sha2Select = document.getElementById('sha2Family');
+            const sha3Select = document.getElementById('sha3Family');
+            
+            if (sha2Select.value) {
+                sha3Select.value = '';
+            }
+        }
+
+        // Handle SHA-3 family selection
+        function onSHA3Select() {
+            const sha2Select = document.getElementById('sha2Family');
+            const sha3Select = document.getElementById('sha3Family');
+            
+            if (sha3Select.value) {
+                sha2Select.value = '';
+            }
+        }
+
+        // Get selected algorithm
+        function getSelectedAlgorithm() {
+            const sha2Family = document.getElementById('sha2Family').value;
+            const sha3Family = document.getElementById('sha3Family').value;
+            
+            if (sha2Family) return sha2Family;
+            if (sha3Family) return sha3Family;
+            return '';
+        }
+
         // Generate SHA hash
         async function generateHash() {
             const inputText = document.getElementById('inputText').value.trim();
-            const sha2Family = document.getElementById('sha2Family').value;
-            const sha3Family = document.getElementById('sha3Family').value;
+            const algorithm = getSelectedAlgorithm();
             
             if (!inputText) {
                 alert('Please enter some text to hash.');
                 return;
             }
             
+            if (!algorithm) {
+                alert('Please select a SHA algorithm.');
+                return;
+            }
+            
             try {
-                // For SHA-2 family, we'll use the Web Crypto API
-                if (sha2Family.startsWith('sha-')) {
-                    const hashBuffer = await crypto.subtle.digest(sha2Family.toUpperCase(), new TextEncoder().encode(inputText));
+                let hashHex = '';
+                
+                // Check if algorithm is supported by Web Crypto API
+                const supportedAlgorithms = ['SHA-256', 'SHA-384', 'SHA-512'];
+                
+                if (supportedAlgorithms.includes(algorithm)) {
+                    // Use Web Crypto API for supported SHA-2 algorithms
+                    const hashBuffer = await crypto.subtle.digest(algorithm, new TextEncoder().encode(inputText));
                     const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-                    document.getElementById('outputText').value = hashHex;
+                    hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
                 } else {
-                    // For SHA-3 family, we'll use a fallback since Web Crypto API doesn't support SHA-3 yet
-                    // In a real implementation, you'd use a proper SHA-3 library
-                    document.getElementById('outputText').value = `SHA-3 family (${sha3Family}) not yet supported in this demo. Please use SHA-2 family.`;
+                    // For unsupported algorithms, show appropriate message
+                    if (algorithm.startsWith('SHA3-')) {
+                        hashHex = `SHA-3 family (${algorithm}) is not yet supported by the Web Crypto API. Please use SHA-256, SHA-384, or SHA-512.`;
+                    } else {
+                        hashHex = `Algorithm ${algorithm} is not supported. Please use SHA-256, SHA-384, or SHA-512.`;
+                    }
                 }
+                
+                document.getElementById('outputText').value = hashHex;
             } catch (error) {
                 document.getElementById('outputText').value = `Error generating hash: ${error.message}`;
             }
@@ -286,7 +326,7 @@
         async function copyHash() {
             const outputText = document.getElementById('outputText').value;
             
-            if (!outputText || outputText.includes('Error') || outputText.includes('not yet supported')) {
+            if (!outputText || outputText.includes('Error') || outputText.includes('not yet supported') || outputText.includes('not supported')) {
                 alert('No valid hash to copy.');
                 return;
             }
