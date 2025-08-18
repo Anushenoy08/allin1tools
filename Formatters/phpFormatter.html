@@ -146,13 +146,31 @@
 
         /* Fullscreen styles */
         .editor-section.fullscreen {
-            grid-column: 1 / -1;
-            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .editor-section.fullscreen .editor-header {
+            border-radius: 0;
+            background: #333;
         }
 
         .editor-section.fullscreen .editor-textarea {
-            height: calc(100vh - 300px);
-            min-height: 500px;
+            border-radius: 0;
+            height: calc(100vh - 60px);
+            font-size: 1rem;
+        }
+
+        /* Hide other elements when in fullscreen */
+        .editor-section.fullscreen ~ .editor-section {
+            display: none !important;
         }
 
         @media (max-width: 1024px) {
@@ -361,70 +379,31 @@
             document.getElementById('outputTextarea').value = '';
         }
 
-        // Expand input (full screen functionality)
+        // Expand input (placeholder function)
         function expandInput() {
-            const inputSection = document.querySelector('.editor-section:first-child');
-            const outputSection = document.querySelector('.editor-section:last-child');
-            const container = document.querySelector('.editor-container');
-            
-            if (inputSection.classList.contains('fullscreen')) {
-                // Exit fullscreen
-                inputSection.classList.remove('fullscreen');
-                outputSection.style.display = 'flex';
-                container.style.gridTemplateColumns = '1fr 1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
-            } else {
-                // Enter fullscreen
-                inputSection.classList.add('fullscreen');
-                outputSection.style.display = 'none';
-                container.style.gridTemplateColumns = '1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
-            }
+            alert('Expand input functionality - to be implemented');
         }
 
-        // Expand output (full screen functionality)
+        // Expand output (placeholder function)
         function expandOutput() {
-            const inputSection = document.querySelector('.editor-section:first-child');
-            const outputSection = document.querySelector('.editor-section:last-child');
-            const container = document.querySelector('.editor-container');
-            
-            if (outputSection.classList.contains('fullscreen')) {
-                // Exit fullscreen
-                outputSection.classList.remove('fullscreen');
-                inputSection.style.display = 'flex';
-                container.style.gridTemplateColumns = '1fr 1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
-            } else {
-                // Enter fullscreen
-                outputSection.classList.add('fullscreen');
-                inputSection.style.display = 'none';
-                container.style.gridTemplateColumns = '1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
-            }
+            alert('Expand output functionality - to be implemented');
         }
 
-        // Improved PHP formatting function
+        // Basic PHP formatting function
         function formatPHPCode(code) {
             let lines = code.split('\n');
             let indentLevel = 0;
             let formattedLines = [];
-            let inString = false;
-            let stringChar = '';
-            let inComment = false;
-            let commentType = '';
             
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                let originalLine = line;
+            for (let line of lines) {
                 line = line.trim();
-                
                 if (line === '') {
                     formattedLines.push('');
                     continue;
                 }
                 
                 // Handle PHP tags
-                if (line.startsWith('<?php') || line.startsWith('<?=') || line.startsWith('<?')) {
+                if (line.startsWith('<?php') || line.startsWith('<?=')) {
                     formattedLines.push(line);
                     continue;
                 }
@@ -434,54 +413,6 @@
                     continue;
                 }
                 
-                // Handle comments
-                if (line.startsWith('//') || line.startsWith('#')) {
-                    formattedLines.push('    '.repeat(indentLevel) + line);
-                    continue;
-                }
-                
-                if (line.startsWith('/*')) {
-                    inComment = true;
-                    commentType = 'block';
-                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
-                    continue;
-                }
-                
-                if (line.includes('*/') && inComment && commentType === 'block') {
-                    inComment = false;
-                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
-                    continue;
-                }
-                
-                if (inComment) {
-                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
-                    continue;
-                }
-                
-                // Handle strings
-                if (line.includes('"') || line.includes("'")) {
-                    // Simple string detection (not perfect but works for most cases)
-                    if (line.includes('"') && !line.includes("'")) {
-                        stringChar = '"';
-                    } else if (line.includes("'") && !line.includes('"')) {
-                        stringChar = "'";
-                    }
-                }
-                
-                // Handle control structures
-                const controlKeywords = [
-                    'if', 'elseif', 'else', 'for', 'while', 'foreach', 'try', 'catch', 'finally',
-                    'switch', 'case', 'default', 'function', 'class', 'interface', 'trait'
-                ];
-                
-                let isControlStructure = false;
-                for (let keyword of controlKeywords) {
-                    if (line.startsWith(keyword + ' ') || line.startsWith(keyword + '(')) {
-                        isControlStructure = true;
-                        break;
-                    }
-                }
-                
                 // Handle indentation
                 if (line.includes('{') && !line.includes('}')) {
                     formattedLines.push('    '.repeat(indentLevel) + line);
@@ -489,20 +420,6 @@
                 } else if (line.includes('}') && !line.includes('{')) {
                     indentLevel = Math.max(0, indentLevel - 1);
                     formattedLines.push('    '.repeat(indentLevel) + line);
-                } else if (line.includes('{') && line.includes('}')) {
-                    // Same line braces
-                    formattedLines.push('    '.repeat(indentLevel) + line);
-                } else if (isControlStructure && line.endsWith(':')) {
-                    // Control structures with colons (like switch cases)
-                    formattedLines.push('    '.repeat(indentLevel) + line);
-                    indentLevel++;
-                } else if (line.startsWith('case ') || line.startsWith('default:')) {
-                    // Switch cases
-                    indentLevel = Math.max(0, indentLevel - 1);
-                    formattedLines.push('    '.repeat(indentLevel) + line);
-                    if (line.endsWith(':')) {
-                        indentLevel++;
-                    }
                 } else {
                     formattedLines.push('    '.repeat(indentLevel) + line);
                 }
@@ -511,25 +428,16 @@
             return formattedLines.join('\n');
         }
 
-        // Improved PHP beautification function
+        // Beautify PHP code
         function beautifyPHPCode(code) {
             let beautified = formatPHPCode(code);
             
-            // Add proper spacing around operators (but not inside strings)
-            beautified = beautified.replace(/([^=!<>+\-*/])\s*([=!<>+\-*/]+)\s*([^=+\-*/])/g, '$1 $2 $3');
+            // Add proper spacing around operators
+            beautified = beautified.replace(/([^=!<>])([=!<>]+)([^=])/g, '$1 $2 $3');
+            beautified = beautified.replace(/([^+\-*/])([+\-*/])([^+\-*/])/g, '$1 $2 $3');
             
-            // Add spacing after commas (but not inside strings)
+            // Add spacing after commas
             beautified = beautified.replace(/,([^\s])/g, ', $1');
-            
-            // Add spacing around function calls
-            beautified = beautified.replace(/(\w+)\s*\(/g, '$1(');
-            
-            // Add spacing around brackets
-            beautified = beautified.replace(/\s*\(\s*/g, ' (');
-            beautified = beautified.replace(/\s*\)\s*/g, ') ');
-            
-            // Clean up multiple spaces
-            beautified = beautified.replace(/\s{2,}/g, ' ');
             
             return beautified;
         }

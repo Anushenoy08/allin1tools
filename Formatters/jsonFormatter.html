@@ -146,13 +146,31 @@
 
         /* Fullscreen styles */
         .editor-section.fullscreen {
-            grid-column: 1 / -1;
-            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .editor-section.fullscreen .editor-header {
+            border-radius: 0;
+            background: #333;
         }
 
         .editor-section.fullscreen .editor-textarea {
-            height: calc(100vh - 300px);
-            min-height: 500px;
+            border-radius: 0;
+            height: calc(100vh - 60px);
+            font-size: 1rem;
+        }
+
+        /* Hide other elements when in fullscreen */
+        .editor-section.fullscreen ~ .editor-section {
+            display: none !important;
         }
 
         @media (max-width: 1024px) {
@@ -367,42 +385,105 @@
         // Expand input (full screen functionality)
         function expandInput() {
             const inputSection = document.querySelector('.editor-section:first-child');
-            const outputSection = document.querySelector('.editor-section:last-child');
-            const container = document.querySelector('.editor-container');
             
             if (inputSection.classList.contains('fullscreen')) {
                 // Exit fullscreen
-                inputSection.classList.remove('fullscreen');
-                outputSection.style.display = 'flex';
-                container.style.gridTemplateColumns = '1fr 1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+                exitFullscreen();
             } else {
                 // Enter fullscreen
-                inputSection.classList.add('fullscreen');
-                outputSection.style.display = 'none';
-                container.style.gridTemplateColumns = '1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+                enterFullscreen(inputSection);
             }
         }
 
         // Expand output (full screen functionality)
         function expandOutput() {
-            const inputSection = document.querySelector('.editor-section:first-child');
             const outputSection = document.querySelector('.editor-section:last-child');
-            const container = document.querySelector('.editor-container');
             
             if (outputSection.classList.contains('fullscreen')) {
                 // Exit fullscreen
-                outputSection.classList.remove('fullscreen');
-                inputSection.style.display = 'flex';
-                container.style.gridTemplateColumns = '1fr 1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+                exitFullscreen();
             } else {
                 // Enter fullscreen
-                outputSection.classList.add('fullscreen');
-                inputSection.style.display = 'none';
-                container.style.gridTemplateColumns = '1fr';
-                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+                enterFullscreen(outputSection);
+            }
+        }
+
+        // Enter fullscreen function
+        function enterFullscreen(element) {
+            // Add fullscreen class for styling
+            element.classList.add('fullscreen');
+            
+            // Try to use browser's fullscreen API
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {
+                    console.log('Fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {
+                    console.log('Webkit fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen().catch(err => {
+                    console.log('Mozilla fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen().catch(err => {
+                    console.log('MS fullscreen API not supported, using CSS fullscreen');
+                });
+            }
+            
+            // Update button text
+            const expandBtn = element.querySelector('.header-actions button:nth-of-type(2)');
+            if (expandBtn) {
+                expandBtn.textContent = '⛶';
+                expandBtn.title = 'Exit Fullscreen';
+            }
+        }
+
+        // Exit fullscreen function
+        function exitFullscreen() {
+            // Remove fullscreen class
+            document.querySelectorAll('.editor-section').forEach(section => {
+                section.classList.remove('fullscreen');
+            });
+            
+            // Try to exit browser fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Exit fullscreen failed');
+                });
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen().catch(err => {
+                    console.log('Exit webkit fullscreen failed');
+                });
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen().catch(err => {
+                    console.log('Exit mozilla fullscreen failed');
+                });
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen().catch(err => {
+                    console.log('Exit MS fullscreen failed');
+                });
+            }
+            
+            // Update button texts
+            document.querySelectorAll('.header-actions button:nth-of-type(2)').forEach(btn => {
+                btn.textContent = '⛶';
+                btn.title = 'Fullscreen';
+            });
+        }
+
+        // Listen for fullscreen change events
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // User exited fullscreen
+                exitFullscreen();
             }
         }
     </script>
