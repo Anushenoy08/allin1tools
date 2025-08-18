@@ -248,33 +248,33 @@
 </head>
 <body>
     <!-- Toolbar from common.css -->
-    <div class="navbar">
+<div class="navbar">
         <img src="images/logo.png" alt="Logo">
         <div class="nav-links">
             <a href="index.html">HOME</a>
             <a href="article.html">ARTICLES</a>
         </div>
-    </div>
+</div>
 
     <div class="main-container">
         <div class="main-card">
             <h1 class="page-title">Words & Characters Counter</h1>
-            
+
             <!-- Search Bar -->
-            <div class="search-bar">
+  <div class="search-bar">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search text..." oninput="updateSearch()">
                 <span class="search-count" id="searchCount">0/0</span>
                 <div class="search-nav">
                     <button class="search-btn" id="prevBtn" onclick="searchPrevious()" disabled>▲</button>
                     <button class="search-btn" id="nextBtn" onclick="searchNext()" disabled>▼</button>
                     <button class="search-btn" onclick="clearSearch()">✕</button>
-                </div>
-            </div>
+      </div>
+    </div>
 
             <!-- Text Input Area -->
             <div class="text-input-area">
                 <textarea class="text-input" id="textInput" placeholder="Enter or paste your text here..." oninput="updateStats()"></textarea>
-            </div>
+  </div>
 
             <!-- Statistics Display -->
             <div class="stats-container">
@@ -302,7 +302,7 @@
                     <div class="stat-label">Search Matches</div>
                     <div class="stat-value" id="searchMatchCount">0</div>
                 </div>
-            </div>
+  </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
@@ -312,10 +312,10 @@
                 </div>
                 <button class="btn btn-primary btn-wide" onclick="tryAnother()">Try Another</button>
             </div>
-        </div>
-    </div>
+  </div>
+</div>
 
-    <script>
+<script>
         let currentSearchIndex = -1;
         let searchMatches = [];
 
@@ -359,9 +359,9 @@
                 document.getElementById('searchCount').textContent = '0/0';
                 document.getElementById('prevBtn').disabled = true;
                 document.getElementById('nextBtn').disabled = true;
-                return;
-            }
-            
+    return;
+  }
+
             // Find all matches
             const regex = new RegExp(searchText, 'gi');
             searchMatches = [];
@@ -444,9 +444,9 @@
             currentSearchIndex = currentSearchIndex >= searchMatches.length - 1 ? 0 : currentSearchIndex + 1;
             document.getElementById('searchCount').textContent = `${currentSearchIndex + 1}/${searchMatches.length}`;
             highlightCurrentMatch();
-        }
+}
 
-        function clearSearch() {
+function clearSearch() {
             document.getElementById('searchInput').value = '';
             updateSearch();
         }
@@ -470,8 +470,8 @@
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                alert('Text copied to clipboard!');
-            }
+  alert('Text copied to clipboard!');
+}
         }
 
         // Download text to file
@@ -501,7 +501,7 @@
             document.getElementById('searchInput').value = '';
             updateStats();
             clearSearch();
-        }
-    </script>
+}
+</script>
 </body>
 </html>

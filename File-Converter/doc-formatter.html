@@ -254,10 +254,10 @@
 </head>
 <body>
     <!-- Toolbar from common.css -->
-    <div class="navbar">
-        <img src="../images/logo.png" alt="Logo">
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
         <div class="nav-links">
-            <a href="../index.html">HOME</a>
+  <a href="../index.html">HOME</a>
             <a href="../article.html">ARTICLES</a>
         </div>
     </div>
@@ -268,7 +268,7 @@
             <div class="header-section">
                 <h1 class="page-title">Document Formatter</h1>
                 <p class="subtitle">Format, merge, split, annotate, and extract from PDFs</p>
-            </div>
+</div>
 
             <!-- Tool Selection Grid -->
             <div class="tool-grid">
@@ -276,7 +276,7 @@
                 <button class="tool-btn" onclick="selectTool('split')">Split PDF</button>
                 <button class="tool-btn" onclick="selectTool('pages')">Add/Remove Pages</button>
                 <button class="tool-btn" onclick="selectTool('annotate')">Annotate/Watermark</button>
-            </div>
+  </div>
 
             <!-- Content Area -->
             <div class="content-area" id="contentArea">
@@ -288,12 +288,12 @@
                         <button class="choose-files-btn" onclick="document.getElementById('fileInput').click()">Choose files</button>
                         <span class="file-count" id="fileCount">No file chosen</span>
                         <input type="file" id="fileInput" class="file-input" accept=".pdf" multiple>
-                    </div>
+  </div>
                     
                     <div class="file-list" id="fileList"></div>
                     
                     <button class="action-btn" id="mergeBtn" onclick="mergePDFs()" disabled>Merge & Download</button>
-                </div>
+  </div>
 
                 <!-- Split PDF Content -->
                 <div id="splitContent" style="display: none;">
@@ -303,9 +303,9 @@
                         <button class="choose-files-btn" onclick="document.getElementById('splitFileInput').click()">Choose file</button>
                         <span class="file-count" id="splitFileCount">No file chosen</span>
                         <input type="file" id="splitFileInput" class="file-input" accept=".pdf">
-                    </div>
+</div>
                     
-                    <div class="file-list" id="splitFileList"></div>
+        <div class="file-list" id="splitFileList"></div>
                     
                     <div style="margin: 1rem 0;">
                         <label for="splitRanges" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Page ranges (e.g., 1-3, 5, 7-9):</label>
@@ -325,7 +325,7 @@
                         <input type="file" id="pagesFileInput" class="file-input" accept=".pdf">
                     </div>
                     
-                    <div class="file-list" id="pagesFileList"></div>
+        <div class="file-list" id="pagesFileList"></div>
                     
                     <div style="margin: 1rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div>
@@ -520,8 +520,8 @@
         async function mergePDFs() {
             if (selectedFiles.length < 2) {
                 alert('Please select at least 2 PDF files to merge.');
-                return;
-            }
+        return;
+      }
 
             try {
                 // Show loading state
@@ -531,15 +531,15 @@
                 
                 // Use PDF-lib to merge PDFs
                 const { PDFDocument } = PDFLib;
-                const mergedPdf = await PDFDocument.create();
+      const mergedPdf = await PDFDocument.create();
                 
                 // Process each selected PDF file
                 for (const file of selectedFiles) {
                     try {
                         const arrayBuffer = await file.arrayBuffer();
                         const pdf = await PDFDocument.load(arrayBuffer);
-                        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                        copiedPages.forEach(page => mergedPdf.addPage(page));
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach(page => mergedPdf.addPage(page));
                     } catch (error) {
                         console.error(`Error processing ${file.name}:`, error);
                         throw new Error(`Failed to process ${file.name}. Please ensure it's a valid PDF file.`);
@@ -598,11 +598,11 @@
             // Create download link for the actual PDF
             const url = URL.createObjectURL(pdfBlob);
             
-            const a = document.createElement('a');
-            a.href = url;
+        const a = document.createElement('a');
+        a.href = url;
             a.download = fileName;
             document.body.appendChild(a);
-            a.click();
+        a.click();
             document.body.removeChild(a);
             
             // Clean up the URL object
@@ -613,14 +613,14 @@
         async function splitPDF() {
             if (!window.splitFile) {
                 alert('Please select a PDF file first.');
-                return;
-            }
+        return;
+      }
 
             const ranges = document.getElementById('splitRanges').value.trim();
             if (!ranges) {
                 alert('Please enter page ranges.');
-                return;
-            }
+        return;
+      }
 
             try {
                 const splitBtn = document.getElementById('splitBtn');
@@ -630,7 +630,7 @@
                 const { PDFDocument } = PDFLib;
                 const arrayBuffer = await window.splitFile.arrayBuffer();
                 const pdf = await PDFDocument.load(arrayBuffer);
-                const totalPages = pdf.getPageCount();
+      const totalPages = pdf.getPageCount();
 
                 // Parse page ranges (e.g., "1-3, 5, 7-9")
                 const pageNumbers = parsePageRanges(ranges, totalPages);
@@ -664,8 +664,8 @@
 
         // Parse page ranges
         function parsePageRanges(rangeStr, totalPages) {
-            const ranges = rangeStr.split(',').map(r => r.trim()).filter(Boolean);
-            let pageNumbers = [];
+      const ranges = rangeStr.split(',').map(r => r.trim()).filter(Boolean);
+      let pageNumbers = [];
 
             for (const range of ranges) {
                 if (range.includes('-')) {
@@ -675,7 +675,7 @@
                             pageNumbers.push(i);
                         }
                     }
-                } else {
+        } else {
                     const pageNum = Number(range);
                     if (pageNum >= 1 && pageNum <= totalPages) {
                         pageNumbers.push(pageNum);
@@ -696,8 +696,8 @@
             const count = parseInt(document.getElementById('addPagesCount').value);
             if (count < 1 || count > 10) {
                 alert('Please enter a valid number of pages (1-10).');
-                return;
-            }
+        return;
+      }
 
             try {
                 const addBtn = document.getElementById('addPageBtn');
@@ -797,14 +797,14 @@
         async function addAnnotation() {
             if (!window.annotateFile) {
                 alert('Please select a PDF file first.');
-                return;
-            }
+        return;
+      }
 
             const text = document.getElementById('annotationText').value.trim();
             if (!text) {
                 alert('Please enter annotation text.');
-                return;
-            }
+        return;
+      }
 
             try {
                 const annotateBtn = document.getElementById('annotateBtn');
@@ -838,7 +838,7 @@
                 
                 for (let i = 0; i < pages.length; i++) {
                     const page = pages[i];
-                    const { width, height } = page.getSize();
+        const { width, height } = page.getSize();
                     
                     // Add copyright symbol and format text
                     const watermarkText = `© ${text}`;
@@ -854,7 +854,7 @@
                     
                     // Position text in bottom-right corner with proper margins
                     const margin = 25;
-                    const x = width - textWidth - margin;
+        const x = width - textWidth - margin;
                     const y = margin + fontSize; // Account for font height
                     
                     console.log(`Page ${i + 1}: Adding watermark at (${x}, ${y}) with text: "${watermarkText}"`);
@@ -872,10 +872,10 @@
                     } else {
                         // Fallback drawing without custom font
                         page.drawText(watermarkText, {
-                            x: x,
-                            y: y,
-                            size: fontSize,
-                            color: color,
+          x: x,
+          y: y,
+          size: fontSize,
+          color: color,
                             opacity: opacity
                         });
                     }
@@ -899,7 +899,7 @@
                 annotateBtn.disabled = false;
                 annotateBtn.textContent = 'Add & Download';
             }
-        }
-    </script>
+  }
+</script>
 </body>
 </html>

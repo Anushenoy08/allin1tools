@@ -198,13 +198,13 @@
 </head>
 <body>
     <!-- Toolbar from common.css -->
-    <div class="navbar">
-        <img src="../images/logo.png" alt="Logo">
+<div class="navbar">
+    <img src="../images/logo.png" alt="Logo">
         <div class="nav-links">
-            <a href="../index.html">HOME</a>
+    <a href="../index.html">HOME</a>
             <a href="../article.html">ARTICLES</a>
         </div>
-    </div>
+</div>
 
     <div class="main-container">
         <h1 class="page-title">SHA HASH GENERATOR</h1>
@@ -234,7 +234,7 @@
                         <option value="SHA3-512">SHA3-512</option>
                     </select>
                 </div>
-            </div>
+                </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
@@ -251,7 +251,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         // Handle SHA-2 family selection
         function onSHA2Select() {
             const sha2Select = document.getElementById('sha2Family');
@@ -263,7 +263,7 @@
         }
 
         // Handle SHA-3 family selection
-        function onSHA3Select() {
+    function onSHA3Select() {
             const sha2Select = document.getElementById('sha2Family');
             const sha3Select = document.getElementById('sha3Family');
             
@@ -309,7 +309,7 @@
                     const hashArray = Array.from(new Uint8Array(hashBuffer));
                     hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
                 } else if (algorithm.startsWith('SHA3-')) {
-                    // Use js-sha3 library for SHA-3 family
+            // Use js-sha3 library for SHA-3 family
                     try {
                         switch (algorithm) {
                             case 'SHA3-224':
@@ -382,7 +382,7 @@
                 generateHash();
             }
         });
-    </script>
+</script>
 </body>
 </html>
 
