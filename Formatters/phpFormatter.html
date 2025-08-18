@@ -1,321 +1,444 @@
----
-layout: default
-title: Best Online PHP Formatter for FREE
-permalink: /Formatters/phpFormatter.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Formatter - Allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<div class="navbar">
-    <img src="../images/logo.png" alt="Logo">
-    <a href="../index.html">HOME</a>
-    <a href="/article/">ARTICLES</a>
-</div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="json-converter-container">
-    <div class="json-converter-title">PHP FORMATTER</div>
-    
-    <div class="buttons-section">
-        <button onclick="formatPHP()">Format</button>
-        <button onclick="beautifyPHP()">Beautify</button>
-        <button onclick="validatePHP()">Validate</button>
-        <button onclick="copyPHP()">Copy PHP</button>
-        <button onclick="downloadPHP()">Download PHP</button>
-    </div>
-    
-    <div class="json-converter-layout">
-        <!-- Left side: Input -->
-        <div class="json-converter-left">
-            <div class="json-converter-box">
-                <div class="toolbar">
-                    <span class="toolbar-label">Input</span>
-                    <div class="toolbar-options">
-                        <label class="upload-option">
-                            <input type="file" accept=".php,.txt" onchange="uploadPHPFile(event)">
-                            <span class="upload-icon">📁</span>
-                        </label>
-                        <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-                            <span class="fullscreen-icon">⛶</span>
-                        </button>
-                        <button class="clear-option" title="Clear" onclick="clearPHP('input')">
-                            <span class="clear-icon">🗑️</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="code-area-wrapper">
-                    <textarea class="json-textarea" id="phpInput" placeholder="Paste or type your PHP code here..."></textarea>
-                </div>
-            </div>
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .content-container {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: 600px;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .editor-header {
+            background: #333;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .editor-textarea {
+            flex: 1;
+            border: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .editor-textarea:focus {
+            background: white;
+            box-shadow: inset 0 0 0 2px #2196f3;
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .editor-section {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .content-container {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
         </div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">PHP Formatter</h1>
         
-        <!-- Right side: Output -->
-        <div class="json-converter-right">
-            <div class="json-converter-box">
-                <div class="toolbar">
-                    <span class="toolbar-label">Output</span>
-                    <div class="toolbar-options">
-                        <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-                            <span class="fullscreen-icon">⛶</span>
-                        </button>
-                        <button class="clear-option" title="Clear" onclick="clearPHP('output')">
-                            <span class="clear-icon">🗑️</span>
-                        </button>
+        <div class="content-container">
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn" onclick="formatPHP()">Format</button>
+                <button class="action-btn" onclick="beautifyPHP()">Beautify</button>
+                <button class="action-btn" onclick="validatePHP()">Validate</button>
+                <button class="action-btn" onclick="copyPHP()">Copy Code</button>
+                <button class="action-btn" onclick="downloadPHP()">Download</button>
+            </div>
+
+            <!-- Editor Container -->
+            <div class="editor-container">
+                <!-- Input Section -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <span class="editor-title">Input</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="uploadFile()" title="Upload File">📁</button>
+                            <button class="header-btn" onclick="expandInput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearInput()" title="Clear">🗑️</button>
+                        </div>
                     </div>
+                    <textarea class="editor-textarea" id="inputTextarea" placeholder="Paste or type your PHP code here..."></textarea>
                 </div>
-                <div class="code-area-wrapper">
-                    <textarea class="json-textarea" id="phpOutput" placeholder="Formatted/Beautified PHP will appear here..." readonly></textarea>
+
+                <!-- Output Section -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <span class="editor-title">Output</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="expandOutput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearOutput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="editor-textarea" id="outputTextarea" placeholder="Formatted/Beautified PHP code will appear here..." readonly></textarea>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="popupMsg" class="popup" style="display:none;"><span id="popupText"></span><button class="close-btn" onclick="closePopup()">✕</button></div>
+    <script>
+        // Format PHP code
+        function formatPHP() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter PHP code to format');
+                return;
+            }
 
-
-
-<script>
-    function showError(msg) {
-        const errorDiv = document.getElementById('errorMsg');
-        errorDiv.innerText = msg;
-        errorDiv.style.display = 'block';
-    }
-    function clearError() {
-        const errorDiv = document.getElementById('errorMsg');
-        errorDiv.innerText = '';
-        errorDiv.style.display = 'none';
-    }
-    function showPopup(msg) {
-        const popup = document.getElementById('popupMsg');
-        document.getElementById('popupText').innerText = msg;
-        popup.style.display = 'flex';
-    }
-    function closePopup() {
-        document.getElementById('popupMsg').style.display = 'none';
-    }
-    function updateInputLineNumbers() {
-        const textarea = document.getElementById('phpInput');
-        const lineNumbers = document.getElementById('inputLineNumbers');
-        const lines = textarea.value.split('\n').length || 1;
-        let html = '';
-        for (let i = 1; i <= lines; i++) html += i + '<br>';
-        lineNumbers.innerHTML = html;
-    }
-    function updateOutputLineNumbers() {
-        const textarea = document.getElementById('phpOutput');
-        const lineNumbers = document.getElementById('outputLineNumbers');
-        const lines = textarea.value.split('\n').length || 1;
-        let html = '';
-        for (let i = 1; i <= lines; i++) html += i + '<br>';
-        lineNumbers.innerHTML = html;
-    }
-    function syncScroll(which) {
-        if (which === 'input') {
-            const textarea = document.getElementById('phpInput');
-            const lineNumbers = document.getElementById('inputLineNumbers');
-            lineNumbers.scrollTop = textarea.scrollTop;
-        } else {
-            const textarea = document.getElementById('phpOutput');
-            const lineNumbers = document.getElementById('outputLineNumbers');
-            lineNumbers.scrollTop = textarea.scrollTop;
+            try {
+                const formatted = formatPHPCode(input);
+                document.getElementById('outputTextarea').value = formatted;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
         }
-    }
-    function formatPHP() {
-        clearError();
-        const input = document.getElementById('phpInput').value;
-        try {
-            // Simple PHP formatting
-            const formatted = input
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0)
-                .join('\n');
-            document.getElementById('phpOutput').value = formatted;
-            updateOutputLineNumbers();
-        } catch (e) {
-            showError('Error formatting PHP: ' + e.message);
-            document.getElementById('phpOutput').value = '';
-            updateOutputLineNumbers();
+
+        // Beautify PHP code
+        function beautifyPHP() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter PHP code to beautify');
+                return;
+            }
+
+            try {
+                const beautified = beautifyPHPCode(input);
+                document.getElementById('outputTextarea').value = beautified;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
         }
-    }
-    function validatePHP() {
-        clearError();
-        const input = document.getElementById('phpInput').value;
-        try {
-            // Basic PHP syntax validation
-            const lines = input.split('\n');
-            let isValid = true;
-            let errorMsg = '';
+
+        // Validate PHP code
+        function validatePHP() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter PHP code to validate');
+                return;
+            }
+
+            try {
+                const validation = validatePHPCode(input);
+                document.getElementById('outputTextarea').value = validation;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
+        }
+
+        // Copy PHP code
+        async function copyPHP() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No code to copy');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(output);
+                alert('PHP code copied to clipboard!');
+            } catch (error) {
+                const textArea = document.createElement('textarea');
+                textArea.value = output;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('PHP code copied to clipboard!');
+            }
+        }
+
+        // Download PHP code
+        function downloadPHP() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No code to download');
+                return;
+            }
+
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formatted.php';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Upload file
+        function uploadFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.php,.txt';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('inputTextarea').value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Clear input
+        function clearInput() {
+            document.getElementById('inputTextarea').value = '';
+        }
+
+        // Clear output
+        function clearOutput() {
+            document.getElementById('outputTextarea').value = '';
+        }
+
+        // Expand input (placeholder function)
+        function expandInput() {
+            alert('Expand input functionality - to be implemented');
+        }
+
+        // Expand output (placeholder function)
+        function expandOutput() {
+            alert('Expand output functionality - to be implemented');
+        }
+
+        // Basic PHP formatting function
+        function formatPHPCode(code) {
+            let lines = code.split('\n');
+            let indentLevel = 0;
+            let formattedLines = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (line === '') {
+                    formattedLines.push('');
+                    continue;
+                }
+                
+                // Handle PHP tags
+                if (line.startsWith('<?php') || line.startsWith('<?=')) {
+                    formattedLines.push(line);
+                    continue;
+                }
+                
+                if (line.startsWith('?>')) {
+                    formattedLines.push(line);
+                    continue;
+                }
+                
+                // Handle indentation
+                if (line.includes('{') && !line.includes('}')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    indentLevel++;
+                } else if (line.includes('}') && !line.includes('{')) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                } else {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                }
+            }
+            
+            return formattedLines.join('\n');
+        }
+
+        // Beautify PHP code
+        function beautifyPHPCode(code) {
+            let beautified = formatPHPCode(code);
+            
+            // Add proper spacing around operators
+            beautified = beautified.replace(/([^=!<>])([=!<>]+)([^=])/g, '$1 $2 $3');
+            beautified = beautified.replace(/([^+\-*/])([+\-*/])([^+\-*/])/g, '$1 $2 $3');
+            
+            // Add spacing after commas
+            beautified = beautified.replace(/,([^\s])/g, ', $1');
+            
+            return beautified;
+        }
+
+        // Validate PHP code
+        function validatePHPCode(code) {
+            let errors = [];
+            let lines = code.split('\n');
             
             for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line && !line.startsWith('//') && !line.startsWith('/*') && !line.startsWith('*')) {
-                    // Basic validation - check for common syntax errors
-                    if (line.includes('function ') && !line.includes('(')) {
-                        isValid = false;
-                        errorMsg = `Line ${i + 1}: Invalid function declaration`;
-                        break;
-                    }
-                    if (line.includes('if ') && !line.includes('(')) {
-                        isValid = false;
-                        errorMsg = `Line ${i + 1}: Invalid if statement`;
-                        break;
-                    }
-                    if (line.includes('for ') && !line.includes('(')) {
-                        isValid = false;
-                        errorMsg = `Line ${i + 1}: Invalid for loop`;
-                        break;
-                    }
+                const line = lines[i];
+                const lineNum = i + 1;
+                
+                // Check for basic syntax issues
+                if (line.includes('echo ') && !line.includes(';') && !line.includes('{')) {
+                    errors.push(`Line ${lineNum}: Missing semicolon after echo statement`);
+                }
+                
+                if (line.includes('$') && line.includes('=') && !line.includes(';') && !line.includes('{')) {
+                    errors.push(`Line ${lineNum}: Missing semicolon after variable assignment`);
                 }
             }
             
-            if (isValid) {
-                showPopup('Valid PHP syntax');
+            if (errors.length === 0) {
+                return '✅ Valid PHP code\n\nNo syntax errors detected.';
             } else {
-                showError(errorMsg);
-            }
-        } catch (e) {
-            showError('Invalid PHP syntax');
-        }
-    }
-    function beautifyPHP() {
-        clearError();
-        const input = document.getElementById('phpInput').value;
-        try {
-            // Simple PHP beautification
-            const beautified = input
-                .split('\n')
-                .map(line => {
-                    const trimmed = line.trim();
-                    if (trimmed.startsWith('function ') || trimmed.startsWith('class ') || trimmed.startsWith('if ') || 
-                        trimmed.startsWith('elseif ') || trimmed.startsWith('else') || trimmed.startsWith('for ') || 
-                        trimmed.startsWith('while ') || trimmed.startsWith('try') || trimmed.startsWith('catch') ||
-                        trimmed.startsWith('finally') || trimmed.startsWith('foreach ')) {
-                        return '    ' + trimmed;
-                    }
-                    return '        ' + trimmed;
-                })
-                .join('\n');
-            document.getElementById('phpOutput').value = beautified;
-            updateOutputLineNumbers();
-        } catch (e) {
-            showError('Error beautifying PHP: ' + e.message);
-            document.getElementById('phpOutput').value = '';
-            updateOutputLineNumbers();
-        }
-    }
-
-    function copyPHP() {
-        const output = document.getElementById('phpOutput').value;
-        if (!output) return;
-        navigator.clipboard.writeText(output);
-        showPopup('Copied to clipboard!');
-    }
-    function downloadPHP() {
-        const output = document.getElementById('phpOutput').value;
-        if (!output) return;
-        const blob = new Blob([output], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'formatted.php';
-        link.click();
-    }
-
-    function uploadPHPFile(which, event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const text = e.target.result;
-                if (which === 'input') {
-                    document.getElementById('phpInput').value = text;
-                } else {
-                    document.getElementById('phpOutput').value = text;
-                }
-            } catch (error) {
-                showError('Error reading file: ' + error.message);
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    function clearPHP(which) {
-        if (which === 'input') {
-            document.getElementById('phpInput').value = '';
-        } else {
-            document.getElementById('phpOutput').value = '';
-        }
-        clearError();
-    }
-
-    function toggleFullScreen(button) {
-        // Find the parent json-converter-box element
-        let box = button.closest('.json-converter-box');
-        
-        // Fallback: if closest() doesn't work, traverse up manually
-        if (!box) {
-            let parent = button.parentElement;
-            while (parent && !parent.classList.contains('json-converter-box')) {
-                parent = parent.parentElement;
-            }
-            box = parent;
-        }
-        
-        // If still no box found, try to find by looking for the textarea parent
-        if (!box) {
-            const textarea = button.closest('.toolbar-options').nextElementSibling;
-            if (textarea && textarea.classList.contains('code-area-wrapper')) {
-                box = textarea.parentElement;
+                return '❌ PHP code issues found:\n\n' + errors.join('\n');
             }
         }
-        
-        // Final fallback: if no box found, show error and return
-        if (!box) {
-            console.error('Could not find json-converter-box element');
-            alert('Fullscreen not available on this device');
-            return;
-        }
-        
-        // Check if already in fullscreen
-        if (document.fullscreenElement || 
-            document.webkitFullscreenElement || 
-            document.mozFullScreenElement || 
-            document.msFullscreenElement) {
-            
-            // Exit fullscreen
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        } else {
-            // Enter fullscreen
-            if (box.requestFullscreen) {
-                box.requestFullscreen().catch(err => {
-                    console.log('Error attempting to enable fullscreen:', err);
-                });
-            } else if (box.webkitRequestFullscreen) {
-                box.webkitRequestFullscreen().catch(err => {
-                    console.log('Error attempting to enable webkit fullscreen:', err);
-                });
-            } else if (box.mozRequestFullScreen) {
-                box.mozRequestFullScreen().catch(err => {
-                    console.log('Error attempting to enable moz fullscreen:', err);
-                });
-            } else if (box.msRequestFullscreen) {
-                box.msRequestFullscreen().catch(err => {
-                    console.log('Error attempting to enable ms fullscreen:', err);
-                });
-            } else {
-                // If no fullscreen API is available, show message
-                alert('Fullscreen not supported on this device');
-            }
-        }
-    }
-
-
-</script>
+    </script>
+</body>
+</html>
 
