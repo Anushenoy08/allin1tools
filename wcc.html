@@ -381,6 +381,54 @@
             highlightCurrentMatch();
         }
 
+        // Highlight current search match
+        function highlightCurrentMatch() {
+            const textInput = document.getElementById('textInput');
+            const searchText = document.getElementById('searchInput').value;
+            
+            if (currentSearchIndex >= 0 && searchMatches.length > 0) {
+                const matchIndex = searchMatches[currentSearchIndex];
+                textInput.focus();
+                textInput.setSelectionRange(matchIndex, matchIndex + searchText.length);
+                
+                // Scroll to the match
+                scrollToMatch(matchIndex, searchText.length);
+            }
+        }
+
+        // Scroll to the current match
+        function scrollToMatch(matchIndex, matchLength) {
+            const textInput = document.getElementById('textInput');
+            
+            // Create a temporary element to measure text dimensions
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.visibility = 'hidden';
+            tempDiv.style.whiteSpace = 'pre-wrap';
+            tempDiv.style.wordWrap = 'break-word';
+            tempDiv.style.font = window.getComputedStyle(textInput).font;
+            tempDiv.style.width = textInput.clientWidth + 'px';
+            tempDiv.style.padding = window.getComputedStyle(textInput).padding;
+            tempDiv.style.border = window.getComputedStyle(textInput).border;
+            tempDiv.style.boxSizing = 'border-box';
+            
+            // Get text before the match
+            const textBeforeMatch = textInput.value.substring(0, matchIndex);
+            tempDiv.textContent = textBeforeMatch;
+            
+            // Add to DOM temporarily to measure
+            document.body.appendChild(tempDiv);
+            
+            // Calculate scroll position
+            const scrollTop = tempDiv.offsetHeight;
+            
+            // Remove temporary element
+            document.body.removeChild(tempDiv);
+            
+            // Scroll to the match with some offset for better visibility
+            textInput.scrollTop = Math.max(0, scrollTop - 30);
+        }
+
         // Search navigation
         function searchPrevious() {
             if (searchMatches.length === 0) return;
@@ -401,18 +449,6 @@
         function clearSearch() {
             document.getElementById('searchInput').value = '';
             updateSearch();
-        }
-
-        // Highlight current search match
-        function highlightCurrentMatch() {
-            const textInput = document.getElementById('textInput');
-            const searchText = document.getElementById('searchInput').value;
-            
-            if (currentSearchIndex >= 0 && searchMatches.length > 0) {
-                const matchIndex = searchMatches[currentSearchIndex];
-                textInput.focus();
-                textInput.setSelectionRange(matchIndex, matchIndex + searchText.length);
-            }
         }
 
         // Copy text to clipboard
