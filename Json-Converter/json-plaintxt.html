@@ -1,263 +1,536 @@
----
-layout: default
-title: Best Online JSON to PlainText Converter for FREE
-permalink: /Json-Converter/json-plaintxt.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to Plain Text Converter - Allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<div class="navbar">
-  <img src="../images/logo.png" alt="Logo">
-  <a href="../index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="json-converter-container">
-  <div class="json-converter-title">JSON to Plain Text Converter</div>
-  
-  <div class="json-converter-layout">
-    <!-- Left side: Input -->
-    <div class="json-converter-left">
-      <div class="json-converter-box">
-        <div class="toolbar">
-          <span class="toolbar-label">Input</span>
-          <div class="toolbar-options">
-            <label class="upload-option">
-              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
-              <span class="upload-icon">📁</span>
-            </label>
-            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-              <span class="fullscreen-icon">⛶</span>
-            </button>
-            <button class="clear-option" title="Clear" onclick="clearInput()">
-              <span class="clear-icon">🗑️</span>
-            </button>
-          </div>
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .content-container {
+            padding: 2rem;
+        }
+
+        .converter-layout {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 2rem;
+            height: 600px;
+        }
+
+        .input-section, .output-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .section-header {
+            background: #333;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .section-textarea {
+            flex: 1;
+            border: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .section-textarea:focus {
+            background: white;
+            box-shadow: inset 0 0 0 2px #2196f3;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            min-width: 150px;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Fullscreen styles */
+        .input-section.fullscreen, .output-section.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .input-section.fullscreen .section-header,
+        .output-section.fullscreen .section-header {
+            border-radius: 0;
+            background: #333;
+        }
+
+        .input-section.fullscreen .section-textarea,
+        .output-section.fullscreen .section-textarea {
+            border-radius: 0;
+            height: calc(100vh - 60px);
+            font-size: 1rem;
+        }
+
+        /* Hide other elements when in fullscreen */
+        .input-section.fullscreen ~ *,
+        .output-section.fullscreen ~ * {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .converter-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+                gap: 1rem;
+            }
+            
+            .input-section, .output-section {
+                height: 400px;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .action-btn {
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .content-container {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
         </div>
-        <div class="code-area-wrapper">
-          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Object or Array Example: {"name":"John","age":30,"city":"New York"}'></textarea>
-        </div>
-      </div>
     </div>
-    
-    <!-- Center: Buttons -->
-    <div class="json-converter-center">
-      <div class="action-btns">
-        <button onclick="convertToPlainText()">Convert to Plain Text</button>
-        <button onclick="copyOutput()">Copy Text</button>
-        <button onclick="downloadOutput()">Download Text</button>
-      </div>
-    </div>
-    
-    <!-- Right side: Output -->
-    <div class="json-converter-right">
-      <div class="json-converter-box">
-        <div class="toolbar">
-          <span class="toolbar-label">Output</span>
-          <div class="toolbar-options">
-            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-              <span class="fullscreen-icon">⛶</span>
-            </button>
-            <button class="clear-option" title="Clear" onclick="clearOutput()">
-              <span class="clear-icon">🗑️</span>
-            </button>
-          </div>
+
+    <div class="main-container">
+        <h1 class="page-title">JSON to Plain Text Converter</h1>
+        
+        <div class="content-container">
+            <div class="converter-layout">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <div class="section-header">
+                        <span class="section-title">Input</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="uploadFile()" title="Upload File">📁</button>
+                            <button class="header-btn" onclick="expandInput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearInput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="section-textarea" id="inputTextarea" placeholder="Enter JSON Object or Array Example:
+{'name':'John', 'age':30,'city': 'New York'}"></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="convertToPlainText()">Convert to Plain Text</button>
+                    <button class="action-btn" onclick="copyText()">Copy Text</button>
+                    <button class="action-btn" onclick="downloadText()">Download Text</button>
+                </div>
+
+                <!-- Output Section -->
+                <div class="output-section">
+                    <div class="section-header">
+                        <span class="section-title">Output</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="expandOutput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearOutput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="section-textarea" id="outputTextarea" placeholder="Plain text result will appear here..." readonly></textarea>
+                </div>
+            </div>
         </div>
-        <div class="code-area-wrapper">
-          <textarea class="json-textarea" id="plainOutput" placeholder="Plain text result will appear here..." readonly></textarea>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<script>
-function convertToPlainText() {
-  const input = document.getElementById('jsonInput').value.trim();
-  const output = document.getElementById('plainOutput');
-  output.value = '';
-  try {
-    const obj = JSON.parse(input);
-    let lines = [];
-    if (Array.isArray(obj)) {
-      obj.forEach((item, idx) => {
-        lines = lines.concat(flattenObject(item, '', idx));
-      });
-    } else {
-      lines = flattenObject(obj);
-    }
-    output.value = lines.join('\n');
-  } catch (e) {
-    alert('Invalid JSON format.');
-  }
-}
+    <script>
+        // Convert JSON to Plain Text
+        function convertToPlainText() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter JSON data to convert');
+                return;
+            }
 
-// Flattens an object to key: value pairs, supports nested objects/arrays
-function flattenObject(obj, prefix = '', arrIdx = null) {
-  let lines = [];
-  for (let key in obj) {
-    if (!obj.hasOwnProperty(key)) continue;
-    let value = obj[key];
-    let fullKey = prefix ? (arrIdx !== null ? `${prefix}[${arrIdx}].${key}` : `${prefix}.${key}`) : key;
-    if (typeof value === 'object' && value !== null) {
-      if (Array.isArray(value)) {
-        value.forEach((v, i) => {
-          if (typeof v === 'object' && v !== null) {
-            lines = lines.concat(flattenObject(v, fullKey, i));
-          } else {
-            lines.push(`${fullKey}[${i}]: ${v}`);
-          }
-        });
-      } else {
-        lines = lines.concat(flattenObject(value, fullKey));
-      }
-    } else {
-      lines.push(`${fullKey}: ${value}`);
-    }
-  }
-  return lines;
-}
+            try {
+                const jsonData = JSON.parse(input);
+                const plainText = jsonToPlainText(jsonData);
+                document.getElementById('outputTextarea').value = plainText;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
+        }
 
-function clearInput() {
-  document.getElementById('jsonInput').value = '';
-}
+        // Convert JSON object to Plain Text
+        function jsonToPlainText(data, indent = 0) {
+            const spaces = '  '.repeat(indent);
+            
+            if (data === null) {
+                return 'null';
+            }
+            
+            if (typeof data === 'undefined') {
+                return 'undefined';
+            }
+            
+            if (typeof data === 'string') {
+                return data;
+            }
+            
+            if (typeof data === 'number') {
+                return data.toString();
+            }
+            
+            if (typeof data === 'boolean') {
+                return data ? 'true' : 'false';
+            }
+            
+            if (Array.isArray(data)) {
+                if (data.length === 0) {
+                    return '[]';
+                }
+                
+                let result = '[\n';
+                data.forEach((item, index) => {
+                    result += spaces + '  ' + jsonToPlainText(item, indent + 1);
+                    if (index < data.length - 1) {
+                        result += ',';
+                    }
+                    result += '\n';
+                });
+                result += spaces + ']';
+                return result;
+            }
+            
+            if (typeof data === 'object') {
+                const keys = Object.keys(data);
+                if (keys.length === 0) {
+                    return '{}';
+                }
+                
+                let result = '{\n';
+                keys.forEach((key, index) => {
+                    result += spaces + '  ' + key + ': ' + jsonToPlainText(data[key], indent + 1);
+                    if (index < keys.length - 1) {
+                        result += ',';
+                    }
+                    result += '\n';
+                });
+                result += spaces + '}';
+                return result;
+            }
+            
+            return String(data);
+        }
 
-function clearOutput() {
-  document.getElementById('plainOutput').value = '';
-}
+        // Copy text to clipboard
+        async function copyText() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No text to copy');
+                return;
+            }
 
-function uploadJSONFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('jsonInput').value = e.target.result;
-  };
-  reader.readAsText(file);
-}
+            try {
+                await navigator.clipboard.writeText(output);
+                alert('Text copied to clipboard!');
+            } catch (error) {
+                const textArea = document.createElement('textarea');
+                textArea.value = output;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Text copied to clipboard!');
+            }
+        }
 
-function toggleFullScreen(button) {
-  const box = button.closest('.json-converter-box');
-  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-    if (box.requestFullscreen) {
-      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
-    } else if (box.webkitRequestFullscreen) {
-      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
-    } else if (box.msRequestFullscreen) {
-      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-  }
-}
+        // Download text file
+        function downloadText() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No text to download');
+                return;
+            }
 
+            const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'converted.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
 
+        // Upload file
+        function uploadFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.txt';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('inputTextarea').value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
 
-function enterMobileFullscreen(which) {
-  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
-  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'plainOutput');
-  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
-  mobileTextarea.value = textarea ? textarea.value : '';
-  overlay.classList.add('active');
-  setTimeout(() => { mobileTextarea.focus(); }, 100);
-  mobileTextarea.addEventListener('input', function() {
-    if (textarea) textarea.value = this.value;
-  });
-}
+        // Clear input
+        function clearInput() {
+            document.getElementById('inputTextarea').value = '';
+        }
 
-function exitMobileFullscreen(which) {
-  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
-  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'plainOutput');
-  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
-  if (textarea) textarea.value = mobileTextarea.value;
-  overlay.classList.remove('active');
-}
+        // Clear output
+        function clearOutput() {
+            document.getElementById('outputTextarea').value = '';
+        }
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    const inputOverlay = document.getElementById('mobileFullscreenInput');
-    const outputOverlay = document.getElementById('mobileFullscreenOutput');
-    if (inputOverlay && inputOverlay.classList.contains('active')) exitMobileFullscreen('input');
-    else if (outputOverlay && outputOverlay.classList.contains('active')) exitMobileFullscreen('output');
-  }
-});
+        // Expand input (full screen functionality)
+        function expandInput() {
+            const inputSection = document.querySelector('.input-section');
+            
+            if (inputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(inputSection);
+            }
+        }
 
-function exitFullScreen() {
-  console.log('Exit fullscreen called');
-  if (document.exitFullscreen) {
-    document.exitFullscreen().then(() => {
-      console.log('Fullscreen exited successfully');
-    }).catch(err => {
-      console.error('Exit fullscreen error:', err);
-    });
-  } else if (document.webkitExitFullscreen) {
-    document.webkitExitFullscreen().then(() => {
-      console.log('Webkit fullscreen exited successfully');
-    }).catch(err => {
-      console.error('Webkit exit fullscreen error:', err);
-    });
-  } else if (document.msExitFullscreen) {
-    document.msExitFullscreen().then(() => {
-      console.log('MS fullscreen exited successfully');
-    }).catch(err => {
-      console.error('MS exit fullscreen error:', err);
-    });
-  }
-}
+        // Expand output (full screen functionality)
+        function expandOutput() {
+            const outputSection = document.querySelector('.output-section');
+            
+            if (outputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(outputSection);
+            }
+        }
 
-function copyOutput() {
-  const output = document.getElementById('plainOutput').value;
-  if (!output || output.trim() === '') {
-    alert('Please convert JSON to Plain Text first.');
-    return;
-  }
-  navigator.clipboard.writeText(output).then(() => {
-    alert('Plain text copied to clipboard!');
-  }).catch(err => {
-    console.error('Failed to copy: ', err);
-    alert('Failed to copy to clipboard. Please try again.');
-  });
-}
+        // Enter fullscreen function
+        function enterFullscreen(element) {
+            // Add fullscreen class for styling
+            element.classList.add('fullscreen');
+            
+            // Try to use browser's fullscreen API
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {
+                    console.log('Fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {
+                    console.log('Webkit fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen().catch(err => {
+                    console.log('Mozilla fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen().catch(err => {
+                    console.log('MS fullscreen API not supported, using CSS fullscreen');
+                });
+            }
+            
+            // Update button text
+            const expandBtn = element.querySelector('.header-actions button:nth-of-type(2)');
+            if (expandBtn) {
+                expandBtn.textContent = '⛶';
+                expandBtn.title = 'Exit Fullscreen';
+            }
+        }
 
-function downloadOutput() {
-  const output = document.getElementById('plainOutput').value;
-  if (!output || output.trim() === '') {
-    alert('Please convert JSON to Plain Text first.');
-    return;
-  }
-  const blob = new Blob([output], { type: 'text/plain;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'output.txt');
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-</script>
+        // Exit fullscreen function
+        function exitFullscreen() {
+            // Remove fullscreen class
+            document.querySelectorAll('.input-section, .output-section').forEach(section => {
+                section.classList.remove('fullscreen');
+            });
+            
+            // Try to exit browser fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Exit fullscreen failed');
+                });
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen().catch(err => {
+                    console.log('Exit webkit fullscreen failed');
+                });
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen().catch(err => {
+                    console.log('Exit mozilla fullscreen failed');
+                });
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen().catch(err => {
+                    console.log('Exit MS fullscreen failed');
+                });
+            }
+            
+            // Update button texts
+            document.querySelectorAll('.header-actions button:nth-of-type(2)').forEach(btn => {
+                btn.textContent = '⛶';
+                btn.title = 'Fullscreen';
+            });
+        }
 
-<!-- Mobile Fullscreen Overlays -->
-<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
-  <div class="mobile-fullscreen-header">
-    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
-    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
-  </div>
-  <div class="mobile-fullscreen-content">
-    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
-  </div>
-</div>
-<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
-  <div class="mobile-fullscreen-header">
-    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
-    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
-  </div>
-  <div class="mobile-fullscreen-content">
-    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" placeholder="Plain text result will appear here..." readonly></textarea>
-  </div>
-</div>
+        // Listen for fullscreen change events
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // User exited fullscreen
+                exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
 
