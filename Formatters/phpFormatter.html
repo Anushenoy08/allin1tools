@@ -271,8 +271,31 @@
             }
 
             try {
-                const formatted = formatPHPCode(input);
-                document.getElementById('outputTextarea').value = formatted;
+                // Handle single-line PHP code by splitting it into logical parts
+                let formatted = input;
+                
+                // If it's a single line, split it into multiple lines
+                if (!input.includes('\n') && input.includes(';')) {
+                    // Split by semicolons and format each statement
+                    let statements = input.split(';').filter(stmt => stmt.trim() !== '');
+                    let formattedStatements = [];
+                    
+                    for (let stmt of statements) {
+                        stmt = stmt.trim();
+                        if (stmt) {
+                            // Add semicolon back
+                            stmt = stmt + ';';
+                            formattedStatements.push(stmt);
+                        }
+                    }
+                    
+                    // Join with line breaks
+                    formatted = formattedStatements.join('\n');
+                }
+                
+                // Now apply proper formatting
+                const result = formatPHPCode(formatted);
+                document.getElementById('outputTextarea').value = result;
             } catch (error) {
                 document.getElementById('outputTextarea').value = 'Error: ' + error.message;
             }
@@ -287,8 +310,31 @@
             }
 
             try {
-                const beautified = beautifyPHPCode(input);
-                document.getElementById('outputTextarea').value = beautified;
+                // Handle single-line PHP code by splitting it into logical parts
+                let formatted = input;
+                
+                // If it's a single line, split it into multiple lines
+                if (!input.includes('\n') && input.includes(';')) {
+                    // Split by semicolons and format each statement
+                    let statements = input.split(';').filter(stmt => stmt.trim() !== '');
+                    let formattedStatements = [];
+                    
+                    for (let stmt of statements) {
+                        stmt = stmt.trim();
+                        if (stmt) {
+                            // Add semicolon back
+                            stmt = stmt + ';';
+                            formattedStatements.push(stmt);
+                        }
+                    }
+                    
+                    // Join with line breaks
+                    formatted = formattedStatements.join('\n');
+                }
+                
+                // Now apply beautification
+                const result = beautifyPHPCode(formatted);
+                document.getElementById('outputTextarea').value = result;
             } catch (error) {
                 document.getElementById('outputTextarea').value = 'Error: ' + error.message;
             }
@@ -507,10 +553,12 @@
                 // Handle PHP tags
                 if (line.startsWith('<?php') || line.startsWith('<?=') || line.startsWith('<?')) {
                     formattedLines.push(line);
+                    formattedLines.push(''); // Add blank line after opening tag
                     continue;
                 }
                 
                 if (line.startsWith('?>')) {
+                    formattedLines.push(''); // Add blank line before closing tag
                     formattedLines.push(line);
                     continue;
                 }
@@ -594,12 +642,13 @@
 
         // Improved PHP beautification function
         function beautifyPHPCode(code) {
-            let beautified = formatPHPCode(code);
+            // First, let's properly format the code with correct spacing
+            let beautified = code;
             
-            // Add proper spacing around operators (but not inside strings)
+            // Add proper spacing around operators
             beautified = beautified.replace(/([^=!<>+\-*/])\s*([=!<>+\-*/]+)\s*([^=+\-*/])/g, '$1 $2 $3');
             
-            // Add spacing after commas (but not inside strings)
+            // Add spacing after commas
             beautified = beautified.replace(/,([^\s])/g, ', $1');
             
             // Add spacing around function calls
@@ -612,7 +661,90 @@
             // Clean up multiple spaces
             beautified = beautified.replace(/\s{2,}/g, ' ');
             
-            return beautified;
+            // Now format with proper structure
+            let lines = beautified.split('\n');
+            let formattedLines = [];
+            let indentLevel = 0;
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                if (line === '') {
+                    formattedLines.push('');
+                    continue;
+                }
+                
+                // Handle PHP tags
+                if (line.startsWith('<?php')) {
+                    formattedLines.push(line);
+                    formattedLines.push(''); // Add blank line after opening tag
+                    continue;
+                }
+                
+                if (line.startsWith('?>')) {
+                    formattedLines.push(''); // Add blank line before closing tag
+                    formattedLines.push(line);
+                    continue;
+                }
+                
+                // Handle variable assignments
+                if (line.includes('$') && line.includes('=') && !line.includes('==') && !line.includes('!=')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle array declarations
+                if (line.includes('array(') || line.includes('[')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    if (line.includes('array(') && !line.includes(')')) {
+                        indentLevel++;
+                    }
+                    continue;
+                }
+                
+                // Handle array closing
+                if (line.includes(')') && indentLevel > 0) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle echo statements
+                if (line.startsWith('echo')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle control structures
+                const controlKeywords = ['if', 'elseif', 'else', 'for', 'while', 'foreach', 'try', 'catch', 'finally'];
+                let isControlStructure = false;
+                for (let keyword of controlKeywords) {
+                    if (line.startsWith(keyword + ' ') || line.startsWith(keyword + '(')) {
+                        isControlStructure = true;
+                        break;
+                    }
+                }
+                
+                if (isControlStructure) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    if (line.includes('{') || line.endsWith(':')) {
+                        indentLevel++;
+                    }
+                    continue;
+                }
+                
+                // Handle closing braces
+                if (line === '}') {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Default case
+                formattedLines.push('    '.repeat(indentLevel) + line);
+            }
+            
+            return formattedLines.join('\n');
         }
 
         // Validate PHP code
