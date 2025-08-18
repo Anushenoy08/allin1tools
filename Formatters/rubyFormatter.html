@@ -1,328 +1,721 @@
----
-layout: default
-title: Best Online Ruby Formatter for FREE
-permalink: /Formatters/rubyFormatter.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruby Formatter - Allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<div class="navbar">
-    <img src="../images/logo.png" alt="Logo">
-    <a href="../index.html">HOME</a>
-    <a href="/article/">ARTICLES</a>
-</div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="json-converter-container">
-    <div class="json-converter-title">RUBY FORMATTER</div>
-        
-        <div class="buttons-section">
-            <button onclick="formatRuby()">Format</button>
-            <button onclick="beautifyRuby()">Beautify</button>
-            <button onclick="validateRuby()">Validate</button>
-            <button onclick="copyRuby()">Copy Ruby</button>
-            <button onclick="downloadRuby()">Download Ruby</button>
-        </div>
-        
-        <div class="json-converter-layout">
-            <!-- Left side: Input -->
-            <div class="json-converter-left">
-                <div class="json-converter-box">
-                    <div class="toolbar">
-                        <span class="toolbar-label">Input</span>
-                        <div class="toolbar-options">
-                                                    <label class="upload-option">
-                            <input type="file" accept=".rb,.txt" onchange="uploadRubyFile(event)">
-                            <span class="upload-icon">📁</span>
-                        </label>
-                            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-                                <span class="fullscreen-icon">⛶</span>
-                            </button>
-                            <button class="clear-option" title="Clear" onclick="clearRuby('input')">
-                                <span class="clear-icon">🗑️</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="code-area-wrapper">
-                        <textarea class="json-textarea" id="rubyInput" placeholder="Paste or type your Ruby code here..."></textarea>
-                    </div>
-                </div>
-            </div>
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .content-container {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: 600px;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .editor-header {
+            background: #333;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .editor-textarea {
+            flex: 1;
+            border: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .editor-textarea:focus {
+            background: white;
+            box-shadow: inset 0 0 0 2px #2196f3;
+        }
+
+        /* Fullscreen styles */
+        .editor-section.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .editor-section.fullscreen .editor-header {
+            border-radius: 0;
+            background: #333;
+        }
+
+        .editor-section.fullscreen .editor-textarea {
+            border-radius: 0;
+            height: calc(100vh - 60px);
+            font-size: 1rem;
+        }
+
+        /* Hide other elements when in fullscreen */
+        .editor-section.fullscreen ~ .editor-section {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
             
-            <!-- Right side: Output -->
-            <div class="json-converter-right">
-                <div class="json-converter-box">
-                    <div class="toolbar">
-                        <span class="toolbar-label">Output</span>
-                        <div class="toolbar-options">
-                            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-                                <span class="fullscreen-icon">⛶</span>
-                            </button>
-                            <button class="clear-option" title="Clear" onclick="clearRuby('output')">
-                                <span class="clear-icon">🗑️</span>
-                            </button>
+            .editor-section {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .content-container {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">Ruby Formatter</h1>
+        
+        <div class="content-container">
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn" onclick="formatRuby()">Format</button>
+                <button class="action-btn" onclick="beautifyRuby()">Beautify</button>
+                <button class="action-btn" onclick="validateRuby()">Validate</button>
+                <button class="action-btn" onclick="copyRuby()">Copy Code</button>
+                <button class="action-btn" onclick="downloadRuby()">Download</button>
+            </div>
+
+            <!-- Editor Container -->
+            <div class="editor-container">
+                <!-- Input Section -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <span class="editor-title">Input</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="uploadFile()" title="Upload File">📁</button>
+                            <button class="header-btn" onclick="expandInput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearInput()" title="Clear">🗑️</button>
                         </div>
                     </div>
-                    <div class="code-area-wrapper">
-                        <textarea class="json-textarea" id="rubyOutput" placeholder="Formatted/Beautified Ruby will appear here..." readonly></textarea>
+                    <textarea class="editor-textarea" id="inputTextarea" placeholder="Paste or type your Ruby code here..."></textarea>
+                </div>
+
+                <!-- Output Section -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <span class="editor-title">Output</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="expandOutput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearOutput()" title="Clear">🗑️</button>
+                        </div>
                     </div>
+                    <textarea class="editor-textarea" id="outputTextarea" placeholder="Formatted/Beautified Ruby code will appear here..." readonly></textarea>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="popupMsg" class="popup" style="display:none;"><span id="popupText"></span><button class="close-btn" onclick="closePopup()">✕</button></div>
+    <script>
+        // Format Ruby code
+        function formatRuby() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter Ruby code to format');
+                return;
+            }
 
-
-
-<script>
-    function showError(msg) {
-        const errorDiv = document.getElementById('errorMsg');
-        errorDiv.innerText = msg;
-        errorDiv.style.display = 'block';
-    }
-    function clearError() {
-        const errorDiv = document.getElementById('errorMsg');
-        errorDiv.innerText = '';
-        errorDiv.style.display = 'none';
-    }
-    function showPopup(msg) {
-        const popup = document.getElementById('popupMsg');
-        document.getElementById('popupText').innerText = msg;
-        popup.style.display = 'flex';
-    }
-    function closePopup() {
-        document.getElementById('popupMsg').style.display = 'none';
-    }
-    function updateInputLineNumbers() {
-        const textarea = document.getElementById('rubyInput');
-        const lineNumbers = document.getElementById('inputLineNumbers');
-        const lines = textarea.value.split('\n').length || 1;
-        let html = '';
-        for (let i = 1; i <= lines; i++) html += i + '<br>';
-        lineNumbers.innerHTML = html;
-    }
-    function updateOutputLineNumbers() {
-        const textarea = document.getElementById('rubyOutput');
-        const lineNumbers = document.getElementById('outputLineNumbers');
-        const lines = textarea.value.split('\n').length || 1;
-        let html = '';
-        for (let i = 1; i <= lines; i++) html += i + '<br>';
-        lineNumbers.innerHTML = html;
-    }
-    function syncScroll(which) {
-        if (which === 'input') {
-            const textarea = document.getElementById('rubyInput');
-            const lineNumbers = document.getElementById('inputLineNumbers');
-            lineNumbers.scrollTop = textarea.scrollTop;
-        } else {
-            const textarea = document.getElementById('rubyOutput');
-            const lineNumbers = document.getElementById('outputLineNumbers');
-            lineNumbers.scrollTop = textarea.scrollTop;
+            try {
+                // Handle single-line Ruby code by splitting it into logical parts
+                let formatted = input;
+                
+                // If it's a single line, split it into multiple lines
+                if (!input.includes('\n') && input.includes(';')) {
+                    // Split by semicolons and format each statement
+                    let statements = input.split(';').filter(stmt => stmt.trim() !== '');
+                    let formattedStatements = [];
+                    
+                    for (let stmt of statements) {
+                        stmt = stmt.trim();
+                        if (stmt) {
+                            formattedStatements.push(stmt);
+                        }
+                    }
+                    
+                    // Join with line breaks
+                    formatted = formattedStatements.join('\n');
+                }
+                
+                // Now apply proper formatting
+                const result = formatRubyCode(formatted);
+                document.getElementById('outputTextarea').value = result;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
         }
-    }
-    function formatRuby() {
-        clearError();
-        const input = document.getElementById('rubyInput').value;
-        try {
-            // Simple Ruby formatting
-            const formatted = input
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0)
-                .join('\n');
-            document.getElementById('rubyOutput').value = formatted;
-            updateOutputLineNumbers();
-        } catch (e) {
-            showError('Error formatting Ruby: ' + e.message);
-            document.getElementById('rubyOutput').value = '';
-            updateOutputLineNumbers();
+
+        // Beautify Ruby code
+        function beautifyRuby() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter Ruby code to beautify');
+                return;
+            }
+
+            try {
+                // Handle single-line Ruby code by splitting it into logical parts
+                let formatted = input;
+                
+                // If it's a single line, split it into multiple lines
+                if (!input.includes('\n') && input.includes(';')) {
+                    // Split by semicolons and format each statement
+                    let statements = input.split(';').filter(stmt => stmt.trim() !== '');
+                    let formattedStatements = [];
+                    
+                    for (let stmt of statements) {
+                        stmt = stmt.trim();
+                        if (stmt) {
+                            formattedStatements.push(stmt);
+                        }
+                    }
+                    
+                    // Join with line breaks
+                    formatted = formattedStatements.join('\n');
+                }
+                
+                // Now apply beautification
+                const result = beautifyRubyCode(formatted);
+                document.getElementById('outputTextarea').value = result;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
         }
-    }
-    function validateRuby() {
-        clearError();
-        const input = document.getElementById('rubyInput').value;
-        try {
-            // Basic Ruby syntax validation
-            const lines = input.split('\n');
-            let isValid = true;
-            let errorMsg = '';
+
+        // Validate Ruby code
+        function validateRuby() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter Ruby code to validate');
+                return;
+            }
+
+            try {
+                const validation = validateRubyCode(input);
+                document.getElementById('outputTextarea').value = validation;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
+        }
+
+        // Copy Ruby code
+        async function copyRuby() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No code to copy');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(output);
+                alert('Ruby code copied to clipboard!');
+            } catch (error) {
+                const textArea = document.createElement('textarea');
+                textArea.value = output;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Ruby code copied to clipboard!');
+            }
+        }
+
+        // Download Ruby code
+        function downloadRuby() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No code to download');
+                return;
+            }
+
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formatted.rb';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Upload file
+        function uploadFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.rb,.txt';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('inputTextarea').value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Clear input
+        function clearInput() {
+            document.getElementById('inputTextarea').value = '';
+        }
+
+        // Clear output
+        function clearOutput() {
+            document.getElementById('outputTextarea').value = '';
+        }
+
+        // Expand input (full screen functionality)
+        function expandInput() {
+            const inputSection = document.querySelector('.editor-section:first-child');
+            
+            if (inputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(inputSection);
+            }
+        }
+
+        // Expand output (full screen functionality)
+        function expandOutput() {
+            const outputSection = document.querySelector('.editor-section:last-child');
+            
+            if (outputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(outputSection);
+            }
+        }
+
+        // Enter fullscreen function
+        function enterFullscreen(element) {
+            // Add fullscreen class for styling
+            element.classList.add('fullscreen');
+            
+            // Try to use browser's fullscreen API
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {
+                    console.log('Fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {
+                    console.log('Webkit fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen().catch(err => {
+                    console.log('Mozilla fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen().catch(err => {
+                    console.log('MS fullscreen API not supported, using CSS fullscreen');
+                });
+            }
+            
+            // Update button text
+            const expandBtn = element.querySelector('.header-actions button:nth-of-type(2)');
+            if (expandBtn) {
+                expandBtn.textContent = '⛶';
+                expandBtn.title = 'Exit Fullscreen';
+            }
+        }
+
+        // Exit fullscreen function
+        function exitFullscreen() {
+            // Remove fullscreen class
+            document.querySelectorAll('.editor-section').forEach(section => {
+                section.classList.remove('fullscreen');
+            });
+            
+            // Try to exit browser fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Exit fullscreen failed');
+                });
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen().catch(err => {
+                    console.log('Exit webkit fullscreen failed');
+                });
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen().catch(err => {
+                    console.log('Exit mozilla fullscreen failed');
+                });
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen().catch(err => {
+                    console.log('Exit MS fullscreen failed');
+                });
+            }
+            
+            // Update button texts
+            document.querySelectorAll('.header-actions button:nth-of-type(2)').forEach(btn => {
+                btn.textContent = '⛶';
+                btn.title = 'Fullscreen';
+            });
+        }
+
+        // Listen for fullscreen change events
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // User exited fullscreen
+                exitFullscreen();
+            }
+        }
+
+        // Improved Ruby formatting function
+        function formatRubyCode(code) {
+            let lines = code.split('\n');
+            let indentLevel = 0;
+            let formattedLines = [];
+            let inString = false;
+            let stringChar = '';
+            let inComment = false;
             
             for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line && !line.startsWith('#') && !line.startsWith('=begin') && !line.startsWith('=end')) {
-                    // Basic validation - check for common syntax errors
-                    if (line.includes('def ') && !line.includes('end')) {
-                        isValid = false;
-                        errorMsg = `Line ${i + 1}: Missing 'end' for method definition`;
-                        break;
+                let line = lines[i];
+                let originalLine = line;
+                line = line.trim();
+                
+                if (line === '') {
+                    formattedLines.push('');
+                    continue;
+                }
+                
+                // Skip comments
+                if (line.startsWith('#')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle multi-line strings
+                if (line.includes('"""') || line.includes("'''")) {
+                    inString = !inString;
+                    if (inString) {
+                        stringChar = line.includes('"""') ? '"""' : "'''";
                     }
-                    if (line.includes('if ') && !line.includes('end')) {
-                        isValid = false;
-                        errorMsg = `Line ${i + 1}: Missing 'end' for if statement`;
-                        break;
-                    }
-                    if (line.includes('do ') && !line.includes('end')) {
-                        isValid = false;
-                        errorMsg = `Line ${i + 1}: Missing 'end' for do block`;
+                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
+                    continue;
+                }
+                
+                if (inString) {
+                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
+                    continue;
+                }
+                
+                // Handle control structures
+                const controlKeywords = [
+                    'if', 'elsif', 'else', 'unless', 'case', 'when', 'def', 'class', 'module',
+                    'begin', 'rescue', 'ensure', 'do', 'end', 'while', 'until', 'for', 'in'
+                ];
+                
+                let isControlStructure = false;
+                for (let keyword of controlKeywords) {
+                    if (line.startsWith(keyword + ' ') || line.startsWith(keyword + ':')) {
+                        isControlStructure = true;
                         break;
                     }
                 }
-            }
-            
-            if (isValid) {
-                showPopup('Valid Ruby syntax');
-            } else {
-                showError(errorMsg);
-            }
-        } catch (e) {
-            showError('Invalid Ruby syntax');
-        }
-    }
-    function beautifyRuby() {
-        clearError();
-        const input = document.getElementById('rubyInput').value;
-        try {
-            // Simple Ruby beautification
-            const beautified = input
-                .split('\n')
-                .map(line => {
-                    const trimmed = line.trim();
-                    if (trimmed.startsWith('def ') || trimmed.startsWith('class ') || trimmed.startsWith('module ') || 
-                        trimmed.startsWith('if ') || trimmed.startsWith('elsif ') || trimmed.startsWith('else') || 
-                        trimmed.startsWith('unless ') || trimmed.startsWith('case ') || trimmed.startsWith('when ') ||
-                        trimmed.startsWith('begin') || trimmed.startsWith('rescue') || trimmed.startsWith('ensure') ||
-                        trimmed.startsWith('do ') || trimmed.startsWith('while ') || trimmed.startsWith('until ')) {
-                        return '    ' + trimmed;
-                    }
-                    return '        ' + trimmed;
-                })
-                .join('\n');
-            document.getElementById('rubyOutput').value = beautified;
-            updateOutputLineNumbers();
-        } catch (e) {
-            showError('Error beautifying Ruby: ' + e.message);
-            document.getElementById('rubyOutput').value = '';
-            updateOutputLineNumbers();
-        }
-    }
-
-    function copyRuby() {
-        const output = document.getElementById('rubyOutput').value;
-        if (!output) return;
-        navigator.clipboard.writeText(output);
-        showPopup('Copied to clipboard!');
-    }
-    function downloadRuby() {
-        const output = document.getElementById('rubyOutput').value;
-        if (!output) return;
-        const blob = new Blob([output], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'formatted.rb';
-        link.click();
-    }
-
-    function uploadRubyFile(which, event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const text = e.target.result;
-                if (which === 'input') {
-                    document.getElementById('rubyInput').value = text;
-                    updateInputLineNumbers();
+                
+                // Handle indentation
+                if (line.endsWith(' do') || line.endsWith(':')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    indentLevel++;
+                } else if (line.startsWith('end') || line.startsWith('else') || line.startsWith('elsif')) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    formattedLines.push('    '.repeat(indentLevel) + line);
                 } else {
-                    document.getElementById('rubyOutput').value = text;
-                    updateOutputLineNumbers();
+                    formattedLines.push('    '.repeat(indentLevel) + line);
                 }
-            } catch (error) {
-                showError('Error reading file: ' + error.message);
             }
-        };
-        reader.readAsText(file);
-    }
-
-    function clearRuby(which) {
-        if (which === 'input') {
-            document.getElementById('rubyInput').value = '';
-            updateInputLineNumbers();
-        } else {
-            document.getElementById('rubyOutput').value = '';
-            updateOutputLineNumbers();
-        }
-        clearError();
-    }
-
-    function toggleFullScreen(button) {
-        // Find the parent json-converter-box element
-        let box = button.closest('.json-converter-box');
-        
-        // Fallback: if closest() doesn't work, traverse up manually
-        if (!box) {
-            let parent = button.parentElement;
-            while (parent && !parent.classList.contains('json-converter-box')) {
-                parent = parent.parentElement;
-            }
-            box = parent;
-        }
-        
-        // If still no box found, try to find by looking for the textarea parent
-        if (!box) {
-            const textarea = button.closest('.toolbar-options').nextElementSibling;
-            if (textarea && textarea.classList.contains('code-area-wrapper')) {
-                box = textarea.parentElement;
-            }
-        }
-        
-        // Final fallback: if no box found, show error and return
-        if (!box) {
-            console.error('Could not find json-converter-box element');
-            alert('Fullscreen not available on this device');
-            return;
-        }
-        
-        // Check if already in fullscreen
-        if (document.fullscreenElement || 
-            document.webkitFullscreenElement || 
-            document.mozFullScreenElement || 
-            document.msFullscreenElement) {
             
-            // Exit fullscreen
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
+            return formattedLines.join('\n');
+        }
+
+        // Improved Ruby beautification function
+        function beautifyRubyCode(code) {
+            // First, let's properly format the code with correct spacing
+            let beautified = code;
+            
+            // Add proper spacing around operators
+            beautified = beautified.replace(/([^=!<>+\-*/])\s*([=!<>+\-*/]+)\s*([^=+\-*/])/g, '$1 $2 $3');
+            
+            // Add spacing after commas
+            beautified = beautified.replace(/,([^\s])/g, ', $1');
+            
+            // Add spacing around function calls
+            beautified = beautified.replace(/(\w+)\s*\(/g, '$1(');
+            
+            // Add spacing around brackets
+            beautified = beautified.replace(/\s*\(\s*/g, ' (');
+            beautified = beautified.replace(/\s*\)\s*/g, ') ');
+            
+            // Clean up multiple spaces
+            beautified = beautified.replace(/\s{2,}/g, ' ');
+            
+            // Now format with proper structure
+            let lines = beautified.split('\n');
+            let formattedLines = [];
+            let indentLevel = 0;
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                if (line === '') {
+                    formattedLines.push('');
+                    continue;
+                }
+                
+                // Handle variable assignments
+                if (line.includes('=') && !line.includes('==') && !line.includes('!=')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle method definitions
+                if (line.startsWith('def ')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    indentLevel++;
+                    continue;
+                }
+                
+                // Handle class definitions
+                if (line.startsWith('class ')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    indentLevel++;
+                    continue;
+                }
+                
+                // Handle control structures
+                const controlKeywords = ['if', 'unless', 'case', 'while', 'until', 'for', 'begin'];
+                let isControlStructure = false;
+                for (let keyword of controlKeywords) {
+                    if (line.startsWith(keyword + ' ') || line.startsWith(keyword + ':')) {
+                        isControlStructure = true;
+                        break;
+                    }
+                }
+                
+                if (isControlStructure) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    if (line.endsWith(' do') || line.endsWith(':')) {
+                        indentLevel++;
+                    }
+                    continue;
+                }
+                
+                // Handle end statements
+                if (line === 'end') {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle else/elsif
+                if (line.startsWith('else') || line.startsWith('elsif')) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    if (line.endsWith(':')) {
+                        indentLevel++;
+                    }
+                    continue;
+                }
+                
+                // Default case
+                formattedLines.push('    '.repeat(indentLevel) + line);
             }
-        } else {
-            // Enter fullscreen
-            if (box.requestFullscreen) {
-                box.requestFullscreen().catch(err => {
-                    console.log('Error attempting to enable fullscreen:', err);
-                });
-            } else if (box.webkitRequestFullscreen) {
-                box.webkitRequestFullscreen().catch(err => {
-                    console.log('Error attempting to enable webkit fullscreen:', err);
-                });
-            } else if (box.mozRequestFullScreen) {
-                box.mozRequestFullScreen().catch(err => {
-                    console.log('Error attempting to enable moz fullscreen:', err);
-                });
-            } else if (box.msRequestFullscreen) {
-                box.msRequestFullscreen().catch(err => {
-                    console.log('Error attempting to enable ms fullscreen:', err);
-                });
+            
+            return formattedLines.join('\n');
+        }
+
+        // Validate Ruby code
+        function validateRubyCode(code) {
+            let errors = [];
+            let lines = code.split('\n');
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const lineNum = i + 1;
+                
+                // Check for basic syntax issues
+                if (line.includes('puts ') && !line.includes('(') && !line.includes('"') && !line.includes("'")) {
+                    errors.push(`Line ${lineNum}: puts statement should have proper syntax`);
+                }
+                
+                if (line.includes('def ') && !line.includes('end')) {
+                    errors.push(`Line ${lineNum}: Method definition should have corresponding 'end'`);
+                }
+            }
+            
+            if (errors.length === 0) {
+                return '✅ Valid Ruby code\n\nNo syntax errors detected.';
             } else {
-                // If no fullscreen API is available, show message
-                alert('Fullscreen not supported on this device');
+                return '❌ Ruby code issues found:\n\n' + errors.join('\n');
             }
         }
-    }
-
-    // Initialize line numbers
-    updateInputLineNumbers();
-    updateOutputLineNumbers();
-</script>
+    </script>
+</body>
+</html>

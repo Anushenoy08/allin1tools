@@ -271,9 +271,29 @@
             }
 
             try {
-                // Basic Python formatting (indentation, spacing)
-                const formatted = formatPythonCode(input);
-                document.getElementById('outputTextarea').value = formatted;
+                // Handle single-line Python code by splitting it into logical parts
+                let formatted = input;
+                
+                // If it's a single line, split it into multiple lines
+                if (!input.includes('\n') && input.includes(';')) {
+                    // Split by semicolons and format each statement
+                    let statements = input.split(';').filter(stmt => stmt.trim() !== '');
+                    let formattedStatements = [];
+                    
+                    for (let stmt of statements) {
+                        stmt = stmt.trim();
+                        if (stmt) {
+                            formattedStatements.push(stmt);
+                        }
+                    }
+                    
+                    // Join with line breaks
+                    formatted = formattedStatements.join('\n');
+                }
+                
+                // Now apply proper formatting
+                const result = formatPythonCode(formatted);
+                document.getElementById('outputTextarea').value = result;
             } catch (error) {
                 document.getElementById('outputTextarea').value = 'Error: ' + error.message;
             }
@@ -288,9 +308,29 @@
             }
 
             try {
-                // Enhanced beautification with better spacing
-                const beautified = beautifyPythonCode(input);
-                document.getElementById('outputTextarea').value = beautified;
+                // Handle single-line Python code by splitting it into logical parts
+                let formatted = input;
+                
+                // If it's a single line, split it into multiple lines
+                if (!input.includes('\n') && input.includes(';')) {
+                    // Split by semicolons and format each statement
+                    let statements = input.split(';').filter(stmt => stmt.trim() !== '');
+                    let formattedStatements = [];
+                    
+                    for (let stmt of statements) {
+                        stmt = stmt.trim();
+                        if (stmt) {
+                            formattedStatements.push(stmt);
+                        }
+                    }
+                    
+                    // Join with line breaks
+                    formatted = formattedStatements.join('\n');
+                }
+                
+                // Now apply beautification
+                const result = beautifyPythonCode(formatted);
+                document.getElementById('outputTextarea').value = result;
             } catch (error) {
                 document.getElementById('outputTextarea').value = 'Error: ' + error.message;
             }
