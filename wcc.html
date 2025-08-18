@@ -1,155 +1,471 @@
----
-layout: default
-title: Best Online Words and Characters Counter for FREE
-permalink: /wcc.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Words & Characters Counter</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<!-- TOOLBAR: remains as per your working common.css -->
-<div class="navbar">
-  <img src="/images/logo.png" alt="Logo">
-  <a href="/index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
 
-<h1>Words & Characters Counter</h1>
+        /* Main container */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
 
-<div class="container">
-  <div class="search-bar">
-    <div class="search-input">
-      <input type="text" id="searchText" placeholder="Search text..." oninput="highlightSearch()">
-      <div class="search-controls">
-        <span id="searchStatus">0/0</span>
-        <button onclick="navigateMatch(-1)">▲</button>
-        <button onclick="navigateMatch(1)">▼</button>
-        <button onclick="clearSearch()">X</button>
-      </div>
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e3f2fd;
+        }
+
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #1976d2;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+        }
+
+        /* Search bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        .search-count {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .search-nav {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .search-btn {
+            background: #e3f2fd;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 8px;
+            cursor: pointer;
+            color: #1976d2;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn:hover {
+            background: #bbdefb;
+        }
+
+        .search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Text input area */
+        .text-input-area {
+            margin-bottom: 2rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .text-input::placeholder {
+            color: #999;
+        }
+
+        /* Statistics display */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #bbdefb;
+        }
+
+        .stat-label {
+            color: #1976d2;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            color: #1976d2;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e8f5e8;
+            color: #1976d2;
+            border: 2px solid #4caf50;
+        }
+
+        .btn-secondary:hover {
+            background: #4caf50;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-wide {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .button-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="index.html">HOME</a>
+            <a href="article.html">ARTICLES</a>
+        </div>
     </div>
-  </div>
 
-  <div id="textInput" contenteditable="true" oninput="calculateStats()" style="white-space: pre-wrap;"></div>
+    <div class="main-container">
+        <div class="main-card">
+            <h1 class="page-title">Words & Characters Counter</h1>
+            
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search text..." oninput="updateSearch()">
+                <span class="search-count" id="searchCount">0/0</span>
+                <div class="search-nav">
+                    <button class="search-btn" id="prevBtn" onclick="searchPrevious()" disabled>▲</button>
+                    <button class="search-btn" id="nextBtn" onclick="searchNext()" disabled>▼</button>
+                    <button class="search-btn" onclick="clearSearch()">✕</button>
+                </div>
+            </div>
 
-  <div class="stats">
-    <div class="stat">Words: <span id="wordCount">0</span></div>
-    <div class="stat">Characters: <span id="charCount">0</span></div>
-    <div class="stat">Spaces: <span id="spaceCount">0</span></div>
-    <div class="stat">Paragraphs: <span id="paraCount">0</span></div>
-    <div class="stat">Emojis: <span id="emojiCount">0</span></div>
-    <div class="stat">Search Matches: <span id="searchCount">0</span></div>
-  </div>
+            <!-- Text Input Area -->
+            <div class="text-input-area">
+                <textarea class="text-input" id="textInput" placeholder="Enter or paste your text here..." oninput="updateStats()"></textarea>
+            </div>
 
-  <div class="button-grid">
-    <button class="primary-btn" onclick="copyText()">Copy Text</button>
-    <button class="unique-download" onclick="downloadText()">Download to File</button>
-    <button class="primary-btn" onclick="resetText()">Try Another</button>
-  </div>
-</div>
+            <!-- Statistics Display -->
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-label">Words</div>
+                    <div class="stat-value" id="wordCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Characters</div>
+                    <div class="stat-value" id="charCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Spaces</div>
+                    <div class="stat-value" id="spaceCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Paragraphs</div>
+                    <div class="stat-value" id="paragraphCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Emojis</div>
+                    <div class="stat-value" id="emojiCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Search Matches</div>
+                    <div class="stat-value" id="searchMatchCount">0</div>
+                </div>
+            </div>
 
-<script>
-let currentIndex = 0;
-let highlights = [];
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <div class="button-row">
+                    <button class="btn btn-primary" onclick="copyText()">Copy Text</button>
+                    <button class="btn btn-secondary" onclick="downloadToFile()">Download to File</button>
+                </div>
+                <button class="btn btn-primary btn-wide" onclick="tryAnother()">Try Another</button>
+            </div>
+        </div>
+    </div>
 
-function calculateStats() {
-  let text = document.getElementById('textInput').innerText;
-  const words = text.trim().split(/\s+/).filter(Boolean);
-  const paragraphs = text.split(/\n{2,}/).filter(Boolean);
-  const emojis = text.match(/([\u{1F600}-\u{1F6FF}\u{1F300}-\u{1F5FF}\u{1F700}-\u{1F77F}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}])/gu) || [];
+    <script>
+        let currentSearchIndex = -1;
+        let searchMatches = [];
 
-  document.getElementById('wordCount').innerText = words.length;
-  document.getElementById('charCount').innerText = text.length;
-  document.getElementById('spaceCount').innerText = (text.match(/\s/g) || []).length;
-  document.getElementById('paraCount').innerText = paragraphs.length;
-  document.getElementById('emojiCount').innerText = emojis.length;
+        // Update statistics when text changes
+        function updateStats() {
+            const text = document.getElementById('textInput').value;
+            
+            // Word count
+            const words = text.trim() ? text.trim().split(/\s+/) : [];
+            document.getElementById('wordCount').textContent = words.length;
+            
+            // Character count
+            document.getElementById('charCount').textContent = text.length;
+            
+            // Space count
+            const spaces = (text.match(/\s/g) || []).length;
+            document.getElementById('spaceCount').textContent = spaces;
+            
+            // Paragraph count
+            const paragraphs = text.trim() ? text.split(/\n\s*\n/).filter(p => p.trim()).length : 0;
+            document.getElementById('paragraphCount').textContent = paragraphs;
+            
+            // Emoji count
+            const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+            const emojis = (text.match(emojiRegex) || []).length;
+            document.getElementById('emojiCount').textContent = emojis;
+            
+            // Update search matches
+            updateSearch();
+        }
 
-  highlightSearch();
-}
+        // Update search functionality
+        function updateSearch() {
+            const searchText = document.getElementById('searchInput').value;
+            const text = document.getElementById('textInput').value;
+            
+            if (!searchText) {
+                searchMatches = [];
+                currentSearchIndex = -1;
+                document.getElementById('searchMatchCount').textContent = '0';
+                document.getElementById('searchCount').textContent = '0/0';
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                return;
+            }
+            
+            // Find all matches
+            const regex = new RegExp(searchText, 'gi');
+            searchMatches = [];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                searchMatches.push(match.index);
+            }
+            
+            document.getElementById('searchMatchCount').textContent = searchMatches.length;
+            document.getElementById('searchCount').textContent = `${currentSearchIndex + 1}/${searchMatches.length}`;
+            
+            // Enable/disable navigation buttons
+            document.getElementById('prevBtn').disabled = searchMatches.length === 0;
+            document.getElementById('nextBtn').disabled = searchMatches.length === 0;
+            
+            // Highlight current match
+            highlightCurrentMatch();
+        }
 
-function highlightSearch() {
-  const search = document.getElementById('searchText').value.trim();
-  const textBox = document.getElementById('textInput');
-  const text = textBox.innerText;
+        // Search navigation
+        function searchPrevious() {
+            if (searchMatches.length === 0) return;
+            
+            currentSearchIndex = currentSearchIndex <= 0 ? searchMatches.length - 1 : currentSearchIndex - 1;
+            document.getElementById('searchCount').textContent = `${currentSearchIndex + 1}/${searchMatches.length}`;
+            highlightCurrentMatch();
+        }
 
-  if (search === "") {
-    textBox.innerText = text;
-    document.getElementById('searchCount').innerText = 0;
-    document.getElementById('searchStatus').innerText = `0/0`;
-    highlights = [];
-    return;
-  }
+        function searchNext() {
+            if (searchMatches.length === 0) return;
+            
+            currentSearchIndex = currentSearchIndex >= searchMatches.length - 1 ? 0 : currentSearchIndex + 1;
+            document.getElementById('searchCount').textContent = `${currentSearchIndex + 1}/${searchMatches.length}`;
+            highlightCurrentMatch();
+        }
 
-  const regex = new RegExp(search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
-  highlights = [];
-  let count = 0;
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            updateSearch();
+        }
 
-  const result = text.replace(regex, (match) => {
-    highlights.push(count);
-    return `<span class="highlight" id="match${count++}">${match}</span>`;
-  });
+        // Highlight current search match
+        function highlightCurrentMatch() {
+            const textInput = document.getElementById('textInput');
+            const searchText = document.getElementById('searchInput').value;
+            
+            if (currentSearchIndex >= 0 && searchMatches.length > 0) {
+                const matchIndex = searchMatches[currentSearchIndex];
+                textInput.focus();
+                textInput.setSelectionRange(matchIndex, matchIndex + searchText.length);
+            }
+        }
 
-  textBox.innerHTML = result;
-  document.getElementById('searchCount').innerText = count;
-  document.getElementById('searchStatus').innerText = count ? `1/${count}` : `0/0`;
+        // Copy text to clipboard
+        async function copyText() {
+            const text = document.getElementById('textInput').value;
+            if (!text) {
+                alert('No text to copy.');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                alert('Text copied to clipboard!');
+            } catch (error) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Text copied to clipboard!');
+            }
+        }
 
-  if (count > 0) {
-    currentIndex = 0;
-    emphasizeActive();
-    scrollToMatch(currentIndex);
-  }
-}
+        // Download text to file
+        function downloadToFile() {
+            const text = document.getElementById('textInput').value;
+            if (!text) {
+                alert('No text to download.');
+                return;
+            }
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'text-content.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+        }
 
-function navigateMatch(direction) {
-  if (highlights.length === 0) return;
-
-  currentIndex += direction;
-  if (currentIndex < 0) currentIndex = highlights.length - 1;
-  if (currentIndex >= highlights.length) currentIndex = 0;
-
-  emphasizeActive();
-  scrollToMatch(currentIndex);
-}
-
-function emphasizeActive() {
-  document.querySelectorAll('.highlight').forEach(el => el.classList.remove('active-highlight'));
-  const activeEl = document.getElementById(`match${currentIndex}`);
-  if (activeEl) activeEl.classList.add('active-highlight');
-  document.getElementById('searchStatus').innerText = `${currentIndex + 1}/${highlights.length}`;
-}
-
-function scrollToMatch(index) {
-  const el = document.getElementById(`match${index}`);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function clearSearch() {
-  document.getElementById('searchText').value = "";
-  highlightSearch();
-}
-
-function copyText() {
-  const text = document.getElementById('textInput').innerText;
-  navigator.clipboard.writeText(text);
-  alert('Text copied to clipboard!');
-}
-
-function downloadText() {
-  const text = document.getElementById('textInput').innerText;
-  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "text.txt";
-  link.click();
-}
-
-function resetText() {
-  document.getElementById('textInput').innerText = "";
-  document.getElementById('searchText').value = "";
-  document.getElementById('wordCount').innerText = 0;
-  document.getElementById('charCount').innerText = 0;
-  document.getElementById('spaceCount').innerText = 0;
-  document.getElementById('paraCount').innerText = 0;
-  document.getElementById('emojiCount').innerText = 0;
-  document.getElementById('searchCount').innerText = 0;
-  document.getElementById('searchStatus').innerText = `0/0`;
-  highlights = [];
-  currentIndex = 0;
-}
-</script>
+        // Try another (clear all)
+        function tryAnother() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('searchInput').value = '';
+            updateStats();
+            clearSearch();
+        }
+    </script>
+</body>
+</html>
