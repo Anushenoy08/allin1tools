@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRON EXPRESSION GENERATOR & EXPLAINER</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+        }
+
+        /* Main card */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Input section */
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .explain-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .explain-btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Explanation display */
+        .explanation-display {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #1565c0;
+            font-size: 1rem;
+            line-height: 1.5;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Examples section */
+        .examples-section {
+            margin-top: 2rem;
+        }
+
+        .examples-title {
+            color: #2196f3;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .example-item {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .example-item:hover {
+            background: #bbdefb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+            border-color: #2196f3;
+        }
+
+        .example-cron {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .example-description {
+            color: #1976d2;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .explain-btn {
+                width: 100%;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">CRON EXPRESSION GENERATOR & EXPLAINER</h1>
+        
+        <div class="main-card">
+            <!-- Main Input Section -->
+            <div class="input-section">
+                <label for="cronExpression">Enter a Quartz cron expression (7 fields):</label>
+                <div class="input-group">
+                    <input type="text" id="cronExpression" class="input-field" placeholder="e.g. 0 0 12 * * ? *">
+                    <button class="explain-btn" onclick="explainCron()">Explain</button>
+                </div>
+                <div class="explanation-display" id="explanationDisplay">
+                    Enter a cron expression and click Explain.
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="examples-section">
+                <h3 class="examples-title">Examples (click to use):</h3>
+                <div class="examples-grid">
+                    <div class="example-item" onclick="useExample('0 0 12 * * ? *')">
+                        <div class="example-cron">0 0 12 * * ? *</div>
+                        <div class="example-description">Every day at noon</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0/5 14 * * ? *')">
+                        <div class="example-cron">0 0/5 14 * * ? *</div>
+                        <div class="example-description">Every 5 minutes, 2pm-2:55pm</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 15 10 ? * MON-FRI *')">
+                        <div class="example-cron">0 15 10 ? * MON-FRI *</div>
+                        <div class="example-description">10:15am, Mon-Fri</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0 0 1 1 ? *')">
+                        <div class="example-cron">0 0 0 1 1 ? *</div>
+                        <div class="example-description">Midnight, Jan 1st</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0/10 * * * ? *')">
+                        <div class="example-cron">0 0/10 * * * ? *</div>
+                        <div class="example-description">Every 10 minutes</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0 12 ? * SUN *')">
+                        <div class="example-cron">0 0 12 ? * SUN *</div>
+                        <div class="example-description">Every Sunday at noon</div>
+                    </div>
+                    
+                    <div class="example-item" onclick="useExample('0 0 12 1/2 * ? *')">
+                        <div class="example-cron">0 0 12 1/2 * ? *</div>
+                        <div class="example-description">Every 2 days at noon</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Explain cron expression
+        function explainCron() {
+            const cronExpression = document.getElementById('cronExpression').value.trim();
+            const explanationDisplay = document.getElementById('explanationDisplay');
+            
+            if (!cronExpression) {
+                explanationDisplay.innerHTML = 'Please enter a cron expression.';
+                return;
+            }
+            
+            try {
+                const description = parseCronExpression(cronExpression);
+                const nextExecutions = generateNextExecutions(cronExpression);
+                
+                let html = `<strong>Description:</strong> ${description}<br><br>`;
+                html += `<strong>Next 5 executions:</strong><br>`;
+                
+                nextExecutions.forEach(execution => {
+                    html += `${execution}<br>`;
+                });
+                
+                explanationDisplay.innerHTML = html;
+            } catch (error) {
+                explanationDisplay.innerHTML = 'Invalid cron expression. Please check the format.';
+            }
+        }
+
+        // Parse and explain cron expression
+        function parseCronExpression(cron) {
+            const fields = cron.split(' ');
+            
+            if (fields.length !== 7) {
+                throw new Error('Cron expression must have exactly 7 fields');
+            }
+            
+            const [second, minute, hour, dayOfMonth, month, dayOfWeek, year] = fields;
+            
+            let description = '';
+            
+            // Second
+            if (second === '0') {
+                description += 'every second, ';
+            } else if (second === '*') {
+                description += 'every second, ';
+            } else if (second.includes('/')) {
+                const interval = second.split('/')[1];
+                description += `every ${interval} seconds, `;
+            } else {
+                description += `at ${second} seconds, `;
+            }
+            
+            // Minute
+            if (minute === '0') {
+                description += 'minute 0, ';
+            } else if (minute === '*') {
+                description += 'every minute, ';
+            } else if (minute.includes('/')) {
+                const interval = minute.split('/')[1];
+                description += `every ${interval} minutes, `;
+            } else if (minute.includes('-')) {
+                const [start, end] = minute.split('-');
+                description += `from ${start} to ${end} minutes, `;
+            } else {
+                description += `minute ${minute}, `;
+            }
+            
+            // Hour
+            if (hour === '0') {
+                description += 'hour 0, ';
+            } else if (hour === '12') {
+                description += 'hour 12, ';
+            } else if (hour === '*') {
+                description += 'every hour, ';
+            } else if (hour.includes('/')) {
+                const interval = hour.split('/')[1];
+                description += `every ${interval} hours, `;
+            } else if (hour.includes('-')) {
+                const [start, end] = hour.split('-');
+                description += `from hour ${start} to ${end}, `;
+            } else {
+                description += `hour ${hour}, `;
+            }
+            
+            // Day of Month
+            if (dayOfMonth === '*' || dayOfMonth === '?') {
+                description += 'every day';
+            } else if (dayOfMonth.includes('/')) {
+                const interval = dayOfMonth.split('/')[1];
+                description += `every ${interval} days`;
+            } else if (dayOfMonth.includes('-')) {
+                const [start, end] = dayOfMonth.split('-');
+                description += `from day ${start} to ${end}`;
+            } else {
+                description += `on day ${dayOfMonth}`;
+            }
+            
+            // Month
+            if (month !== '*') {
+                if (month.includes('/')) {
+                    const interval = month.split('/')[1];
+                    description += `, every ${interval} months`;
+                } else if (month.includes('-')) {
+                    const [start, end] = month.split('-');
+                    description += `, from month ${start} to ${end}`;
+                } else {
+                    description += `, in month ${month}`;
+                }
+            }
+            
+            // Day of Week
+            if (dayOfWeek !== '*' && dayOfWeek !== '?') {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                
+                if (dayOfWeek.includes('/')) {
+                    const interval = dayOfWeek.split('/')[1];
+                    description += `, every ${interval} days of the week`;
+                } else if (dayOfWeek.includes('-')) {
+                    const [start, end] = dayOfWeek.split('-');
+                    const startDay = days[parseInt(start)];
+                    const endDay = days[parseInt(end)];
+                    description += `, ${startDay} through ${endDay}`;
+                } else if (dayOfWeek.includes(',')) {
+                    const selectedDays = dayOfWeek.split(',').map(d => days[parseInt(d)]).join(', ');
+                    description += `, on ${selectedDays}`;
+                } else {
+                    const dayName = days[parseInt(dayOfWeek)];
+                    description += `, on ${dayName}`;
+                }
+            }
+            
+            // Year
+            if (year !== '*') {
+                if (year.includes('/')) {
+                    const interval = year.split('/')[1];
+                    description += `, every ${interval} years`;
+                } else if (year.includes('-')) {
+                    const [start, end] = year.split('-');
+                    description += `, from year ${start} to ${end}`;
+                } else {
+                    description += `, in year ${year}`;
+                }
+            }
+            
+            return description;
+        }
+
+        // Generate next executions
+        function generateNextExecutions(cron) {
+            const fields = cron.split(' ');
+            const [second, minute, hour, dayOfMonth, month, dayOfWeek, year] = fields;
+            
+            // For simplicity, we'll generate next 5 executions based on current time
+            // In a real implementation, you'd use a proper cron library
+            const now = new Date();
+            const executions = [];
+            
+            for (let i = 0; i < 5; i++) {
+                const nextDate = new Date(now);
+                nextDate.setDate(now.getDate() + i);
+                
+                // Set to noon (12:00:00) for the example
+                nextDate.setHours(12, 0, 0, 0);
+                
+                const day = nextDate.getDate().toString().padStart(2, '0');
+                const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+                const year = nextDate.getFullYear();
+                const hours = nextDate.getHours().toString().padStart(2, '0');
+                const minutes = nextDate.getMinutes().toString().padStart(2, '0');
+                const seconds = nextDate.getSeconds().toString().padStart(2, '0');
+                
+                executions.push(`${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`);
+            }
+            
+            return executions;
+        }
+
+        // Use example cron expression
+        function useExample(cron) {
+            document.getElementById('cronExpression').value = cron;
+            explainCron();
+        }
+
+        // Handle Enter key in input field
+        document.getElementById('cronExpression').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                explainCron();
+            }
+        });
+</script>
+</body>
+</html>

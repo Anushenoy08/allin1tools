@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's My IP? - Allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-container {
+            padding: 2rem;
+        }
+
+        .ip-section {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .ip-label {
+            color: #2196f3;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .ip-display {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #333;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: white;
+            color: #666;
+            border: 1px solid #2196f3;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .copy-btn:hover {
+            background: #2196f3;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .preview-btn {
+            background: #666;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 2rem auto 0;
+            display: block;
+        }
+
+        .preview-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #f44336;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .content-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">WHAT'S MY IP?</h1>
+        
+        <div class="content-container">
+            <!-- IPv4 Section -->
+            <div class="ip-section">
+                <label class="ip-label">IPv4 Address</label>
+                <div class="ip-display" id="ipv4Display">
+                    <span class="loading">Loading...</span>
+                </div>
+                <button class="copy-btn" onclick="copyIPv4()">Copy IPv4</button>
+            </div>
+
+            <!-- IPv6 Section -->
+            <div class="ip-section">
+                <label class="ip-label">IPv6 Address</label>
+                <div class="ip-display" id="ipv6Display">
+                    <span class="loading">Loading...</span>
+                </div>
+                <button class="copy-btn" onclick="copyIPv6()">Copy IPv6</button>
+            </div>
+
+            <!-- Preview Button -->
+            <button class="preview-btn" onclick="refreshIP()">Refresh</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables to store IP addresses
+        let ipv4Address = '';
+        let ipv6Address = '';
+
+        // Load IP addresses when page loads
+        window.addEventListener('load', function() {
+            getIPAddresses();
+        });
+
+        // Get IP addresses from multiple services
+        async function getIPAddresses() {
+            try {
+                // Try to get IPv4
+                const ipv4Response = await fetch('https://api.ipify.org?format=json');
+                if (ipv4Response.ok) {
+                    const ipv4Data = await ipv4Response.json();
+                    ipv4Address = ipv4Data.ip;
+                    document.getElementById('ipv4Display').textContent = ipv4Address;
+                } else {
+                    throw new Error('Failed to get IPv4');
+                }
+
+                // Try to get IPv6 (many ISPs don't provide IPv6)
+                try {
+                    const ipv6Response = await fetch('https://api64.ipify.org?format=json');
+                    if (ipv6Response.ok) {
+                        const ipv6Data = await ipv6Response.json();
+                        ipv6Address = ipv6Data.ip;
+                        document.getElementById('ipv6Display').textContent = ipv6Address;
+                    } else {
+                        document.getElementById('ipv6Display').innerHTML = '<span class="error">Not available</span>';
+                    }
+                } catch (ipv6Error) {
+                    document.getElementById('ipv6Display').innerHTML = '<span class="error">Not available</span>';
+                }
+
+            } catch (error) {
+                console.error('Error fetching IP:', error);
+                
+                // Fallback services
+                try {
+                    const fallbackResponse = await fetch('https://httpbin.org/ip');
+                    if (fallbackResponse.ok) {
+                        const fallbackData = await fallbackResponse.json();
+                        ipv4Address = fallbackData.origin.split(',')[0].trim();
+                        document.getElementById('ipv4Display').textContent = ipv4Address;
+                    } else {
+                        document.getElementById('ipv4Display').innerHTML = '<span class="error">Unable to fetch IP</span>';
+                    }
+                } catch (fallbackError) {
+                    document.getElementById('ipv4Display').innerHTML = '<span class="error">Unable to fetch IP</span>';
+                }
+                
+                document.getElementById('ipv6Display').innerHTML = '<span class="error">Not available</span>';
+            }
+        }
+
+        // Copy IPv4 to clipboard
+        async function copyIPv4() {
+            if (!ipv4Address) {
+                alert('No IPv4 address available to copy');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(ipv4Address);
+                alert('IPv4 address copied to clipboard!');
+            } catch (error) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = ipv4Address;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('IPv4 address copied to clipboard!');
+            }
+        }
+
+        // Copy IPv6 to clipboard
+        async function copyIPv6() {
+            if (!ipv6Address) {
+                alert('No IPv6 address available to copy');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(ipv6Address);
+                alert('IPv6 address copied to clipboard!');
+            } catch (error) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = ipv6Address;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('IPv6 address copied to clipboard!');
+            }
+        }
+
+        // Refresh IP addresses
+        function refreshIP() {
+            document.getElementById('ipv4Display').innerHTML = '<span class="loading">Loading...</span>';
+            document.getElementById('ipv6Display').innerHTML = '<span class="loading">Loading...</span>';
+            getIPAddresses();
+        }
+    </script>
+</body>
+</html>

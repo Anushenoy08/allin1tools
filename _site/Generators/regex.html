@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Generator & Tester | allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e3f6fc 0%, #b3c6f9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Ensure navbar spans full width */
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 1rem 2rem;
+        }
+        
+        /* Main container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Main content layout */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* Left panel */
+        .left-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Right panel */
+        .right-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Section headings */
+        .section-heading {
+            color: #2196f3;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .section-subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        /* Form groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #616161;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(117, 117, 117, 0.3);
+        }
+        
+        /* Quick insert buttons */
+        .quick-insert {
+            margin: 20px 0;
+        }
+        
+        .quick-insert h4 {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .quick-btn {
+            padding: 12px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #e3f2fd;
+            color: #2196f3;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .quick-btn:hover {
+            border-color: #2196f3;
+            background: #bbdefb;
+            transform: translateY(-1px);
+        }
+        
+        /* Flags section */
+        .flags-section {
+            margin: 20px 0;
+        }
+        
+        .flags-section h4 {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .flag-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .flag-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .flag-checkbox input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .flag-checkbox label {
+            margin: 0;
+            font-weight: normal;
+            color: #555;
+        }
+        
+        /* Results section */
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .results-section h3 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .result-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 120px;
+        }
+        
+        .result-box h4 {
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .result-content {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 15px;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .result-actions .btn {
+            margin: 0;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .result-actions .btn:hover {
+            background: #1976d2;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        /* Alternate button colors for variety */
+        .result-actions .btn:nth-child(2) {
+            background: #4caf50;
+        }
+        
+        .result-actions .btn:nth-child(2):hover {
+            background: #388e3c;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .main-container {
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .quick-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .flag-checkboxes {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .quick-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar from common.css -->
+<div class="navbar">
+  <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+  <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+</div>
+
+    <div class="main-container">
+        <!-- Page Title -->
+        <h1 class="page-title">Regex Generator & Tester</h1>
+        
+        <!-- Main Content Layout -->
+        <div class="content-layout">
+            <!-- Regex Generator Section -->
+            <div class="left-panel" style="grid-column: 1 / -1; margin-bottom: 30px;">
+                <h2 class="section-heading">Regex Generator</h2>
+                <p class="section-subtitle">Enter a sample value and click Generate to create a regex pattern automatically.</p>
+                
+                <div class="form-group">
+                    <label for="sampleValue">Sample Value:</label>
+                    <input type="text" id="sampleValue" placeholder="Enter a sample value (e.g., test@email.com)">
+  </div>
+  
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" onclick="generateRegex()">Generate Regex</button>
+</div>
+
+                <div class="form-group" id="generatedRegexGroup" style="display: none;">
+                    <label for="generatedRegex">Generated Regex:</label>
+                    <input type="text" id="generatedRegex" readonly>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="copyGeneratedRegex()">Copy Regex</button>
+    </div>
+      </div>
+    </div>
+
+            <!-- Regex Tester Section -->
+            <div class="left-panel">
+                <h2 class="section-heading">Regex Tester</h2>
+                <p class="section-subtitle">Test your regex patterns with real-time matching and replacement.</p>
+                
+                <!-- Presets -->
+                <div class="form-group">
+                    <label for="presets">Presets</label>
+                    <select id="presets" onchange="loadPreset()">
+                        <option value="">Select a preset...</option>
+                        <option value="date">Date (YYYY-MM-DD)</option>
+                        <option value="number">10-digit Number</option>
+                        <option value="email">Email Address</option>
+                        <option value="url">URL</option>
+                        <option value="phone">Phone Number</option>
+                        <option value="hex">Hex Color</option>
+                        <option value="css-hex">CSS Hex Color</option>
+                    </select>
+    </div>
+
+                <!-- Regex Pattern -->
+                <div class="form-group">
+                    <label for="regexPattern">Regex Pattern</label>
+                    <input type="text" id="regexPattern" placeholder="Enter your regex pattern">
+    </div>
+
+                <!-- Quick Insert Buttons -->
+                <div class="quick-insert">
+                    <h4>Quick Insert:</h4>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="insertRegex('^')">^</button>
+                        <button class="quick-btn" onclick="insertRegex('$')">$</button>
+                        <button class="quick-btn" onclick="insertRegex('.')">.</button>
+                        <button class="quick-btn" onclick="insertRegex('\\d')">\\d</button>
+                        <button class="quick-btn" onclick="insertRegex('\\w')">\\w</button>
+                        <button class="quick-btn" onclick="insertRegex('\\s')">\\s</button>
+                        <button class="quick-btn" onclick="insertRegex('[')">[</button>
+                        <button class="quick-btn" onclick="insertRegex(']')">]</button>
+                        <button class="quick-btn" onclick="insertRegex('(')">(</button>
+                        <button class="quick-btn" onclick="insertRegex(')')">)</button>
+                        <button class="quick-btn" onclick="insertRegex('|')">|</button>
+                        <button class="quick-btn" onclick="insertRegex('*')">*</button>
+                        <button class="quick-btn" onclick="insertRegex('+')">+</button>
+                        <button class="quick-btn" onclick="insertRegex('?')">?</button>
+    </div>
+  </div>
+
+                <!-- Flags -->
+                <div class="flags-section">
+                    <h4>Flags:</h4>
+                    <div class="flag-checkboxes">
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagG" value="g">
+                            <label for="flagG">g (Global)</label>
+        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagI" value="i">
+                            <label for="flagI">i (Case Insensitive)</label>
+      </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagM" value="m">
+                            <label for="flagM">m (Multiline)</label>
+    </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagS" value="s">
+                            <label for="flagS">s (Dot All)</label>
+        </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagU" value="u">
+                            <label for="flagU">u (Unicode)</label>
+      </div>
+                        <div class="flag-checkbox">
+                            <input type="checkbox" id="flagY" value="y">
+                            <label for="flagY">y (Sticky)</label>
+    </div>
+  </div>
+</div>
+
+                <!-- Test String -->
+                <div class="form-group">
+                    <label for="testString">Test String</label>
+                    <textarea id="testString" placeholder="Enter your test string here..."></textarea>
+    </div>
+    
+                <!-- Replacement -->
+                <div class="form-group">
+                    <label for="replacement">Replacement (optional)</label>
+                    <input type="text" id="replacement" placeholder="Enter replacement text">
+    </div>
+    
+                <!-- Test Button -->
+                <div style="text-align: center;">
+                    <button class="btn btn-success" onclick="testRegex()">Test Pattern</button>
+    </div>
+    </div>
+    
+            <!-- Right Panel - Results -->
+            <div class="right-panel">
+                <h3 class="results-section">Results</h3>
+                
+                <!-- Match Results -->
+                <div class="result-box">
+                    <h4>Match Results</h4>
+                    <div id="matchResults" class="result-content">Enter a regex pattern.</div>
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyMatches()">Copy Matches</button>
+                        <button class="btn btn-secondary" onclick="downloadMatches()">Download Matches</button>
+    </div>
+  </div>
+  
+                <!-- Replacement Result -->
+                <div class="result-box">
+                    <h4>Replacement Result</h4>
+                    <div id="replacementResult" class="result-content">No results to display.</div>
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyReplaced()">Copy Replaced</button>
+                        <button class="btn btn-secondary" onclick="downloadReplaced()">Download Replaced</button>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+        // Generate Regex from sample value
+        function generateRegex() {
+            const sampleValue = document.getElementById('sampleValue').value.trim();
+            
+            if (!sampleValue) {
+                alert('Please enter a sample value first!');
+                return;
+            }
+            
+            // Enhanced regex generation logic
+            let generatedPattern = '';
+            
+            // Email pattern detection
+            if (sampleValue.includes('@') && sampleValue.includes('.')) {
+                const parts = sampleValue.split('@');
+                const domainParts = parts[1].split('.');
+                
+                if (parts[0].length > 0 && domainParts.length >= 2) {
+                    generatedPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+                }
+            }
+            // Date pattern detection (YYYY-MM-DD)
+            else if (/^\d{4}-\d{2}-\d{2}$/.test(sampleValue)) {
+                generatedPattern = '^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$';
+            }
+            // Date pattern detection (MM/DD/YYYY)
+            else if (/^\d{2}\/\d{2}\/\d{4}$/.test(sampleValue)) {
+                generatedPattern = '^(0[1-9]|1[0-2])\\/(0[1-9]|[12]\\d|3[01])\\/\\d{4}$';
+            }
+            // Phone number pattern detection
+            else if (/^[\d\s\-\(\)\+]+$/.test(sampleValue) && sampleValue.replace(/\D/g, '').length >= 10) {
+                generatedPattern = '^[+]?[\\d\\s\\-\\(\\)]{10,}$';
+            }
+            // URL pattern detection
+            else if (sampleValue.startsWith('http') || sampleValue.includes('.') && sampleValue.includes('/')) {
+                generatedPattern = '^(https?:\\/\\/)?([\\w-]+\\.)+[\\w-]+(\\/\\S*)?$';
+            }
+            // Credit card pattern detection
+            else if (/^\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}$/.test(sampleValue.replace(/\s/g, ''))) {
+                generatedPattern = '^\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}$';
+            }
+            // ZIP code pattern detection (US format)
+            else if (/^\d{5}(-\d{4})?$/.test(sampleValue)) {
+                generatedPattern = '^\\d{5}(-\\d{4})?$';
+            }
+            // Social Security Number pattern
+            else if (/^\d{3}-\d{2}-\d{4}$/.test(sampleValue)) {
+                generatedPattern = '^\\d{3}-\\d{2}-\\d{4}$';
+            }
+            // IP Address pattern
+            else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(sampleValue)) {
+                generatedPattern = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
+            }
+            // Hex color pattern
+            else if (/^#[0-9A-Fa-f]{6}$/.test(sampleValue)) {
+                generatedPattern = '^#[0-9A-Fa-f]{6}$';
+            }
+            // Hex color without # pattern
+            else if (/^[0-9A-Fa-f]{6}$/.test(sampleValue)) {
+                generatedPattern = '^[0-9A-Fa-f]{6}$';
+            }
+            // Time pattern (HH:MM or HH:MM:SS)
+            else if (/^\d{2}:\d{2}(:\d{2})?$/.test(sampleValue)) {
+                generatedPattern = '^([01]\\d|2[0-3]):([0-5]\\d)(:([0-5]\\d))?$';
+            }
+            // Currency pattern
+            else if (/^\$[\d,]+(\.\d{2})?$/.test(sampleValue)) {
+                generatedPattern = '^\\$[\\d,]+(\\.\\d{2})?$';
+            }
+            // Pattern with repeated special characters (like @@)
+            else if (/(.)\1+/.test(sampleValue)) {
+                // Find repeated characters and create a pattern
+                const repeatedChars = sampleValue.match(/(.)\1+/g);
+                let pattern = '^';
+                
+                // Split by repeated characters
+                let currentIndex = 0;
+                repeatedChars.forEach(repeat => {
+                    const char = repeat[0];
+                    const beforeRepeat = sampleValue.substring(currentIndex, sampleValue.indexOf(repeat, currentIndex));
+                    
+                    if (beforeRepeat) {
+                        // Handle the part before repeated characters
+                        if (/^[a-zA-Z0-9]+$/.test(beforeRepeat)) {
+                            pattern += `[a-zA-Z0-9]{${beforeRepeat.length}}`;
+                        } else {
+                            pattern += beforeRepeat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        }
+                    }
+                    
+                    // Handle repeated characters
+                    if (char === '@') {
+                        pattern += '@+';
+                    } else if (char === '.') {
+                        pattern += '\\.+';
+                    } else if (char === '-') {
+                        pattern += '-+';
+                    } else if (char === '_') {
+                        pattern += '_+';
+                    } else {
+                        pattern += `\\${char}+`;
+                    }
+                    
+                    currentIndex = sampleValue.indexOf(repeat, currentIndex) + repeat.length;
+                });
+                
+                // Handle remaining part after last repeated character
+                const remaining = sampleValue.substring(currentIndex);
+                if (remaining) {
+                    if (/^[a-zA-Z0-9]+$/.test(remaining)) {
+                        pattern += `[a-zA-Z0-9]{${remaining.length}}`;
+                    } else {
+                        pattern += remaining.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    }
+                }
+                
+                pattern += '$';
+                generatedPattern = pattern;
+            }
+            // Alphanumeric with specific length
+            else if (/^[a-zA-Z0-9]+$/.test(sampleValue)) {
+                const length = sampleValue.length;
+                if (length <= 10) {
+                    generatedPattern = `^[a-zA-Z0-9]{${length}}$`;
+                } else {
+                    generatedPattern = '^[a-zA-Z0-9]{8,}$';
+                }
+            }
+            // Alphabetic only
+            else if (/^[a-zA-Z\s]+$/.test(sampleValue)) {
+                generatedPattern = '^[a-zA-Z\\s]+$';
+            }
+            // Numeric only
+            else if (/^\d+$/.test(sampleValue)) {
+                const length = sampleValue.length;
+                if (length <= 10) {
+                    generatedPattern = `^\\d{${length}}$`;
+                } else {
+                    generatedPattern = '^\\d+$';
+                }
+            }
+            // Mixed pattern with special characters
+            else {
+                // Analyze the pattern structure
+                const letters = sampleValue.match(/[a-zA-Z]/g) || [];
+                const numbers = sampleValue.match(/\d/g) || [];
+                const specials = sampleValue.match(/[^a-zA-Z0-9\s]/g) || [];
+                
+                if (letters.length > 0 && numbers.length > 0 && specials.length > 0) {
+                    // Mixed alphanumeric with special characters
+                    let pattern = '^';
+                    
+                    // Group similar characters together
+                    let currentType = '';
+                    let currentCount = 0;
+                    
+                    for (let i = 0; i < sampleValue.length; i++) {
+                        const char = sampleValue[i];
+                        const isLetter = /[a-zA-Z]/.test(char);
+                        const isNumber = /\d/.test(char);
+                        const isSpecial = /[^a-zA-Z0-9\s]/.test(char);
+                        
+                        let charType = '';
+                        if (isLetter) charType = 'letter';
+                        else if (isNumber) charType = 'number';
+                        else if (isSpecial) charType = 'special';
+                        
+                        if (charType === currentType) {
+                            currentCount++;
+                        } else {
+                            // Add the previous group to pattern
+                            if (currentType === 'letter') {
+                                pattern += `[a-zA-Z]{${currentCount}}`;
+                            } else if (currentType === 'number') {
+                                pattern += `\\d{${currentCount}}`;
+                            } else if (currentType === 'special') {
+                                pattern += `[${currentType === 'special' ? '^a-zA-Z0-9\\s' : ''}]{${currentCount}}`;
+                            }
+                            
+                            // Start new group
+                            currentType = charType;
+                            currentCount = 1;
+                        }
+                    }
+                    
+                    // Add the last group
+                    if (currentType === 'letter') {
+                        pattern += `[a-zA-Z]{${currentCount}}`;
+                    } else if (currentType === 'number') {
+                        pattern += `\\d{${currentCount}}`;
+                    } else if (currentType === 'special') {
+                        pattern += `[^a-zA-Z0-9\\s]{${currentCount}}`;
+                    }
+                    
+                    pattern += '$';
+                    generatedPattern = pattern;
+                } else {
+                    // Generic pattern with escaped special characters
+                    const escaped = sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    
+                    // Make it more flexible by allowing variations
+                    if (sampleValue.length > 3) {
+                        // For longer strings, make it more flexible
+                        generatedPattern = escaped.replace(/\\s+/g, '\\s+'); // Allow flexible whitespace
+                    } else {
+                        // For short strings, keep exact match
+                        generatedPattern = `^${escaped}$`;
+                    }
+                }
+            }
+            
+            // If no pattern was generated, create a basic one
+            if (!generatedPattern) {
+                generatedPattern = `^${sampleValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`;
+            }
+            
+            document.getElementById('generatedRegex').value = generatedPattern;
+            document.getElementById('generatedRegexGroup').style.display = 'block';
+            
+            // Auto-fill the regex pattern in tester
+            document.getElementById('regexPattern').value = generatedPattern;
+            
+            // Auto-test if there's a test string
+            if (document.getElementById('testString').value.trim()) {
+                testRegex();
+            }
+        }
+        
+        // Copy generated regex
+        function copyGeneratedRegex() {
+            const regex = document.getElementById('generatedRegex').value;
+            navigator.clipboard.writeText(regex);
+            alert('Regex copied to clipboard!');
+        }
+        
+        // Load preset patterns
+        function loadPreset() {
+            const preset = document.getElementById('presets').value;
+            const patterns = {
+                'date': '^\\d{4}-\\d{2}-\\d{2}$',
+                'number': '^\\d{10}$',
+                'email': '^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$',
+                'url': '^(https?:\\/\\/)?([\\w-]+\\.)+[\\w-]+(\\/\\S*)?$',
+                'phone': '^\\+?\\d{1,3}?[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$',
+                'hex': '^[0-9A-Fa-f]{6}$',
+                'css-hex': '^#[0-9A-Fa-f]{6}$'
+            };
+            
+            if (patterns[preset]) {
+                document.getElementById('regexPattern').value = patterns[preset];
+            }
+        }
+        
+        // Insert regex element
+        function insertRegex(element) {
+            const pattern = document.getElementById('regexPattern');
+            const start = pattern.selectionStart;
+            const end = pattern.selectionEnd;
+            const text = pattern.value;
+            
+            pattern.value = text.substring(0, start) + element + text.substring(end);
+            pattern.focus();
+            pattern.setSelectionRange(start + element.length, start + element.length);
+        }
+        
+        // Test regex pattern
+        function testRegex() {
+            const pattern = document.getElementById('regexPattern').value.trim();
+            const testString = document.getElementById('testString').value.trim();
+            const replacement = document.getElementById('replacement').value.trim();
+            
+            if (!pattern) {
+                document.getElementById('matchResults').textContent = 'Enter a regex pattern.';
+                document.getElementById('replacementResult').textContent = 'No results to display.';
+                return;
+            }
+            
+            if (!testString) {
+                document.getElementById('matchResults').textContent = 'Enter a test string.';
+                document.getElementById('replacementResult').textContent = 'No results to display.';
+                return;
+            }
+            
+            try {
+                // Get selected flags
+                const flags = getSelectedFlags();
+                const regex = new RegExp(pattern, flags);
+                
+                // Test matches
+                const matches = testString.match(regex);
+                let matchResults = 'No matches found.';
+                
+                if (matches) {
+                    matchResults = `Found ${matches.length} match(es):\n`;
+                    matches.forEach((match, index) => {
+                        matchResults += `${index + 1}. '${match}'\n`;
+                    });
+                }
+                
+                document.getElementById('matchResults').textContent = matchResults;
+                
+                // Test replacement
+                if (replacement) {
+                    const replaced = testString.replace(regex, replacement);
+                    document.getElementById('replacementResult').textContent = replaced;
+      } else {
+                    document.getElementById('replacementResult').textContent = 'No replacement text provided.';
+                }
+                
+            } catch (error) {
+                document.getElementById('matchResults').textContent = 'Invalid regex pattern: ' + error.message;
+                document.getElementById('replacementResult').textContent = 'Cannot perform replacement with invalid pattern.';
+            }
+        }
+        
+        // Get selected flags
+        function getSelectedFlags() {
+            const flags = [];
+            const flagElements = document.querySelectorAll('.flag-checkbox input:checked');
+            flagElements.forEach(flag => {
+                flags.push(flag.value);
+            });
+            return flags.join('');
+        }
+        
+        // Copy functions
+        function copyMatches() {
+            const matches = document.getElementById('matchResults').textContent;
+            navigator.clipboard.writeText(matches);
+            alert('Matches copied to clipboard!');
+        }
+        
+        function copyReplaced() {
+            const replaced = document.getElementById('replacementResult').textContent;
+            navigator.clipboard.writeText(replaced);
+            alert('Replacement result copied to clipboard!');
+        }
+        
+        // Download functions
+        function downloadMatches() {
+            const matches = document.getElementById('matchResults').textContent;
+            downloadText(matches, 'regex_matches.txt');
+        }
+        
+        function downloadReplaced() {
+            const replaced = document.getElementById('replacementResult').textContent;
+            downloadText(replaced, 'regex_replacement.txt');
+        }
+        
+        function downloadText(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize page
+        window.onload = function() {
+            // Set default test string
+            document.getElementById('testString').value = 'test@email.com\n2023-12-25\n1234567890\nhttps://example.com';
+        };
+</script>
+</body>
+</html>

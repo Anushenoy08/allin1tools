@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter - Allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .content-container {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: 600px;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .editor-header {
+            background: #333;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .editor-textarea {
+            flex: 1;
+            border: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .editor-textarea:focus {
+            background: white;
+            box-shadow: inset 0 0 0 2px #2196f3;
+        }
+
+        /* Fullscreen styles */
+        .editor-section.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .editor-section.fullscreen .editor-header {
+            border-radius: 0;
+            background: #333;
+        }
+
+        .editor-section.fullscreen .editor-textarea {
+            border-radius: 0;
+            height: calc(100vh - 60px);
+            font-size: 1rem;
+        }
+
+        /* Hide other elements when in fullscreen */
+        .editor-section.fullscreen ~ .editor-section {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .editor-section {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .content-container {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1 class="page-title">JSON Formatter</h1>
+        
+        <div class="content-container">
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn" onclick="formatJSON()">Format</button>
+                <button class="action-btn" onclick="beautifyJSON()">Beautify</button>
+                <button class="action-btn" onclick="validateJSON()">Validate</button>
+                <button class="action-btn" onclick="copyJSON()">Copy JSON</button>
+                <button class="action-btn" onclick="downloadJSON()">Download JSON</button>
+            </div>
+
+            <!-- Editor Container -->
+            <div class="editor-container">
+                <!-- Input Section -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <span class="editor-title">Input</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="uploadFile()" title="Upload File">📁</button>
+                            <button class="header-btn" onclick="expandInput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearInput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="editor-textarea" id="inputTextarea" placeholder="Paste or type your JSON here..."></textarea>
+                </div>
+
+                <!-- Output Section -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <span class="editor-title">Output</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="expandOutput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearOutput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="editor-textarea" id="outputTextarea" placeholder="Formatted/Beautified JSON will appear here..." readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Format JSON
+        function formatJSON() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter JSON to format');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const formatted = JSON.stringify(parsed, null, 2);
+                document.getElementById('outputTextarea').value = formatted;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: Invalid JSON\n' + error.message;
+            }
+        }
+
+        // Beautify JSON (same as format but with more spacing)
+        function beautifyJSON() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter JSON to beautify');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const beautified = JSON.stringify(parsed, null, 4);
+                document.getElementById('outputTextarea').value = beautified;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: Invalid JSON\n' + error.message;
+            }
+        }
+
+        // Validate JSON
+        function validateJSON() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            if (!input) {
+                alert('Please enter JSON to validate');
+                return;
+            }
+
+            try {
+                JSON.parse(input);
+                document.getElementById('outputTextarea').value = '✅ Valid JSON\n\n' + JSON.stringify(JSON.parse(input), null, 2);
+            } catch (error) {
+                document.getElementById('outputTextarea').value = '❌ Invalid JSON\n\nError: ' + error.message;
+            }
+        }
+
+        // Copy JSON
+        async function copyJSON() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No JSON to copy');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(output);
+                alert('JSON copied to clipboard!');
+            } catch (error) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = output;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('JSON copied to clipboard!');
+            }
+        }
+
+        // Download JSON
+        function downloadJSON() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No JSON to download');
+                return;
+            }
+
+            const blob = new Blob([output], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formatted.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Upload file
+        function uploadFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.txt';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('inputTextarea').value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Clear input
+        function clearInput() {
+            document.getElementById('inputTextarea').value = '';
+        }
+
+        // Clear output
+        function clearOutput() {
+            document.getElementById('outputTextarea').value = '';
+        }
+
+        // Expand input (full screen functionality)
+        function expandInput() {
+            const inputSection = document.querySelector('.editor-section:first-child');
+            
+            if (inputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(inputSection);
+            }
+        }
+
+        // Expand output (full screen functionality)
+        function expandOutput() {
+            const outputSection = document.querySelector('.editor-section:last-child');
+            
+            if (outputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(outputSection);
+            }
+        }
+
+        // Enter fullscreen function
+        function enterFullscreen(element) {
+            // Add fullscreen class for styling
+            element.classList.add('fullscreen');
+            
+            // Try to use browser's fullscreen API
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {
+                    console.log('Fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {
+                    console.log('Webkit fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen().catch(err => {
+                    console.log('Mozilla fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen().catch(err => {
+                    console.log('MS fullscreen API not supported, using CSS fullscreen');
+                });
+            }
+            
+            // Update button text
+            const expandBtn = element.querySelector('.header-actions button:nth-of-type(2)');
+            if (expandBtn) {
+                expandBtn.textContent = '⛶';
+                expandBtn.title = 'Exit Fullscreen';
+            }
+        }
+
+        // Exit fullscreen function
+        function exitFullscreen() {
+            // Remove fullscreen class
+            document.querySelectorAll('.editor-section').forEach(section => {
+                section.classList.remove('fullscreen');
+            });
+            
+            // Try to exit browser fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Exit fullscreen failed');
+                });
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen().catch(err => {
+                    console.log('Exit webkit fullscreen failed');
+                });
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen().catch(err => {
+                    console.log('Exit mozilla fullscreen failed');
+                });
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen().catch(err => {
+                    console.log('Exit MS fullscreen failed');
+                });
+            }
+            
+            // Update button texts
+            document.querySelectorAll('.header-actions button:nth-of-type(2)').forEach(btn => {
+                btn.textContent = '⛶';
+                btn.title = 'Fullscreen';
+            });
+        }
+
+        // Listen for fullscreen change events
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // User exited fullscreen
+                exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
