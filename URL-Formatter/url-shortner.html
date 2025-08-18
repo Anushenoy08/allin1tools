@@ -335,7 +335,6 @@
                     const shortenedURL = await response.text();
                     
                     // Display result
-                    document.getElementById('originalUrl').textContent = input;
                     document.getElementById('shortenedUrl').textContent = shortenedURL;
                     document.getElementById('resultSuccess').style.display = 'block';
                     document.getElementById('resultArea').value = shortenedURL;
@@ -353,7 +352,6 @@
                     const fallbackData = await fallbackResponse.json();
                     
                     if (fallbackData.shorturl) {
-                        document.getElementById('originalUrl').textContent = input;
                         document.getElementById('shortenedUrl').textContent = fallbackData.shorturl;
                         document.getElementById('resultSuccess').style.display = 'block';
                         document.getElementById('resultArea').value = fallbackData.shorturl;
