@@ -372,13 +372,13 @@
                 await navigator.clipboard.writeText(shortenedURL);
                 alert('Shortened URL copied to clipboard!');
             } catch (error) {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
                 textArea.value = shortenedURL;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
                 alert('Shortened URL copied to clipboard!');
             }
         }
@@ -396,8 +396,8 @@
         document.getElementById('urlInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !document.getElementById('shortenBtn').disabled) {
                 shortenURL();
-            }
-        });
-    </script>
+    }
+  });
+</script>
 </body>
 </html>
