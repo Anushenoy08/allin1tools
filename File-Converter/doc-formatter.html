@@ -815,35 +815,70 @@
                 const arrayBuffer = await window.annotateFile.arrayBuffer();
                 const pdf = await PDFDocument.load(arrayBuffer);
 
-                // Embed font
-                const font = await pdf.embedFont(StandardFonts.Helvetica);
-                const fontSize = 16;
-                const color = rgb(0.6, 0.6, 0.6); // Darker grey for better visibility
-                const opacity = 0.7; // Higher opacity for better visibility
+                // Embed font - try multiple font options for better compatibility
+                let font;
+                try {
+                    font = await pdf.embedFont(StandardFonts.Helvetica);
+                } catch (fontError) {
+                    try {
+                        font = await pdf.embedFont(StandardFonts.TimesRoman);
+                    } catch (fallbackError) {
+                        // Use default font if embedding fails
+                        font = undefined;
+                    }
+                }
+
+                const fontSize = 18;
+                const color = rgb(0.4, 0.4, 0.4); // Darker grey for maximum visibility
+                const opacity = 0.8; // High opacity for clear visibility
 
                 // Add annotation to each page
                 const pages = pdf.getPages();
-                for (const page of pages) {
+                console.log(`Processing ${pages.length} pages for annotation`);
+                
+                for (let i = 0; i < pages.length; i++) {
+                    const page = pages[i];
                     const { width, height } = page.getSize();
                     
                     // Add copyright symbol and format text
                     const watermarkText = `© ${text}`;
-                    const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
+                    
+                    // Calculate text width (use fallback if font embedding failed)
+                    let textWidth = 0;
+                    if (font) {
+                        textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
+                    } else {
+                        // Estimate text width if font embedding failed
+                        textWidth = watermarkText.length * fontSize * 0.6;
+                    }
                     
                     // Position text in bottom-right corner with proper margins
-                    const margin = 20;
+                    const margin = 25;
                     const x = width - textWidth - margin;
                     const y = margin + fontSize; // Account for font height
                     
+                    console.log(`Page ${i + 1}: Adding watermark at (${x}, ${y}) with text: "${watermarkText}"`);
+                    
                     // Draw the watermark text
-                    page.drawText(watermarkText, {
-                        x: x,
-                        y: y,
-                        size: fontSize,
-                        font: font,
-                        color: color,
-                        opacity: opacity
-                    });
+                    if (font) {
+                        page.drawText(watermarkText, {
+                            x: x,
+                            y: y,
+                            size: fontSize,
+                            font: font,
+                            color: color,
+                            opacity: opacity
+                        });
+                    } else {
+                        // Fallback drawing without custom font
+                        page.drawText(watermarkText, {
+                            x: x,
+                            y: y,
+                            size: fontSize,
+                            color: color,
+                            opacity: opacity
+                        });
+                    }
                 }
 
                 const newPdfBytes = await pdf.save();
