@@ -1,272 +1,658 @@
----
-layout: default
-title: Best Online JSON to SQL Converter for FREE
-permalink: /Json-Converter/json-sql.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to SQL Insert Converter - Allin1tools</title>
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<div class="navbar">
-  <img src="../images/logo.png" alt="Logo">
-  <a href="../index.html">HOME</a>
-  <a href="/article/">ARTICLES</a>
-</div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-<div class="json-converter-container">
-  <div class="json-converter-title">JSON to SQL Insert Converter</div>
-  
-  <div class="json-converter-layout">
-    <!-- Left side: Input -->
-    <div class="json-converter-left">
-      <div class="json-converter-box">
-        <div class="toolbar">
-          <span class="toolbar-label">Input</span>
-          <div class="toolbar-options">
-            <label class="upload-option">
-              <input type="file" accept="application/json" onchange="uploadJSONFile(event)">
-              <span class="upload-icon">📁</span>
-            </label>
-            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-              <span class="fullscreen-icon">⛶</span>
-            </button>
-            <button class="clear-option" title="Clear" onclick="clearInput()">
-              <span class="clear-icon">🗑️</span>
-            </button>
-          </div>
+        .navbar {
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #2196f3;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .content-container {
+            padding: 2rem;
+        }
+
+        .converter-layout {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 2rem;
+            height: 600px;
+        }
+
+        .input-section, .output-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .section-header {
+            background: #333;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .section-textarea {
+            flex: 1;
+            border: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .section-textarea:focus {
+            background: white;
+            box-shadow: inset 0 0 0 2px #2196f3;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            min-width: 150px;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .table-name-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .table-name-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .table-name-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .table-name-input:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        .table-name-input::placeholder {
+            color: #999;
+        }
+
+        /* Fullscreen styles */
+        .input-section.fullscreen, .output-section.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .input-section.fullscreen .section-header,
+        .output-section.fullscreen .section-header {
+            border-radius: 0;
+            background: #333;
+        }
+
+        .input-section.fullscreen .section-textarea,
+        .output-section.fullscreen .section-textarea {
+            border-radius: 0;
+            height: calc(100vh - 60px);
+            font-size: 1rem;
+        }
+
+        /* Hide other elements when in fullscreen */
+        .input-section.fullscreen ~ *,
+        .output-section.fullscreen ~ * {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .converter-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+                gap: 1rem;
+            }
+            
+            .input-section, .output-section {
+                height: 400px;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .action-btn {
+                min-width: 120px;
+            }
+
+            .table-name-section {
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .content-container {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="../images/logo.png" alt="Logo">
+        <div class="nav-links">
+            <a href="../index.html">HOME</a>
+            <a href="../article.html">ARTICLES</a>
         </div>
-        <div class="code-area-wrapper">
-          <textarea class="json-textarea" id="jsonInput" placeholder='Enter JSON Array of Objects Example: [{"id":1,"name":"Alice","profile":{"age":30,"city":"New York"},"hobbies":["reading","swimming"]}]'></textarea>
-        </div>
-      </div>
     </div>
-    
-    <!-- Center: Buttons and Table Name Input -->
-    <div class="json-converter-center">
-      <div class="action-btns">
-        <button onclick="convertToSQL()">Convert to SQL</button>
-        <button onclick="copyOutput()">Copy SQL</button>
-        <button onclick="downloadOutput()">Download SQL</button>
-      </div>
-      
-      <!-- Table Name Input -->
-      <div style="margin-top: 20px; text-align: center;">
-        <label for="tableNameInput" style="font-weight: 500; color: #1565c0; margin-bottom: 8px; display: block;">Table Name</label>
-        <input id="tableNameInput" type="text" placeholder="table_name" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #b2ebf2; font-size: 1.08em; width: 100%; max-width: 250px;">
-      </div>
-    </div>
-    
-    <!-- Right side: Output -->
-    <div class="json-converter-right">
-      <div class="json-converter-box">
-        <div class="toolbar">
-          <span class="toolbar-label">Output</span>
-          <div class="toolbar-options">
-            <button class="fullscreen-option" title="Full Screen" onclick="toggleFullScreen(this)">
-              <span class="fullscreen-icon">⛶</span>
-            </button>
-            <button class="clear-option" title="Clear" onclick="clearOutput()">
-              <span class="clear-icon">🗑️</span>
-            </button>
-          </div>
+
+    <div class="main-container">
+        <h1 class="page-title">JSON to SQL Insert Converter</h1>
+        
+        <div class="content-container">
+            <div class="converter-layout">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <div class="section-header">
+                        <span class="section-title">Input</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="uploadFile()" title="Upload File">📁</button>
+                            <button class="header-btn" onclick="expandInput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearInput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="section-textarea" id="inputTextarea" placeholder="Enter JSON Array of Objects Example:
+[{'id':1,'name':'Alice', 'profile':{'age':30,'city': 'New York'}, 'hobbies':['reading', 'swimming']}]"></textarea>
+                </div>
+
+                <!-- Action Buttons and Table Name -->
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="convertToSQL()">Convert to SQL</button>
+                    <button class="action-btn" onclick="copySQL()">Copy SQL</button>
+                    <button class="action-btn" onclick="downloadSQL()">Download SQL</button>
+                    
+                    <div class="table-name-section">
+                        <label class="table-name-label">Table Name</label>
+                        <input type="text" class="table-name-input" id="tableNameInput" placeholder="table_name" value="users">
+                    </div>
+                </div>
+
+                <!-- Output Section -->
+                <div class="output-section">
+                    <div class="section-header">
+                        <span class="section-title">Output</span>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="expandOutput()" title="Expand">⛶</button>
+                            <button class="header-btn" onclick="clearOutput()" title="Clear">🗑️</button>
+                        </div>
+                    </div>
+                    <textarea class="section-textarea" id="outputTextarea" placeholder="SQL INSERT statements will appear here..." readonly></textarea>
+                </div>
+            </div>
         </div>
-        <div class="code-area-wrapper">
-          <textarea class="json-textarea" id="sqlOutput" placeholder="SQL INSERT statements will appear here..." readonly></textarea>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<script>
-function convertToSQL() {
-  const input = document.getElementById('jsonInput').value.trim();
-  const output = document.getElementById('sqlOutput');
-  const tableNameInput = document.getElementById('tableNameInput');
-  const tableName = (tableNameInput && tableNameInput.value.trim()) ? tableNameInput.value.trim() : 'table_name';
-  output.value = '';
-  try {
-    const arr = JSON.parse(input);
-    if (!Array.isArray(arr) || arr.length === 0 || typeof arr[0] !== 'object') {
-      alert('Input JSON must be a non-empty array of objects.');
-      return;
-    }
-    const sql = jsonToSQL(arr, tableName);
-    output.value = sql;
-  } catch (e) {
-    alert('Invalid JSON format.');
-  }
-}
+    <script>
+        // Convert JSON to SQL INSERT
+        function convertToSQL() {
+            const input = document.getElementById('inputTextarea').value.trim();
+            const tableName = document.getElementById('tableNameInput').value.trim() || 'table_name';
+            
+            if (!input) {
+                alert('Please enter JSON data to convert');
+                return;
+            }
 
-function jsonToSQL(arr, tableName) {
-  // Get all unique keys
-  const keys = Array.from(new Set(arr.flatMap(obj => Object.keys(obj))));
-  let sql = '';
-  for (const obj of arr) {
-    const columns = keys.join(', ');
-    const values = keys.map(key => sqlValue(obj[key])).join(', ');
-    sql += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
-  }
-  return sql.trim();
-}
+            try {
+                const jsonData = JSON.parse(input);
+                const sql = jsonToSQLInsert(jsonData, tableName);
+                document.getElementById('outputTextarea').value = sql;
+            } catch (error) {
+                document.getElementById('outputTextarea').value = 'Error: ' + error.message;
+            }
+        }
 
-function sqlValue(val) {
-  if (val === null || val === undefined) return 'NULL';
-  if (typeof val === 'number') return val;
-  if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE';
-  if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'`;
-  return `'${String(val).replace(/'/g, "''")}'`;
-}
+        // Convert JSON array to SQL INSERT statements
+        function jsonToSQLInsert(data, tableName) {
+            if (!Array.isArray(data)) {
+                // If it's a single object, wrap it in an array
+                data = [data];
+            }
 
-function clearInput() {
-  document.getElementById('jsonInput').value = '';
-}
+            if (data.length === 0) {
+                return '-- No data to insert';
+            }
 
-function clearOutput() {
-  document.getElementById('sqlOutput').value = '';
-}
+            // Get all unique keys from all objects
+            const allKeys = new Set();
+            data.forEach(obj => {
+                if (typeof obj === 'object' && obj !== null) {
+                    Object.keys(obj).forEach(key => allKeys.add(key));
+                }
+            });
 
-function toggleFullScreen(button) {
-  if (window.innerWidth <= 1024) {
-    const which = button.closest('.json-converter-box').querySelector('.box-label').textContent.toLowerCase();
-    enterMobileFullscreen(which);
-  } else {
-    const box = button.closest('.json-converter-box');
-    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-      if (box.requestFullscreen) {
-        box.requestFullscreen().then(() => {}).catch(err => { alert('Failed to enter fullscreen mode: ' + err.message); });
-      } else if (box.webkitRequestFullscreen) {
-        box.webkitRequestFullscreen().then(() => {}).catch(err => { alert('Failed to enter fullscreen mode: ' + err.message); });
-      } else if (box.msRequestFullscreen) {
-        box.msRequestFullscreen().then(() => {}).catch(err => { alert('Failed to enter fullscreen mode: ' + err.message); });
-      } else {
-        alert('Fullscreen is not supported in this browser');
-      }
-    } else {
-      exitFullScreen();
-    }
-  }
-}
+            const columns = Array.from(allKeys).sort();
+            
+            // Generate SQL
+            let sql = `-- SQL INSERT statements for table: ${tableName}\n`;
+            sql += `-- Generated from JSON data\n\n`;
+            
+            // Add CREATE TABLE statement (optional)
+            sql += `-- CREATE TABLE statement (if needed):\n`;
+            sql += `CREATE TABLE IF NOT EXISTS ${escapeSQLIdentifier(tableName)} (\n`;
+            sql += `    id INT AUTO_INCREMENT PRIMARY KEY,\n`;
+            
+            columns.forEach((column, index) => {
+                const columnType = getColumnType(data, column);
+                sql += `    ${escapeSQLIdentifier(column)} ${columnType}`;
+                if (index < columns.length - 1) sql += ',';
+                sql += '\n';
+            });
+            sql += `);\n\n`;
+            
+            // Add INSERT statements
+            sql += `-- INSERT statements:\n`;
+            
+            data.forEach((row, rowIndex) => {
+                if (typeof row === 'object' && row !== null) {
+                    sql += `INSERT INTO ${escapeSQLIdentifier(tableName)} (`;
+                    sql += columns.map(col => escapeSQLIdentifier(col)).join(', ');
+                    sql += `) VALUES (`;
+                    
+                    const values = columns.map(column => {
+                        const value = row[column];
+                        return formatSQLValue(value);
+                    });
+                    
+                    sql += values.join(', ');
+                    sql += `);`;
+                    
+                    if (rowIndex < data.length - 1) sql += '\n';
+                }
+            });
+            
+            return sql;
+        }
 
-function enterMobileFullscreen(which) {
-  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
-  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'sqlOutput');
-  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
-  mobileTextarea.value = textarea ? textarea.value : '';
-  overlay.classList.add('active');
-  setTimeout(() => { mobileTextarea.focus(); }, 100);
-  mobileTextarea.addEventListener('input', function() {
-    if (textarea) textarea.value = this.value;
-  });
-}
+        // Get appropriate SQL column type based on data
+        function getColumnType(data, columnName) {
+            let hasNull = false;
+            let hasString = false;
+            let hasNumber = false;
+            let hasBoolean = false;
+            let maxLength = 0;
 
-function exitMobileFullscreen(which) {
-  const overlay = document.getElementById('mobileFullscreen' + which.charAt(0).toUpperCase() + which.slice(1));
-  const textarea = document.getElementById(which === 'input' ? 'jsonInput' : 'sqlOutput');
-  const mobileTextarea = document.getElementById('mobile' + which.charAt(0).toUpperCase() + which.slice(1) + 'Textarea');
-  if (textarea) textarea.value = mobileTextarea.value;
-  overlay.classList.remove('active');
-}
+            data.forEach(row => {
+                if (row && row.hasOwnProperty(columnName)) {
+                    const value = row[columnName];
+                    
+                    if (value === null || value === undefined) {
+                        hasNull = true;
+                    } else if (typeof value === 'string') {
+                        hasString = true;
+                        maxLength = Math.max(maxLength, value.length);
+                    } else if (typeof value === 'number') {
+                        hasNumber = true;
+                    } else if (typeof value === 'boolean') {
+                        hasBoolean = true;
+                    } else if (typeof value === 'object') {
+                        hasString = true;
+                        maxLength = Math.max(maxLength, JSON.stringify(value).length);
+                    }
+                }
+            });
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    const inputOverlay = document.getElementById('mobileFullscreenInput');
-    const outputOverlay = document.getElementById('mobileFullscreenOutput');
-    if (inputOverlay && inputOverlay.classList.contains('active')) exitMobileFullscreen('input');
-    else if (outputOverlay && outputOverlay.classList.contains('active')) exitMobileFullscreen('output');
-  }
-});
+            if (hasBoolean) {
+                return 'BOOLEAN';
+            } else if (hasNumber && !hasString) {
+                return 'INT';
+            } else if (hasString) {
+                if (maxLength <= 255) {
+                    return `VARCHAR(${Math.max(50, maxLength)})`;
+                } else if (maxLength <= 65535) {
+                    return 'TEXT';
+                } else if (maxLength <= 16777215) {
+                    return 'MEDIUMTEXT';
+                } else {
+                    return 'LONGTEXT';
+                }
+            } else {
+                return 'VARCHAR(255)';
+            }
+        }
 
-function exitFullScreen() {
-  console.log('Exit fullscreen called');
-  if (document.exitFullscreen) {
-    document.exitFullscreen().then(() => {
-      console.log('Fullscreen exited successfully');
-    }).catch(err => {
-      console.error('Exit fullscreen error:', err);
-    });
-  } else if (document.webkitExitFullscreen) {
-    document.webkitExitFullscreen().then(() => {
-      console.log('Webkit fullscreen exited successfully');
-    }).catch(err => {
-      console.error('Webkit exit fullscreen error:', err);
-    });
-  } else if (document.msExitFullscreen) {
-    document.msExitFullscreen().then(() => {
-      console.log('MS fullscreen exited successfully');
-    }).catch(err => {
-      console.error('MS exit fullscreen error:', err);
-    });
-  }
-}
+        // Format value for SQL
+        function formatSQLValue(value) {
+            if (value === null || value === undefined) {
+                return 'NULL';
+            } else if (typeof value === 'string') {
+                return `'${escapeSQLString(value)}'`;
+            } else if (typeof value === 'number') {
+                return value.toString();
+            } else if (typeof value === 'boolean') {
+                return value ? '1' : '0';
+            } else if (typeof value === 'object') {
+                // Convert objects and arrays to JSON strings
+                return `'${escapeSQLString(JSON.stringify(value))}'`;
+            } else {
+                return `'${escapeSQLString(String(value))}'`;
+            }
+        }
 
-function copyOutput() {
-  const output = document.getElementById('sqlOutput').value;
-  if (!output || output.trim() === '') {
-    alert('Please convert JSON to SQL first.');
-    return;
-  }
-  navigator.clipboard.writeText(output).then(() => {
-    alert('SQL statements copied to clipboard!');
-  }).catch(err => {
-    console.error('Failed to copy: ', err);
-    alert('Failed to copy to clipboard. Please try again.');
-  });
-}
+        // Escape SQL string
+        function escapeSQLString(str) {
+            return str.replace(/'/g, "''").replace(/\\/g, '\\\\');
+        }
 
-function downloadOutput() {
-  const output = document.getElementById('sqlOutput').value;
-  if (!output || output.trim() === '') {
-    alert('Please convert JSON to SQL first.');
-    return;
-  }
-  const blob = new Blob([output], { type: 'text/plain;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'insert_statements.sql');
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+        // Escape SQL identifier
+        function escapeSQLIdentifier(identifier) {
+            // Use backticks for MySQL-style escaping
+            return `\`${identifier.replace(/`/g, '``')}\``;
+        }
 
-function toggleFullScreen(button) {
-  const box = button.closest('.json-converter-box');
-  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-    if (box.requestFullscreen) {
-      box.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
-    } else if (box.webkitRequestFullscreen) {
-      box.webkitRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
-    } else if (box.msRequestFullscreen) {
-      box.msRequestFullscreen().catch(err => console.error('Fullscreen error:', err));
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-  }
-}
-</script>
+        // Copy SQL to clipboard
+        async function copySQL() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No SQL to copy');
+                return;
+            }
 
-<!-- Mobile Fullscreen Overlays -->
-<div id="mobileFullscreenInput" class="mobile-fullscreen-overlay">
-  <div class="mobile-fullscreen-header">
-    <div class="mobile-fullscreen-title">Input - Fullscreen</div>
-    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('input')">✕</button>
-  </div>
-  <div class="mobile-fullscreen-content">
-    <textarea id="mobileInputTextarea" class="mobile-fullscreen-textarea" placeholder="Enter JSON here..."></textarea>
-  </div>
-</div>
-<div id="mobileFullscreenOutput" class="mobile-fullscreen-overlay">
-  <div class="mobile-fullscreen-header">
-    <div class="mobile-fullscreen-title">Output - Fullscreen</div>
-    <button class="mobile-fullscreen-close" onclick="exitMobileFullscreen('output')">✕</button>
-  </div>
-  <div class="mobile-fullscreen-content">
-    <textarea id="mobileOutputTextarea" class="mobile-fullscreen-textarea" placeholder="SQL INSERT statements will appear here..." readonly></textarea>
-  </div>
-</div>
+            try {
+                await navigator.clipboard.writeText(output);
+                alert('SQL statements copied to clipboard!');
+            } catch (error) {
+                const textArea = document.createElement('textarea');
+                textArea.value = output;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('SQL statements copied to clipboard!');
+            }
+        }
+
+        // Download SQL file
+        function downloadSQL() {
+            const output = document.getElementById('outputTextarea').value;
+            if (!output) {
+                alert('No SQL to download');
+                return;
+            }
+
+            const tableName = document.getElementById('tableNameInput').value.trim() || 'table_name';
+            const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${tableName}_insert.sql`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Upload file
+        function uploadFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.txt';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('inputTextarea').value = e.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Clear input
+        function clearInput() {
+            document.getElementById('inputTextarea').value = '';
+        }
+
+        // Clear output
+        function clearOutput() {
+            document.getElementById('outputTextarea').value = '';
+        }
+
+        // Expand input (full screen functionality)
+        function expandInput() {
+            const inputSection = document.querySelector('.input-section');
+            
+            if (inputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(inputSection);
+            }
+        }
+
+        // Expand output (full screen functionality)
+        function expandOutput() {
+            const outputSection = document.querySelector('.output-section');
+            
+            if (outputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                exitFullscreen();
+            } else {
+                // Enter fullscreen
+                enterFullscreen(outputSection);
+            }
+        }
+
+        // Enter fullscreen function
+        function enterFullscreen(element) {
+            // Add fullscreen class for styling
+            element.classList.add('fullscreen');
+            
+            // Try to use browser's fullscreen API
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {
+                    console.log('Fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {
+                    console.log('Webkit fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen().catch(err => {
+                    console.log('Mozilla fullscreen API not supported, using CSS fullscreen');
+                });
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen().catch(err => {
+                    console.log('MS fullscreen API not supported, using CSS fullscreen');
+                });
+            }
+            
+            // Update button text
+            const expandBtn = element.querySelector('.header-actions button:nth-of-type(2)');
+            if (expandBtn) {
+                expandBtn.textContent = '⛶';
+                expandBtn.title = 'Exit Fullscreen';
+            }
+        }
+
+        // Exit fullscreen function
+        function exitFullscreen() {
+            // Remove fullscreen class
+            document.querySelectorAll('.input-section, .output-section').forEach(section => {
+                section.classList.remove('fullscreen');
+            });
+            
+            // Try to exit browser fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Exit fullscreen failed');
+                });
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen().catch(err => {
+                    console.log('Exit webkit fullscreen failed');
+                });
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen().catch(err => {
+                    console.log('Exit mozilla fullscreen failed');
+                });
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen().catch(err => {
+                    console.log('Exit MS fullscreen failed');
+                });
+            }
+            
+            // Update button texts
+            document.querySelectorAll('.header-actions button:nth-of-type(2)').forEach(btn => {
+                btn.textContent = '⛶';
+                btn.title = 'Fullscreen';
+            });
+        }
+
+        // Listen for fullscreen change events
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // User exited fullscreen
+                exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
 
