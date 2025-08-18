@@ -40,6 +40,15 @@
             border: 1px solid #e3f2fd;
         }
 
+        /* Page title */
+        .page-title {
+            text-align: center;
+            color: #1976d2;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+        }
+
         /* Three-column layout */
         .content-layout {
             display: grid;
@@ -142,6 +151,10 @@
         }
 
         @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
             .main-container {
                 padding: 15px;
             }
@@ -174,6 +187,8 @@
 
     <div class="main-container">
         <div class="main-card">
+            <h1 class="page-title">URL Encoder</h1>
+            
             <div class="content-layout">
                 <!-- Left Section - Input -->
                 <div class="input-section">
@@ -183,7 +198,7 @@
 
                 <!-- Middle Section - Action Buttons -->
                 <div class="action-section">
-                    <button class="action-btn" onclick="encodeURIComponent()">encodeURIComponent</button>
+                    <button class="action-btn" onclick="encodeURIComponentFn()">encodeURIComponent</button>
                     <button class="action-btn" onclick="encodeBase64()">Base64</button>
                     <button class="action-btn" onclick="copyOutput()">Copy</button>
                 </div>
@@ -205,7 +220,7 @@
             const input = document.getElementById('inputText').value;
             if (input) {
                 if (currentEncoding === 'uri') {
-                    encodeURIComponent();
+                    encodeURIComponentFn();
                 } else if (currentEncoding === 'base64') {
                     encodeBase64();
                 }
@@ -215,7 +230,7 @@
         }
 
         // Encode using encodeURIComponent
-        function encodeURIComponent() {
+        function encodeURIComponentFn() {
             const input = document.getElementById('inputText').value;
             if (!input) {
                 alert('Please enter some text to encode.');
@@ -277,7 +292,7 @@
             // Ctrl+Enter for encodeURIComponent
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
-                encodeURIComponent();
+                encodeURIComponentFn();
             }
             
             // Ctrl+Shift+Enter for Base64
