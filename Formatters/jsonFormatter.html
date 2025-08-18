@@ -144,6 +144,17 @@
             box-shadow: inset 0 0 0 2px #2196f3;
         }
 
+        /* Fullscreen styles */
+        .editor-section.fullscreen {
+            grid-column: 1 / -1;
+            height: 100%;
+        }
+
+        .editor-section.fullscreen .editor-textarea {
+            height: calc(100vh - 300px);
+            min-height: 500px;
+        }
+
         @media (max-width: 1024px) {
             .editor-container {
                 grid-template-columns: 1fr;
@@ -353,14 +364,46 @@
             document.getElementById('outputTextarea').value = '';
         }
 
-        // Expand input (placeholder function)
+        // Expand input (full screen functionality)
         function expandInput() {
-            alert('Expand input functionality - to be implemented');
+            const inputSection = document.querySelector('.editor-section:first-child');
+            const outputSection = document.querySelector('.editor-section:last-child');
+            const container = document.querySelector('.editor-container');
+            
+            if (inputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                inputSection.classList.remove('fullscreen');
+                outputSection.style.display = 'flex';
+                container.style.gridTemplateColumns = '1fr 1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            } else {
+                // Enter fullscreen
+                inputSection.classList.add('fullscreen');
+                outputSection.style.display = 'none';
+                container.style.gridTemplateColumns = '1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            }
         }
 
-        // Expand output (placeholder function)
+        // Expand output (full screen functionality)
         function expandOutput() {
-            alert('Expand output functionality - to be implemented');
+            const inputSection = document.querySelector('.editor-section:first-child');
+            const outputSection = document.querySelector('.editor-section:last-child');
+            const container = document.querySelector('.editor-container');
+            
+            if (outputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                outputSection.classList.remove('fullscreen');
+                inputSection.style.display = 'flex';
+                container.style.gridTemplateColumns = '1fr 1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            } else {
+                // Enter fullscreen
+                outputSection.classList.add('fullscreen');
+                inputSection.style.display = 'none';
+                container.style.gridTemplateColumns = '1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            }
         }
     </script>
 </body>

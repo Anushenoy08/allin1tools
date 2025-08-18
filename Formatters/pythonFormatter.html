@@ -144,6 +144,17 @@
             box-shadow: inset 0 0 0 2px #2196f3;
         }
 
+        /* Fullscreen styles */
+        .editor-section.fullscreen {
+            grid-column: 1 / -1;
+            height: 100%;
+        }
+
+        .editor-section.fullscreen .editor-textarea {
+            height: calc(100vh - 300px);
+            min-height: 500px;
+        }
+
         @media (max-width: 1024px) {
             .editor-container {
                 grid-template-columns: 1fr;
@@ -353,35 +364,115 @@
             document.getElementById('outputTextarea').value = '';
         }
 
-        // Expand input (placeholder function)
+        // Expand input (full screen functionality)
         function expandInput() {
-            alert('Expand input functionality - to be implemented');
+            const inputSection = document.querySelector('.editor-section:first-child');
+            const outputSection = document.querySelector('.editor-section:last-child');
+            const container = document.querySelector('.editor-container');
+            
+            if (inputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                inputSection.classList.remove('fullscreen');
+                outputSection.style.display = 'flex';
+                container.style.gridTemplateColumns = '1fr 1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            } else {
+                // Enter fullscreen
+                inputSection.classList.add('fullscreen');
+                outputSection.style.display = 'none';
+                container.style.gridTemplateColumns = '1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            }
         }
 
-        // Expand output (placeholder function)
+        // Expand output (full screen functionality)
         function expandOutput() {
-            alert('Expand output functionality - to be implemented');
+            const inputSection = document.querySelector('.editor-section:first-child');
+            const outputSection = document.querySelector('.editor-section:last-child');
+            const container = document.querySelector('.editor-container');
+            
+            if (outputSection.classList.contains('fullscreen')) {
+                // Exit fullscreen
+                outputSection.classList.remove('fullscreen');
+                inputSection.style.display = 'flex';
+                container.style.gridTemplateColumns = '1fr 1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            } else {
+                // Enter fullscreen
+                outputSection.classList.add('fullscreen');
+                inputSection.style.display = 'none';
+                container.style.gridTemplateColumns = '1fr';
+                document.querySelector('.header-actions button:nth-of-type(2)').textContent = '⛶';
+            }
         }
 
-        // Basic Python formatting function
+        // Improved Python formatting function
         function formatPythonCode(code) {
-            // This is a basic formatter - in a real implementation, you'd use a proper Python formatter
             let lines = code.split('\n');
             let indentLevel = 0;
             let formattedLines = [];
+            let inString = false;
+            let stringChar = '';
             
-            for (let line of lines) {
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let originalLine = line;
                 line = line.trim();
+                
                 if (line === '') {
                     formattedLines.push('');
                     continue;
                 }
                 
+                // Skip comments
+                if (line.startsWith('#')) {
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                    continue;
+                }
+                
+                // Handle multi-line strings
+                if (line.includes('"""') || line.includes("'''")) {
+                    inString = !inString;
+                    if (inString) {
+                        stringChar = line.includes('"""') ? '"""' : "'''";
+                    }
+                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
+                    continue;
+                }
+                
+                if (inString) {
+                    formattedLines.push('    '.repeat(indentLevel) + originalLine);
+                    continue;
+                }
+                
+                // Handle control structures
+                const controlKeywords = [
+                    'if', 'elif', 'else', 'for', 'while', 'try', 'except', 'finally',
+                    'with', 'def', 'class', 'async def', 'async for', 'async with'
+                ];
+                
+                let isControlStructure = false;
+                for (let keyword of controlKeywords) {
+                    if (line.startsWith(keyword + ' ') || line.startsWith(keyword + ':')) {
+                        isControlStructure = true;
+                        break;
+                    }
+                }
+                
                 // Handle indentation
                 if (line.endsWith(':')) {
                     formattedLines.push('    '.repeat(indentLevel) + line);
-                    indentLevel++;
-                } else if (line.startsWith('return ') || line.startsWith('break') || line.startsWith('continue') || line.startsWith('pass')) {
+                    if (isControlStructure) {
+                        indentLevel++;
+                    }
+                } else if (line.startsWith('return ') || line.startsWith('break') || 
+                          line.startsWith('continue') || line.startsWith('pass') ||
+                          line.startsWith('raise ') || line.startsWith('yield ')) {
+                    // These statements typically end a block
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+                } else if (line.startsWith('except') || line.startsWith('finally') || 
+                          line.startsWith('else') || line.startsWith('elif')) {
+                    // These reduce indentation
                     indentLevel = Math.max(0, indentLevel - 1);
                     formattedLines.push('    '.repeat(indentLevel) + line);
                 } else {
@@ -392,17 +483,25 @@
             return formattedLines.join('\n');
         }
 
-        // Beautify Python code
+        // Improved Python beautification function
         function beautifyPythonCode(code) {
-            // Enhanced beautification with better spacing and formatting
             let beautified = formatPythonCode(code);
             
-            // Add proper spacing around operators
-            beautified = beautified.replace(/([^=!<>])([=!<>]+)([^=])/g, '$1 $2 $3');
-            beautified = beautified.replace(/([^+\-*/])([+\-*/])([^+\-*/])/g, '$1 $2 $3');
+            // Add proper spacing around operators (but not inside strings)
+            beautified = beautified.replace(/([^=!<>+\-*/])\s*([=!<>+\-*/]+)\s*([^=+\-*/])/g, '$1 $2 $3');
             
-            // Add spacing after commas
+            // Add spacing after commas (but not inside strings)
             beautified = beautified.replace(/,([^\s])/g, ', $1');
+            
+            // Add spacing around function calls
+            beautified = beautified.replace(/(\w+)\s*\(/g, '$1(');
+            
+            // Add spacing around brackets
+            beautified = beautified.replace(/\s*\(\s*/g, ' (');
+            beautified = beautified.replace(/\s*\)\s*/g, ') ');
+            
+            // Clean up multiple spaces
+            beautified = beautified.replace(/\s{2,}/g, ' ');
             
             return beautified;
         }
