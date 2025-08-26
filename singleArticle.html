@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Article</title>
+<script src="https://cdn.jsdelivr.net/npm/contentful@latest/dist/contentful.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@contentful/rich-text-html-renderer@16.0.4/dist/rich-text-html-renderer.browser.min.js"></script>
 <style>
   body { font-family: Inter, system-ui, sans-serif; background:#f7f9fc; padding:2rem; }
   .container { max-width:900px; margin:0 auto; background:#fff; border-radius:12px; padding:28px; box-shadow:0 8px 30px rgba(0,0,0,0.06); }
@@ -17,52 +19,27 @@
 <body>
   <div class="container" id="post">Loading…</div>
 
-<script>
-const spaceId = "4l890vk1ti4c";
-const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
+  <script>
+    const client = contentful.createClient({
+      space: '4l890vk1ti4c',
+      accessToken: 'bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA'
+    });
 
-function findAssetUrl(assetId, includes) {
-  if (!includes || !includes.Asset) return "";
-  const asset = includes.Asset.find(a => a.sys.id === assetId);
-  return asset ? "https:" + asset.fields.file.url : "";
-}
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
 
-async function fetchPost() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-  if (!id) {
-    document.getElementById("post").innerHTML = "<p>No article id provided.</p>";
-    return;
-  }
+    async function fetchPost() {
+      const entry = await client.getEntry(postId);
+      const postContainer = document.getElementById('post');
 
-  const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries/${id}?access_token=${accessToken}&include=2`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (!data || !data.fields) {
-    document.getElementById("post").innerHTML = "<p>Article not found.</p>";
-    return;
-  }
+      postContainer.innerHTML = `
+        <h1>${entry.fields.title}</h1>
+        <p>${new Date(entry.fields.dateTime).toDateString()}</p>
+        <div>${window.contentfulRichTextHtmlRenderer.documentToHtmlString(entry.fields.post)}</div>
+      `;
+    }
 
-  const post = data.fields;
-  const imageId = post.featuredImage?.sys?.id;
-  const hero = imageId ? findAssetUrl(imageId, data.includes) : "";
-  const prettyDate = post.dateTime || data.sys.createdAt;
-  const dateStr = prettyDate ? (new Date(prettyDate)).toLocaleDateString() : "";
-  const bodyHtml = post.post || "";
-
-  document.getElementById("post").innerHTML = `
-    <a class="back" href="articles.html">&larr; Back to Articles</a>
-    <h1 class="post-title">${post.title || ""}</h1>
-    <div class="post-date">${dateStr}</div>
-    ${hero ? `<img class="post-image" src="${hero}" alt="${post.title || ''}" />` : ""}
-    <div class="post-content"><p>${bodyHtml.replace(/\n/g, "<br>")}</p></div>
-  `;
-}
-
-fetchPost().catch(err => {
-  console.error(err);
-  document.getElementById("post").innerHTML = "<p>Error loading article.</p>";
-});
-</script>
+    fetchPost();
+  </script>
 </body>
 </html>
