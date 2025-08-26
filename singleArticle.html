@@ -4,12 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Article</title>
-<script type="module">
-    import { createClient } from "https://cdn.skypack.dev/contentful";
-    import { documentToHtmlString } from "https://cdn.skypack.dev/@contentful/rich-text-html-renderer";
-  </script>
+
+<!-- Contentful UMD & Rich Text renderer -->
 <script src="https://cdn.jsdelivr.net/npm/contentful@latest/dist/contentful.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@contentful/rich-text-html-renderer@16.0.4/dist/rich-text-html-renderer.browser.min.js"></script>
+
 <style>
   body { font-family: Inter, system-ui, sans-serif; background:#f7f9fc; padding:2rem; }
   .container { max-width:900px; margin:0 auto; background:#fff; border-radius:12px; padding:28px; box-shadow:0 8px 30px rgba(0,0,0,0.06); }
@@ -33,19 +32,25 @@
     const postId = params.get('id');
 
     async function fetchPost() {
-      const entry = await client.getEntry(postId);
-      const postContainer = document.getElementById('post');
-      const post = documentToHtmlString(entry.fields.post);
-      document.getElementById("post").innerHTML = post;
+        const entry = await client.getEntry(postId);
+        const postContainer = document.getElementById('post');
 
-      postContainer.innerHTML = `
-        <h1>${entry.fields.title}</h1>
-        <p>${new Date(entry.fields.dateTime).toDateString()}</p>
-        <div>${window.contentfulRichTextHtmlRenderer.documentToHtmlString(entry.fields.post)}</div>
-      `;
-    }
+        const postHtml = window.contentfulRichTextHtmlRenderer.documentToHtmlString(entry.fields.post);
 
-    fetchPost();
+        postContainer.innerHTML = `
+        <a class="back" href="articles.html">&larr; Back to Articles</a>
+        <h1 class="post-title">${entry.fields.title}</h1>
+        <div class="post-date">${new Date(entry.fields.dateTime).toDateString()}</div>
+        ${entry.fields.image ? `<img class="post-image" src="https:${entry.fields.image.fields.file.url}" alt="${entry.fields.title}">` : ""}
+        <div class="post-content">${postHtml}</div>
+        `;
+    } 
+
+    fetchPost().catch(err => {
+        console.error(err);
+        document.getElementById('post').innerHTML = "<p>Error loading article.</p>";
+    });
+    
   </script>
 </body>
 </html>

@@ -111,28 +111,40 @@
     });
 
     async function fetchPosts() {
-      const entries = await client.getEntries({
+        const data = await client.getEntries({
         content_type: 'blogPost',
-        order: '-fields.dateTime'
-      });
+        order: '-fields.dateTime',
+        include: 1
+        });
 
-      const articlesContainer = document.getElementById('articles');
-      articlesContainer.innerHTML = entries.items.map(post => {
+        const container = document.getElementById('articles');
+        if (!data.items || data.items.length === 0) {
+        container.innerHTML = "<p>No posts found.</p>";
+        return;
+        }
+
+        container.innerHTML = data.items.map(item => {
+        const { title, dateTime, post, image } = item.fields;
+        const imageUrl = image ? "https:" + image.fields.file.url : "";
+        const excerpt = post && post.content ? post.content.slice(0,150) + "..." : "";
+
         return `
-          <div>
-            <h2>
-              <a href="singleArticle.html?id=${post.sys.id}">
-                ${post.fields.title}
-              </a>
-            </h2>
-            <p>${new Date(post.fields.dateTime).toDateString()}</p>
-            <p>${post.fields.excerpt || ''}</p>
-          </div>
+            <a class="article-card" href="singleArticle.html?id=${item.sys.id}">
+            ${imageUrl ? `<img class="article-thumb" src="${imageUrl}" alt="${title}">` : ""}
+            <div class="article-body">
+                <div class="article-title">${title}</div>
+                <div class="article-date">${new Date(dateTime).toLocaleDateString()}</div>
+                <p class="article-excerpt">${excerpt}</p>
+            </div>
+            </a>
         `;
-      }).join('');
+        }).join('');
     }
 
-    fetchPosts();
+    fetchPosts().catch(err => {
+        console.error(err);
+        document.getElementById('articles').innerHTML = "<p>Error loading posts.</p>";
+    });
   </script>
 </body>
 </html>
