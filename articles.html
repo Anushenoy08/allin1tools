@@ -174,25 +174,30 @@
             <p class="articles-subtitle">Discover insights, tutorials, and updates from our team</p>
         </div>
 
-        <div class="articles-grid">
-            <!-- Article cards will be dynamically populated -->
-            <div class="article-card">
-                <a href="#" class="article-link">
-                    <div class="article-image-container">
-                        <div class="article-image-placeholder">
-                            <span>📝</span>
-                        </div>
-                        <div class="article-overlay">
-                            <span class="read-more">Read More</span>
-                        </div>
-                    </div>
-                    <div class="article-content">
-                        <h3 class="article-title">Getting Started with Allin1tools</h3>
-                        <p class="article-date">Coming Soon</p>
-                    </div>
-                </a>
-            </div>
-        </div>
+        <script>
+            const spaceId = "4l890vk1ti4c";
+            const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
+        
+            async function fetchPosts() {
+              const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=post&order=-fields.publishedDate`;
+              const res = await fetch(url);
+              const data = await res.json();
+        
+              const container = document.getElementById("articles");
+              container.innerHTML = data.items.map(item => {
+                const post = item.fields;
+                return `
+                  <div class="post">
+                    <h2>${post.title}</h2>
+                    <p><em>${post.publishedDate}</em></p>
+                    <p>${post.excerpt || ""}</p>
+                  </div>
+                `;
+              }).join("");
+            }
+        
+            fetchPosts();
+          </script>
     </div>
 </body>
 </html>
