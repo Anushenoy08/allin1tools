@@ -174,16 +174,21 @@
             <p class="articles-subtitle">Discover insights, tutorials, and updates from our team</p>
         </div>      
     </div>
+    <div id="articles" class="articles-grid"></div>
     <script>
         const spaceId = "4l890vk1ti4c";
         const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
     
         async function fetchPosts() {
-          const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=post&order=-fields.publishedDate`;
+          const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=blogPost&order=-fields.dateTime`;
           const res = await fetch(url);
           const data = await res.json();
     
           const container = document.getElementById("articles");
+          if (!data.items || data.items.length === 0) {
+            container.innerHTML = "<p>No posts found.</p>";
+            return;
+          }
           container.innerHTML = data.items.map(item => {
             const post = item.fields;
             return `
