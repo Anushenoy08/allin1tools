@@ -7,7 +7,7 @@
 
 <!-- Contentful UMD & Rich Text renderer -->
 <script src="https://cdn.jsdelivr.net/npm/contentful@latest/dist/contentful.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@contentful/rich-text-html-renderer@16.0.4/dist/rich-text-html-renderer.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@contentful/rich-text-html-renderer@16.0.4/dist/rich-text-html-renderer.umd.js"></script>
 
 <style>
   body { font-family: Inter, system-ui, sans-serif; background:#f7f9fc; padding:2rem; }
@@ -32,24 +32,29 @@
     const postId = params.get('id');
 
     async function fetchPost() {
-        const entry = await client.getEntry(postId);
-        const postContainer = document.getElementById('post');
+        try {
+            const entry = await client.getEntry(postId);
+            const postContainer = document.getElementById('post');
 
-        const postHtml = window.contentfulRichTextHtmlRenderer.documentToHtmlString(entry.fields.post);
+            // Use UMD version
+            const postHtml = window.contentfulRichTextHtmlRenderer.documentToHtmlString(entry.fields.post);
 
-        postContainer.innerHTML = `
-        <a class="back" href="articles.html">&larr; Back to Articles</a>
-        <h1 class="post-title">${entry.fields.title}</h1>
-        <div class="post-date">${new Date(entry.fields.dateTime).toDateString()}</div>
-        ${entry.fields.image ? `<img class="post-image" src="https:${entry.fields.image.fields.file.url}" alt="${entry.fields.title}">` : ""}
-        <div class="post-content">${postHtml}</div>
-        `;
-    } 
+            const imageUrl = entry.fields.image ? "https:" + entry.fields.image.fields.file.url : "";
 
-    fetchPost().catch(err => {
-        console.error(err);
-        document.getElementById('post').innerHTML = "<p>Error loading article.</p>";
-    });
+            postContainer.innerHTML = `
+            <a class="back" href="articles.html">&larr; Back to Articles</a>
+            <h1 class="post-title">${entry.fields.title}</h1>
+            <div class="post-date">${new Date(entry.fields.dateTime).toDateString()}</div>
+            ${imageUrl ? `<img class="post-image" src="${imageUrl}" alt="${entry.fields.title}">` : ""}
+            <div class="post-content">${postHtml}</div>
+            `;
+        } catch(err) {
+            console.error(err);
+            document.getElementById('post').innerHTML = "<p>Error loading article.</p>";
+        }
+    }
+
+    fetchPost();
     
   </script>
 </body>
