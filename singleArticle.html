@@ -1,43 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Article</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; }
-    h1 { font-size: 2em; }
-    .date { color: #777; margin-bottom: 20px; }
-    .content { line-height: 1.6; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Article</title>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; background:#f7f9fc; padding:2rem; }
+  .container { max-width:900px; margin:0 auto; background:#fff; border-radius:12px; padding:28px; box-shadow:0 8px 30px rgba(0,0,0,0.06); }
+  .post-title { font-size:2rem; margin:0 0 8px; }
+  .post-date { color:#666; margin-bottom:14px; }
+  .post-image { width:100%; max-height:420px; object-fit:cover; border-radius:8px; margin-bottom:14px; }
+  .post-content img { max-width:100%; height:auto; border-radius:6px; }
+  .back { display:inline-block; margin-bottom:14px; color:#1565c0; text-decoration:none; }
+</style>
 </head>
 <body>
-  <div id="article"></div>
+  <div class="container" id="post">Loading…</div>
 
-  <script>
-    const spaceId = "YOUR_SPACE_ID";
-    const accessToken = "YOUR_ACCESS_TOKEN";
-    const environment = "master";
+<script>
+const spaceId = "4l890vk1ti4c";
+const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
 
-    async function fetchPost(id) {
-      const res = await fetch(
-        `https://cdn.contentful.com/spaces/${spaceId}/environments/${environment}/entries/${id}?access_token=${accessToken}`
-      );
-      const post = await res.json();
+function findAssetUrl(assetId, includes) {
+  if (!includes || !includes.Asset) return "";
+  const asset = includes.Asset.find(a => a.sys.id === assetId);
+  return asset ? "https:" + asset.fields.file.url : "";
+}
 
-      const { title, dateTime, post: content } = post.fields;
-      document.title = title;
+async function fetchPost() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id) {
+    document.getElementById("post").innerHTML = "<p>No article id provided.</p>";
+    return;
+  }
 
-      document.getElementById("article").innerHTML = `
-        <h1>${title}</h1>
-        <div class="date">${new Date(dateTime).toDateString()}</div>
-        <div class="content">${content}</div>
-      `;
-    }
+  const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries/${id}?access_token=${accessToken}&include=2`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data || !data.fields) {
+    document.getElementById("post").innerHTML = "<p>Article not found.</p>";
+    return;
+  }
 
-    // Get post id from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get("id");
-    fetchPost(postId);
-  </script>
+  const post = data.fields;
+  const imageId = post.featuredImage?.sys?.id;
+  const hero = imageId ? findAssetUrl(imageId, data.includes) : "";
+  const prettyDate = post.dateTime || data.sys.createdAt;
+  const dateStr = prettyDate ? (new Date(prettyDate)).toLocaleDateString() : "";
+  const bodyHtml = post.post || "";
+
+  document.getElementById("post").innerHTML = `
+    <a class="back" href="articles.html">&larr; Back to Articles</a>
+    <h1 class="post-title">${post.title || ""}</h1>
+    <div class="post-date">${dateStr}</div>
+    ${hero ? `<img class="post-image" src="${hero}" alt="${post.title || ''}" />` : ""}
+    <div class="post-content"><p>${bodyHtml.replace(/\n/g, "<br>")}</p></div>
+  `;
+}
+
+fetchPost().catch(err => {
+  console.error(err);
+  document.getElementById("post").innerHTML = "<p>Error loading article.</p>";
+});
+</script>
 </body>
 </html>
