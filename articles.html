@@ -1,160 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latest Articles - Allin1tools</title>
-    <link rel="stylesheet" href="common.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .navbar {
-            width: 100%;
-            left: 0;
-            right: 0;
-            margin: 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-
-        .container{
-            max-width:980px;
-            margin:0 auto;
-            padding: 2rem;
-        }
-        .articles-list{
-            display:flex;
-            flex-direction:column;
-            gap:1rem;
-        }
-        .page-header{
-            text-align:center;
-            margin-bottom:1rem;
-        }
-        .article-card{
-            display:flex;
-            gap:1rem;
-            align-items:flex-start;
-            background:#fff;
-            border-radius:12px;
-            padding:12px;
-            box-shadow:0 6px 20px rgba(0,0,0,0.06);
-            text-decoration:none;
-            color:inherit}
-        .article-thumb{
-            width:160px;
-            height:120px;
-            flex-shrink:0;
-            object-fit:cover;
-            border-radius:8px;
-            background:#eee
-        }
-        .article-body{
-            flex:1;
-        }
-        .article-date{
-            font-size:0.85rem;
-            color:#666;
-            margin-bottom:8px;
-        }
-        .article-excerpt{
-            color:#333;margin:0;}
-        @media (max-width:700px){
-            .article-card{
-            flex-direction:row;
-            }
-            .article-thumb{
-            width:120px;
-            height:88px;
-            }
-        }
-    </style>        
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latest Articles - Allin1tools</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 0;
+    }
+    .navbar { width: 100%; position: sticky; top: 0; z-index: 1000; }
+    .container { max-width: 980px; margin: 0 auto; padding: 2rem; }
+    .articles-list { display: flex; flex-direction: column; gap: 1rem; }
+    .page-header { text-align: center; margin-bottom: 1rem; }
+    .article-card {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: #fff; border-radius: 12px; padding: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      text-decoration: none; color: inherit;
+    }
+    .article-thumb {
+      width: 160px; height: 120px; flex-shrink: 0;
+      object-fit: cover; border-radius: 8px; background: #eee;
+    }
+    .article-body { flex: 1; }
+    .article-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 4px; }
+    .article-date { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+    .article-excerpt { font-size: 0.95rem; color: #333; margin: 0; }
+    @media (max-width: 700px) {
+      .article-thumb { width: 120px; height: 88px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Toolbar from common.css -->
-    <div class="navbar">
-        <img src="/images/logo.png" alt="Logo">
-        <div class="nav-links">
-            <a href="index.html">HOME</a>
-            <a href="articles.html">ARTICLES</a>
-        </div>
-    </div> 
-    <div class="container">
-        <div class="page-header">
-            <h1>Latest Articles</h1>
-            <p>Discover insights, tutorials, and updates from our team</p>
-        </div>
-        <div id="articles" class="articles-list">Loading…</div>
+  <div class="navbar">
+    <img src="/images/logo.png" alt="Logo">
+    <div class="nav-links">
+      <a href="index.html">HOME</a>
+      <a href="articles.html">ARTICLES</a>
     </div>
+  </div> 
 
-    <script>
-        const spaceId = "4l890vk1ti4c";
-        const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
+  <div class="container">
+    <div class="page-header">
+      <h1>Latest Articles</h1>
+      <p>Discover insights, tutorials, and updates from our team</p>
+    </div>
+    <div id="articles" class="articles-list">Loading…</div>
+  </div>
 
-        function findAssetUrl(assetId, includes) {
-        if (!includes || !includes.Asset) return "";
-        const asset = includes.Asset.find(a => a.sys.id === assetId);
-        return asset ? ("https:" + (asset.fields.file?.url || asset.fields.file?.details?.file?.url || "")) : "";
-        }
+  <script>
+    const spaceId = "4l890vk1ti4c";
+    const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
 
-        async function tryFetch(url) {
-        const res = await fetch(url);
-        const json = await res.json();
-        return json;
-        }
+    function findAssetUrl(assetId, includes) {
+      if (!includes || !includes.Asset) return "";
+      const asset = includes.Asset.find(a => a.sys.id === assetId);
+      return asset ? "https:" + asset.fields.file.url : "";
+    }
 
-        async function fetchPosts() {
-        const base = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=blogPost&include=2`;
-        // try ordering by publishedDate first, fallback to createdAt
-        let data = await tryFetch(base + "&order=-fields.dateTime");
-        if (!data || !data.items) {
-            data = await tryFetch(base + "&order=-sys.createdAt");
-        }
-        const container = document.getElementById("articles");
-        if (!data || !data.items || data.items.length === 0) {
-            container.innerHTML = "<p>No posts found.</p>";
-            return;
-        }
+    async function fetchPosts() {
+      const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=blogPost&order=-fields.dateTime&include=2`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const container = document.getElementById("articles");
 
-        container.innerHTML = data.items.map(item => {
-            const post = item.fields || {};
-            const imageId = post.featuredImage?.sys?.id;
-            const imageUrl = imageId ? findAssetUrl(imageId, data.includes) : "";
-            const dateStr = post.dateTime || item.sys?.createdAt || "";
-            const dateTime = dateStr ? (new Date(dateStr)).toLocaleDateString() : "";
-            const content = post.content || (post.description) || "";
+      if (!data.items || data.items.length === 0) {
+        container.innerHTML = "<p>No posts found.</p>";
+        return;
+      }
 
-            return `
-            <a class="article-card" href="singleArticle.html?id=${item.sys.id}">
-                <img class="article-thumb" src="${imageUrl ? imageUrl : ''}" alt="${post.title || ''}">
-                <div class="article-body">
-                <div class="article-title">${post.title || "(No title)"}</div>
-                <div class="article-date">${dateTime}</div>
-                <p class="article-content">${content}</p>
-                </div>
-            </a>
-            `;
-        }).join("");
-        }
+      container.innerHTML = data.items.map(item => {
+        const post = item.fields || {};
+        const imageId = post.featuredImage?.sys?.id;
+        const imageUrl = imageId ? findAssetUrl(imageId, data.includes) : "";
+        const dateStr = post.dateTime || item.sys.createdAt;
+        const dateTime = dateStr ? (new Date(dateStr)).toLocaleDateString() : "";
+        const excerpt = post.post ? post.post.substring(0, 120) + "..." : "";
 
-        fetchPosts().catch(err => {
-        console.error(err);
-        document.getElementById("articles").innerHTML = "<p>Error loading posts.</p>";
-        });
-    </script>
+        return `
+          <a class="article-card" href="singleArticle.html?id=${item.sys.id}">
+            ${imageUrl ? `<img class="article-thumb" src="${imageUrl}" alt="${post.title || ''}">` : ""}
+            <div class="article-body">
+              <div class="article-title">${post.title || "(No title)"}</div>
+              <div class="article-date">${dateTime}</div>
+              <p class="article-excerpt">${excerpt}</p>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    fetchPosts().catch(err => {
+      console.error(err);
+      document.getElementById("articles").innerHTML = "<p>Error loading posts.</p>";
+    });
+  </script>
 </body>
 </html>
