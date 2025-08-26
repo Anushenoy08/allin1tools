@@ -180,7 +180,7 @@
         const accessToken = "bPbgjAoOo6pmJT3DTI82TSry6MQh8zwuHEbi9VtVkmA";
     
         async function fetchPosts() {
-          const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=blogPost&order=-fields.dateTime`;
+          const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/master/entries?access_token=${accessToken}&content_type=blogPost&order=-fields.publishedDate`;
           const res = await fetch(url);
           const data = await res.json();
     
@@ -194,7 +194,7 @@
             return `
               <div class="post">
                 <h2>${post.title}</h2>
-                <p><em>${post.publishedDate}</em></p>
+                <p><em>${post.dateTime}</em></p>
                 <p>${post.excerpt || ""}</p>
               </div>
             `;
