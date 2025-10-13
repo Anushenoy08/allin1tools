@@ -3,34 +3,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Content Manager</title>
-
-    <!-- must be BEFORE CMS script -->
-    <script>
-      window.CMS_MANUAL_INIT = true;
-    </script>
-
-    <!-- Load Decap CMS from correct CDN -->
-    <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js" defer></script>
+    <title>Decap CMS</title>
+    <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js"></script>
   </head>
   <body>
     <div id="nc-root"></div>
 
     <script>
-      // ✅ Use absolute URL to ensure correct loading
-      (function initDecap() {
-        function tryInit() {
-          if (window.CMS && typeof window.CMS.init === "function") {
-            window.CMS.init({
-              configPath:
-                "https://allin1tools-qtmqyre1n-anushenoy08s-projects.vercel.app/admin/config.yml",
-            });
-          } else {
-            setTimeout(tryInit, 100);
-          }
+      function initCMS() {
+        if (window.CMS && typeof window.CMS.init === "function") {
+          console.log("✅ Decap CMS loaded");
+
+          // Use relative path *from this file's directory*
+          window.CMS.init({ configPath: "config.yml" });
+        } else {
+          console.warn("Waiting for Decap CMS...");
+          setTimeout(initCMS, 300);
         }
-        tryInit();
-      })();
+      }
+      initCMS();
     </script>
   </body>
 </html>
