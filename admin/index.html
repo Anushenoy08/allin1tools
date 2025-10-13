@@ -2,11 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
+
+    <!-- Decap CMS -->
     <script src="https://unpkg.com/decap-cms@^3.9.0/dist/decap-cms.js"></script>
   </head>
   <body>
     <div id="nc-root"></div>
+    <script>
+      // Force Decap CMS to fetch config from /admin/config.yml
+      window.CMS_MANUAL_INIT = true;
+      window.initCMS({ configPath: "admin/config.yml" });
+    </script>
   </body>
 </html>
