@@ -10,17 +10,21 @@
       window.CMS_MANUAL_INIT = true;
     </script>
 
-    <!-- ✅ Correct CDN URL -->
+    <!-- Load Decap CMS from correct CDN -->
     <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js" defer></script>
   </head>
   <body>
     <div id="nc-root"></div>
 
     <script>
+      // ✅ Use absolute URL to ensure correct loading
       (function initDecap() {
         function tryInit() {
           if (window.CMS && typeof window.CMS.init === "function") {
-            window.CMS.init({ configPath: "/admin/config.yml" });
+            window.CMS.init({
+              configPath:
+                "https://allin1tools-qtmqyre1n-anushenoy08s-projects.vercel.app/admin/config.yml",
+            });
           } else {
             setTimeout(tryInit, 100);
           }
