@@ -5,29 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
 
-    <!-- MUST set manual init BEFORE loading decap-cms -->
+    <!-- must be BEFORE CMS script -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
 
-    <!-- Load Decap CMS (pin version or latest) -->
-    <script src="https://unpkg.com/decap-cms@3.9.0/dist/decap-cms.js" defer></script>
+    <!-- ✅ Correct CDN URL -->
+    <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js" defer></script>
   </head>
   <body>
     <div id="nc-root"></div>
 
-    <!-- Initialize after script loads -->
     <script>
       (function initDecap() {
-        // Wait until the CMS lib is available
         function tryInit() {
           if (window.CMS && typeof window.CMS.init === "function") {
-            window.CMS.init({ configPath: "/admin/config.yml", root: "#nc-root" });
-          } else if (document.readyState === "complete" || document.readyState === "interactive") {
-            // not ready yet - try again shortly
-            setTimeout(tryInit, 50);
+            window.CMS.init({ configPath: "/admin/config.yml" });
           } else {
-            window.addEventListener("load", tryInit, { once: true });
+            setTimeout(tryInit, 100);
           }
         }
         tryInit();
