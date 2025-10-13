@@ -4,15 +4,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
-    <!-- Load Decap CMS -->
-    <script src="https://unpkg.com/decap-cms@^3.9.0/dist/decap-cms.js"></script>
+    <!-- Load Decap CMS properly -->
+    <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js"></script>
   </head>
   <body>
     <div id="nc-root"></div>
     <script>
-      // Tell Decap where to find its config
       window.CMS_MANUAL_INIT = true;
-      window.CMS.init({ configPath: "/admin/config.yml" });
+      window.addEventListener("load", function () {
+        if (window.CMS && typeof window.CMS.init === "function") {
+          window.CMS.init({ configPath: "/admin/config.yml" });
+        } else {
+          console.error("Decap CMS failed to load. Check script path.");
+        }
+      });
     </script>
   </body>
 </html>
