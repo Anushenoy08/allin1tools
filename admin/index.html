@@ -5,22 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Decap CMS</title>
     <!-- ✅ Correct working CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/decap-cms@3.9.0/dist/decap-cms.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/decap-cms@latest/dist/decap-cms.min.js"></script>
   </head>
   <body>
     <div id="nc-root"></div>
 
     <script>
-      function initCMS() {
-        if (window.CMS && typeof window.CMS.init === "function") {
-          console.log("✅ Decap CMS loaded");
-          window.CMS.init({ configPath: "config.yml" });
-        } else {
-          console.warn("Waiting for Decap CMS...");
-          setTimeout(initCMS, 300);
+        function initCMS() {
+          if (window.CMS && typeof window.CMS.init === "function") {
+            window.CMS.init({ configPath: "./config.yml" });
+          } else {
+            setTimeout(initCMS, 300);
+          }
         }
-      }
-      initCMS();
-    </script>
+        initCMS();
+      </script>
   </body>
 </html>
