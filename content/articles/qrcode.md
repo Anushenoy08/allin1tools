@@ -1,5 +1,5 @@
 
-# Article for "Generate your own QR code"
+# "Generate your own QR code"
 
 ## Overview
 
@@ -99,5 +99,5 @@ By leveraging secure, client-side libraries with intelligent fallbacks, it ensur
 With a few strategic enhancements such as SVG export, validation improvements, and CORS-safe logo handling, this tool can evolve into a production-grade, industry-standard QR solution. Simple, fast, and elegant — it embodies the future of user-centric, web-based utilities.
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTUyNDY5MzM5Ml19
+eyJoaXN0b3J5IjpbLTMzOTU4MDExMV19
 -->
