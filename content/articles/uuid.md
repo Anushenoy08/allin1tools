@@ -1,151 +1,173 @@
----
-title: "Free UUID generator"
-date: "2025-10-14"
-author: "Anushree Shenoy"
----
-# Welcome to StackEdit!
+# Free UUID v4 Generator
+## Overview
 
-Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.
+A compact, user-friendly web tool that generates UUID v4 identifiers instantly. Built with a clean UI and essential utilities — generate single or multiple UUIDs, encode output as Base64 or Hex, copy to clipboard, and download results as a text file. Ideal for developers, QA, and product teams who need quick, collision-resistant identifiers for testing, mock data, or lightweight production uses (with recommended cryptographic improvements for high-security needs).
 
 
-# Files
 
-StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
+## History
 
-## Create files and folders
-
-The file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.
-
-## Switch to another file
-
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
-
-## Rename a file
-
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
-
-## Delete a file
-
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
-
-## Export a file
-
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
+The UUID (Universally Unique Identifier) standard — originally specified by the Open Software Foundation (OSF) — provides a 128-bit value used to uniquely identify information in distributed systems. UUID **version 4 (v4)** is randomly generated and has become the de facto choice for many systems because it’s simple, decentralized, and reasonably collision-resistant when generated correctly. Browser-based generators like this one are common developer utilities that speed up workflows without requiring libraries or network requests.
 
 
-# Synchronization
+## Usage
 
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
+### UI Flow
 
-There are two types of synchronization and they can complement each other:
+1.  **Number of UUIDs** — choose how many (1–1000).
+    
+2.  **Encoding** — select `None`, `Base64`, or `Hexadecimal`.
+    
+    -   **None:** newline-separated standard UUIDs `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.
+        
+    -   **Base64:** Base64-encoded string of the concatenated UUID output.
+        
+    -   **Hex:** UUIDs formatted without dashes and uppercase.
+        
+3.  **Generate UUIDs** — produces the output in the read-only textarea.
+    
+4.  **Copy to Clipboard** — copies the textarea contents; gives a short visual feedback.
+    
+5.  **Download to a file** — downloads a `generated-uuids.txt` with the current output.
+    
+6.  **Generate Another** — regenerate with same parameters.
+    
 
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
+### Implementation notes (from the provided code)
 
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-	> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
+-   The generator uses the classic `replace(/[xy]/g, ...)` approach with `Math.random()` to fill UUID bits.
+    
+-   Encodings:
+    
+    -   `base64` uses `btoa()` on the newline-concatenated string.
+        
+    -   `hex` replaces dashes and converts to uppercase.
+        
+-   Initialization triggers a generation on page load.
+    
 
-## Open a file
+### Security / Reliability tip
 
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
+The current implementation uses `Math.random()` which **is not cryptographically secure**. For use-cases where stronger randomness is required (session IDs, security tokens, production guarantees), prefer the `crypto.getRandomValues()` approach. Example secure generator replacement:
 
-## Save a file
+        // Cryptographically secure UUID v4 generator (recommended)
+    function generateUUIDSecure() {
+      const buf = new Uint8Array(16);
+      crypto.getRandomValues(buf);
+    
+      // Per RFC 4122, set version and variant
+      buf[6] = (buf[6] & 0x0f) | 0x40; // version 4
+      buf[8] = (buf[8] & 0x3f) | 0x80; // variant
+    
+      const hex = Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+      return `${hex.substr(0,8)}-${hex.substr(8,4)}-${hex.substr(12,4)}-${hex.substr(16,4)}-${hex.substr(20,12)}`;
+    }
 
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
+## Examples for all types
 
-## Synchronize a file
+### 1) Single UUID (default)
 
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
+**Input:** Number = 1, Encoding = None  
+**Output (example):**
 
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
+    3f8a9d2b-1c4f-4f0f-9b2a-2f3c9a6b7d8e
 
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
+### 2) Multiple UUIDs (newline-separated)
 
-## Manage file synchronization
+**Input:** Number = 5, Encoding = None  
+**Output (example):**
 
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
+    3f8a9d2b-1c4f-4f0f-9b2a-2f3c9a6b7d8e
+    8c2b0f5d-6a11-4b7f-81a1-5e4d9c3b2a10 ...
 
+ 
+### 3) Base64 encoding of generated output
 
-# Publication
+**Input:** Number = 3, Encoding = Base64  
+**Process:** joins the three UUID strings with `\n`, then `btoa()` encodes to Base64.  
+**Output (example):**
 
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
+    M2Y4YTlkMmItMWM0Zi00ZjBmLTliMmEtMmYzYzlhNmI3ZDhlCjhjMmIwZjVkLTZhMTEtNGI3Zi04MWExLTVlNGQ5YzNiMmExMAo... 
 
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
+### 4) Hex encoding (dashes removed, uppercase)
 
-## Publish a File
+**Input:** Number = 2, Encoding = Hex  
+**Process:** removes `-` and converts to uppercase  
+**Output (example):**
 
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
+    3F8A9D2B1C4F4F0F9B2A2F3C9A6B7D8E
+    8C2B0F5D6A114B7F81A15E4D9C3B2A10
 
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
+### 5) Copy / Download workflows
 
-## Update a publication
+-   **Copy to Clipboard**: selects textarea and executes `document.execCommand('copy')` (note: modern APIs recommend `navigator.clipboard.writeText()` for better UX/permissions).
+    
+-   **Download to a file**: creates a blob and triggers a download as `generated-uuids.txt`.
 
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
+----------
 
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
+## Technologies that use this tool (high demand)
 
-## Manage file publication
+UUIDs are ubiquitous. Here are the common domains and technologies that benefit highly from a UUID v4 generator:
 
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
+-   **Databases & ORMs**
+    
+    -   Primary keys, surrogate keys, or client-side id generation in PostgreSQL, MongoDB (object ids vs UUIDs), DynamoDB.
+        
+-   **Microservices & Distributed Systems**
+    
+    -   Correlation IDs for tracing requests across services, log aggregation, distributed tracing (OpenTelemetry).
+        
+-   **Front-end & Mobile Apps**
+    
+    -   Temporary client IDs, local storage keys, unique component keys in React, identifiers for offline data sync.
+        
+-   **APIs & Backend Services**
+    
+    -   Request/transaction IDs, idempotency keys for safe retries, resource identifiers for REST endpoints.
+        
+-   **Testing & QA**
+    
+    -   Generating test data, seeding databases, mocking unique identifiers for automation tests.
+        
+-   **Analytics & Telemetry**
+    
+    -   Session IDs, anonymous user identifiers, event identifiers.
+        
+-   **CI/CD & DevOps**
+    
+    -   Build IDs, artifact IDs, temp resource names in cloud automation scripts.
+        
+-   **IoT & Edge Devices**
+    
+    -   Device IDs where central registration is optional or offline-first workflows are used.
+        
+-   **Content Management / Document Stores**
+    
+    -   Document IDs, file names, URL-safe references (often combined with encoding).
+        
 
+----------
 
-# Markdown extensions
+## Quick Improvements & Best Practices (implementation checklist)
 
-StackEdit extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.
+-   Replace `Math.random()` with `crypto.getRandomValues()` for cryptographic-grade randomness if identifiers are security-sensitive.
+    
+-   Use `navigator.clipboard.writeText()` instead of `document.execCommand('copy')` for modern clipboard handling with promise-based flow and better error handling.
+    
+-   For very large counts (1000+), paginate or stream results to avoid freezing the UI.
+    
+-   If using Base64 output and you need URL-safe strings, convert to Base64 URL encoding (replace `+`/`/` and strip `=` padding).
+    
+-   When used as primary keys in databases, consider storage format and indexing: `BINARY(16)` for compact storage versus text UUID representation.
+    
+-   Add an option to output as **compact UUID (no dashes)** or **URN** (`urn:uuid:...`) as needed by consumers.
+----------
+## Conclusion
 
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
+This **Free UUID v4 Generator** is a practical, lightweight utility for developers and testers. It ships with essential UX features (bulk generation, encodings, copy, download) and is perfectly suited for local workflows and quick prototyping. For production or security-critical usage, swap to the `crypto.getRandomValues()` implementation and adopt safer clipboard APIs and streaming strategies for large outputs.
 
-
-## SmartyPants
-
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
-
-
-## KaTeX
-
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
-
-The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
-
-$$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
-$$
-
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
-
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
-```
-
-And this will produce a flow chart:
-
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
+----------
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTMzMjQ1NTM2M119
+eyJoaXN0b3J5IjpbMjQwMzI0MTMyXX0=
 -->
