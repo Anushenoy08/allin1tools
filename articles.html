@@ -320,7 +320,10 @@
     async function loadArticle(slug) {
       const list = document.getElementById("articles-list");
       const content = document.getElementById("article-content");
-      list.style.display = "none";
+      const container = document.querySelector(".container");
+      
+      // Hide the entire container (including "Latest Articles" header)
+      container.style.display = "none";
       content.style.display = "block";
       content.innerHTML = `<div class='back-btn' onclick='goBack()'>← Back to Articles</div><p>Loading...</p>`;
       try {
@@ -344,6 +347,8 @@
     }
 
     function goBack() {
+      const container = document.querySelector(".container");
+      container.style.display = "block";
       document.getElementById("articles-list").style.display = "block";
       document.getElementById("article-content").style.display = "none";
     }
