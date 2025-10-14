@@ -190,6 +190,12 @@
         const titleMatch = md.match(/^#\s+(.+)$/m);
         if (titleMatch) {
           meta.title = titleMatch[1];
+        } else {
+          // If no heading found, try to extract from the first line of content
+          const firstLine = md.split('\n').find(line => line.trim() !== '');
+          if (firstLine && firstLine.length > 0) {
+            meta.title = firstLine.trim().substring(0, 50) + (firstLine.length > 50 ? '...' : '');
+          }
         }
       }
       return meta;
