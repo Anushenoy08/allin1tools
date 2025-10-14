@@ -1,13 +1,3 @@
----
-title: "Generate your own QR code"
-date: "2024-01-15"
-author: "Anushree Shenoy"
----
-
-# Generate your own QR code
-
-## Overview
-
 A **QR code generator** is a tool that converts text, URLs, files (via share links), and other payloads into a machine-readable 2D barcode which smartphones and scanners can decode. Your tool is a client-side, browser-first QR generator that supports multiple content types, allows logo overlays, provides a visual preview, and offers PNG downloads. It uses two popular JavaScript QR libraries with a CDN fallback strategy to improve reliability.
 
 This article explains the background of QR codes, how and when to use a generator like this, code-level behavior and examples for each content type, and the kinds of technologies and real-world workflows that commonly rely on QR code generation.
@@ -104,5 +94,5 @@ By leveraging secure, client-side libraries with intelligent fallbacks, it ensur
 With a few strategic enhancements such as SVG export, validation improvements, and CORS-safe logo handling, this tool can evolve into a production-grade, industry-standard QR solution. Simple, fast, and elegant — it embodies the future of user-centric, web-based utilities.
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzkwOTkxOTg1XX0=
+eyJoaXN0b3J5IjpbLTI0Mjc0Njg3MV19
 -->
