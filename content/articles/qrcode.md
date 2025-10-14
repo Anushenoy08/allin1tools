@@ -1,3 +1,8 @@
+---
+title: "Generate your own QR code"
+date: "2024-01-15"
+author: "Anushree Shenoy"
+---
 
 # Generate your own QR code
 
