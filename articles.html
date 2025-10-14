@@ -175,19 +175,19 @@
     }
 
     function extractFrontMatter(md) {
-      const fmRegex = /^---\\n([\\s\\S]*?)\\n---/;
+      const fmRegex = /^---\n([\s\S]*?)\n---/;
       const match = md.match(fmRegex);
       const meta = { title: "Untitled", date: new Date().toISOString().split('T')[0], author: "Anonymous" };
       
       if (match) {
-        const lines = match[1].split("\\n");
+        const lines = match[1].split("\n");
         lines.forEach(line => {
           const [key, ...value] = line.split(":");
-          if (key && value) meta[key.trim()] = value.join(":").trim().replace(/['\"]/g, "");
+          if (key && value) meta[key.trim()] = value.join(":").trim().replace(/['"]/g, "");
         });
       } else {
         // Extract title from first heading if no frontmatter
-        const titleMatch = md.match(/^#\\s+(.+)$/m);
+        const titleMatch = md.match(/^#\s+(.+)$/m);
         if (titleMatch) {
           meta.title = titleMatch[1];
         }
@@ -197,17 +197,15 @@
 
     function extractExcerpt(md) {
       // Remove frontmatter if present
-      const content = md.replace(/^---[\\s\\S]*?---\\n/, "");
+      const content = md.replace(/^---[\s\S]*?---\n/, "");
       
       // Remove first heading if it exists
-      const withoutFirstHeading = content.replace(/^#\\s+.+\\n/, "");
+      const withoutFirstHeading = content.replace(/^#\s+.+\n/, "");
       
-      // Get first two lines of actual content
-      const lines = withoutFirstHeading.split('\\n').filter(line => line.trim() !== '');
+      // Get first line of actual content
+      const lines = withoutFirstHeading.split('\n').filter(line => line.trim() !== '');
       
-      if (lines.length >= 2) {
-        return lines.slice(0, 2).join(' ').trim();
-      } else if (lines.length === 1) {
+      if (lines.length >= 1) {
         return lines[0].trim();
       }
       
@@ -229,7 +227,7 @@
       try {
         const res = await fetch(`https://raw.githubusercontent.com/${repoUser}/${repoName}/${branch}/${folder}/${slug}.md`);
         const md = await res.text();
-        const body = md.replace(/^---[\\s\\S]*?---/, ""); // remove frontmatter
+        const body = md.replace(/^---[\s\S]*?---/, ""); // remove frontmatter
         content.innerHTML = `<div class='back-btn' onclick='goBack()'>← Back to Articles</div>` + marked.parse(body);
       } catch {
         content.innerHTML = `<p>Article not found.</p>`;
