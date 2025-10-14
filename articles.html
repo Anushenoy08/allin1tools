@@ -330,8 +330,10 @@
       const list = document.getElementById("articles-list");
       const content = document.getElementById("article-content");
       const container = document.querySelector(".container");
+      const navbar = document.querySelector(".navbar");
       
-      // Hide the entire container (including "Latest Articles" header)
+      // Hide the navbar and entire container (including "Latest Articles" header)
+      navbar.style.display = "none";
       container.style.display = "none";
       content.style.display = "block";
       content.innerHTML = `
@@ -366,6 +368,10 @@
 
     function goBack() {
       const container = document.querySelector(".container");
+      const navbar = document.querySelector(".navbar");
+      
+      // Show the navbar and container again
+      navbar.style.display = "block";
       container.style.display = "block";
       document.getElementById("articles-list").style.display = "block";
       document.getElementById("article-content").style.display = "none";
