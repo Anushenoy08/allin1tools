@@ -40,6 +40,7 @@
     }
     .back-btn {
         display: inline-flex;
+        align-content: center;
         align-items: center;
         gap: 0.5rem;
         color: #6c757d;
@@ -51,8 +52,16 @@
         border-radius: 8px;
         background: #fff;
         transition: all 0.2s ease;
-        margin-bottom: 2rem;
+        margin: 2rem auto;
         cursor: pointer;
+        justify-self: center;
+        align-self: center;
+    }
+    .back-btn-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 2rem;
     }
     .back-btn:hover {
         color: #495057;
@@ -325,20 +334,29 @@
       // Hide the entire container (including "Latest Articles" header)
       container.style.display = "none";
       content.style.display = "block";
-      content.innerHTML = `<div class='back-btn' onclick='goBack()'>← Back to Articles</div><p>Loading...</p>`;
+      content.innerHTML = `
+        <div class='back-btn-container'>
+          <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+        </div>
+        <p>Loading...</p>
+      `;
       try {
         const res = await fetch(`https://raw.githubusercontent.com/${repoUser}/${repoName}/${branch}/${folder}/${slug}.md`);
         const md = await res.text();
         const body = md.replace(/^---[\s\S]*?---/, ""); // remove frontmatter
         content.innerHTML = `
-          <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+          <div class='back-btn-container'>
+            <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+          </div>
           <div class='article-container'>
             <div class='article-content'>${marked.parse(body)}</div>
           </div>
         `;
       } catch {
         content.innerHTML = `
-          <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+          <div class='back-btn-container'>
+            <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+          </div>
           <div class='article-container'>
             <div class='article-content'><p>Article not found.</p></div>
           </div>
