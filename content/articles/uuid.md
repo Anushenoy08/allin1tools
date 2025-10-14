@@ -146,22 +146,6 @@ UUIDs are ubiquitous. Here are the common domains and technologies that benefit 
     
     -   Document IDs, file names, URL-safe references (often combined with encoding).
         
-
-----------
-
-## Quick Improvements & Best Practices (implementation checklist)
-
--   Replace `Math.random()` with `crypto.getRandomValues()` for cryptographic-grade randomness if identifiers are security-sensitive.
-    
--   Use `navigator.clipboard.writeText()` instead of `document.execCommand('copy')` for modern clipboard handling with promise-based flow and better error handling.
-    
--   For very large counts (1000+), paginate or stream results to avoid freezing the UI.
-    
--   If using Base64 output and you need URL-safe strings, convert to Base64 URL encoding (replace `+`/`/` and strip `=` padding).
-    
--   When used as primary keys in databases, consider storage format and indexing: `BINARY(16)` for compact storage versus text UUID representation.
-    
--   Add an option to output as **compact UUID (no dashes)** or **URN** (`urn:uuid:...`) as needed by consumers.
 ----------
 ## Conclusion
 
@@ -169,5 +153,5 @@ This **Free UUID v4 Generator** is a practical, lightweight utility for develope
 
 ----------
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjQwMzI0MTMyXX0=
+eyJoaXN0b3J5IjpbNDg5NzU4NjIxXX0=
 -->
