@@ -1,13 +1,9 @@
 {
+    "ignoreCommand": "",
     "routes": [
-      {
-        "src": "/admin/(.*)",
-        "dest": "/admin/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/index.html"
-      }
-    ]
+      { "src": "/admin/(.*)", "dest": "/admin/$1" },
+      { "src": "/(.*)", "dest": "/index.html" }
+    ],
+    "outputDirectory": "."
   }
   
