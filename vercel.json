@@ -1,9 +1,9 @@
 {
-    "ignoreCommand": "",
+    "cleanUrls": true,
+    "trailingSlash": false,
     "routes": [
       { "src": "/admin/(.*)", "dest": "/admin/$1" },
       { "src": "/(.*)", "dest": "/index.html" }
-    ],
-    "outputDirectory": "."
+    ]
   }
   
