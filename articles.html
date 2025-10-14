@@ -29,6 +29,99 @@
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+    .article-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f0f0f0;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: #fff;
+        transition: all 0.2s ease;
+        margin-bottom: 2rem;
+        cursor: pointer;
+    }
+    .back-btn:hover {
+        color: #495057;
+        border-color: #dee2e6;
+        background: #f8f9fa;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .article-content {
+        line-height: 1.7;
+        color: #2c3e50;
+        font-size: 1.05rem;
+    }
+    .article-content h1, .article-content h2, .article-content h3 {
+        color: #1a202c;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    .article-content h1 {
+        font-size: 2rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+    }
+    .article-content h2 {
+        font-size: 1.5rem;
+        color: #2d3748;
+    }
+    .article-content h3 {
+        font-size: 1.25rem;
+        color: #4a5568;
+    }
+    .article-content p {
+        margin-bottom: 1.5rem;
+        color: #4a5568;
+    }
+    .article-content ul, .article-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+    .article-content li {
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+    }
+    .article-content strong {
+        color: #2d3748;
+        font-weight: 600;
+    }
+    .article-content code {
+        background: #f7fafc;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.9em;
+        color: #e53e3e;
+    }
+    .article-content pre {
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border: 1px solid #e2e8f0;
+    }
+    .article-content pre code {
+        background: none;
+        padding: 0;
+        color: #2d3748;
+    }
     .articles-list { 
         display: flex; 
         flex-direction: column; 
@@ -234,9 +327,19 @@
         const res = await fetch(`https://raw.githubusercontent.com/${repoUser}/${repoName}/${branch}/${folder}/${slug}.md`);
         const md = await res.text();
         const body = md.replace(/^---[\s\S]*?---/, ""); // remove frontmatter
-        content.innerHTML = `<div class='back-btn' onclick='goBack()'>← Back to Articles</div>` + marked.parse(body);
+        content.innerHTML = `
+          <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+          <div class='article-container'>
+            <div class='article-content'>${marked.parse(body)}</div>
+          </div>
+        `;
       } catch {
-        content.innerHTML = `<p>Article not found.</p>`;
+        content.innerHTML = `
+          <div class='back-btn' onclick='goBack()'>← Back to Articles</div>
+          <div class='article-container'>
+            <div class='article-content'><p>Article not found.</p></div>
+          </div>
+        `;
       }
     }
 
