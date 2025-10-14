@@ -2,22 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Decap CMS</title>
-    <script src="https://cdn.jsdelivr.net/npm/decap-cms@latest/dist/decap-cms.min.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Static CMS</title>
+    <script src="https://unpkg.com/@staticcms/app@latest/dist/static-cms-app.js"></script>
   </head>
   <body>
     <div id="nc-root"></div>
-
     <script>
-      function initCMS() {
-        if (window.CMS && typeof window.CMS.init === "function") {
-          window.CMS.init({ configPath: "/admin/config.yml" });
-        } else {
-          setTimeout(initCMS, 300);
-        }
-      }
-      initCMS();
+      window.CMS.init({ configPath: "/admin/config.yml" });
     </script>
   </body>
 </html>

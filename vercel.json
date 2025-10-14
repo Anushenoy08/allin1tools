@@ -1,8 +1,6 @@
 {
-    "public": true,
-    "routes": [
-      { "src": "/admin/?$", "dest": "/admin/index.html" },
-      { "src": "/admin/(.*)", "dest": "/admin/$1" }
+    "rewrites": [
+      { "source": "/admin/config.yml", "destination": "/admin/config.yml" }
     ]
   }
   
