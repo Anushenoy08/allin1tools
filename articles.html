@@ -371,7 +371,10 @@
       const navbar = document.querySelector(".navbar");
       
       // Show the navbar and container again
-      navbar.style.display = "block";
+      // Remove inline override so CSS (flex) applies again
+      if (navbar && navbar.style) {
+        navbar.style.removeProperty('display');
+      }
       container.style.display = "block";
       document.getElementById("articles-list").style.display = "block";
       document.getElementById("article-content").style.display = "none";
