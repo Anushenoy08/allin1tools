@@ -468,29 +468,31 @@
       // Remove frontmatter if present
       const content = md.replace(/^---[\s\S]*?---\n/, "");
 
-      // Helper to take first two non-empty, non-heading lines
-      function firstTwoContentLines(text) {
-        const lines = text
+      // Try to extract the entire History section (until the next heading)
+      const sectionRegex = /^#{1,6}\s+history\s*\n+([\s\S]*?)(?=^#{1,6}\s+\S|$)/im;
+      const sectionMatch = content.match(sectionRegex);
+      if (sectionMatch && sectionMatch[1]) {
+        const rawSection = sectionMatch[1]
+          // drop any leading/trailing blank lines
+          .replace(/^\s+|\s+$/g, '')
+          // ignore lines that are headings inside this block (rare)
           .split('\n')
-          .map(l => l.trim())
-          .filter(l => l && !/^#{1,6}\s+/.test(l));
-        if (lines.length >= 2) return lines[0] + ' ' + lines[1] + '...';
-        if (lines.length === 1) return lines[0] + '...';
-        return null;
+          .filter(l => l.trim() && !/^#{1,6}\s+/.test(l))
+          .join('\n');
+        if (rawSection) {
+          // collapse multiple newlines to spaces for a clean card excerpt
+          return rawSection.replace(/\s*\n\s*/g, ' ').trim();
+        }
       }
 
-      // Find a markdown heading for History like "# History" or "## History"
-      const historyHeadingRegex = /^#{1,6}\s+history\s*$/im;
-      const match = historyHeadingRegex.exec(content);
-      if (match) {
-        const afterHistory = content.slice(match.index + match[0].length);
-        const extracted = firstTwoContentLines(afterHistory);
-        if (extracted) return extracted;
-      }
-
-      // Fallback: first two content lines from the whole document (ignoring headings like ## Overview)
-      const fallback = firstTwoContentLines(content);
-      return fallback || "No description available";
+      // Fallback: take first two non-empty, non-heading lines from the whole document
+      const lines = content
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l && !/^#{1,6}\s+/.test(l));
+      if (lines.length >= 2) return lines[0] + ' ' + lines[1] + '...';
+      if (lines.length === 1) return lines[0] + '...';
+      return "No description available";
     }
 
     function formatDate(dateStr) {
