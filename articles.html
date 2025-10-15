@@ -238,6 +238,9 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: normal;                /* ensure wrapping */
+      max-height: 3.2em;                  /* 2 lines * 1.6 line-height as fallback */
+      word-break: break-word;             /* prevent overflow on long tokens */
     }
 
     /* Responsive design - Tablet */
