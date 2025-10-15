@@ -1,3 +1,8 @@
+---
+title: "Regex Generator and tester"
+date: "2025-10-15"
+author: "Anushree Shenoy"
+---
 # Regex Generator & Tester – Automate and Simplify Pattern Matching
 
 ## Overview
