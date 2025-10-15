@@ -468,14 +468,30 @@
       // Remove frontmatter if present
       const content = md.replace(/^---[\s\S]*?---\n/, "");
       
-      // Remove first heading if it exists
-      const withoutFirstHeading = content.replace(/^#\s+.+\n/, "");
+      // Find the "History" section
+      const historyIndex = content.toLowerCase().indexOf('history');
       
-      // Get first line of actual content
-      const lines = withoutFirstHeading.split('\n').filter(line => line.trim() !== '');
+      if (historyIndex === -1) {
+        // If no "History" section found, fall back to first 2 lines of content
+        const lines = content.split('\n').filter(line => line.trim() !== '');
+        if (lines.length >= 2) {
+          return lines[0].trim() + ' ' + lines[1].trim() + '...';
+        } else if (lines.length >= 1) {
+          return lines[0].trim() + '...';
+        }
+        return "No description available";
+      }
       
-      if (lines.length >= 1) {
-        return lines[0].trim();
+      // Get content after "History"
+      const afterHistory = content.substring(historyIndex + 7); // 7 = length of "history"
+      
+      // Split into lines and filter out empty lines
+      const lines = afterHistory.split('\n').filter(line => line.trim() !== '');
+      
+      if (lines.length >= 2) {
+        return lines[0].trim() + ' ' + lines[1].trim() + '...';
+      } else if (lines.length >= 1) {
+        return lines[0].trim() + '...';
       }
       
       return "No description available";
