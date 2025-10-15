@@ -467,34 +467,30 @@
     function extractExcerpt(md) {
       // Remove frontmatter if present
       const content = md.replace(/^---[\s\S]*?---\n/, "");
-      
-      // Find the "History" section
-      const historyIndex = content.toLowerCase().indexOf('history');
-      
-      if (historyIndex === -1) {
-        // If no "History" section found, fall back to first 2 lines of content
-        const lines = content.split('\n').filter(line => line.trim() !== '');
-        if (lines.length >= 2) {
-          return lines[0].trim() + ' ' + lines[1].trim() + '...';
-        } else if (lines.length >= 1) {
-          return lines[0].trim() + '...';
-        }
-        return "No description available";
+
+      // Helper to take first two non-empty, non-heading lines
+      function firstTwoContentLines(text) {
+        const lines = text
+          .split('\n')
+          .map(l => l.trim())
+          .filter(l => l && !/^#{1,6}\s+/.test(l));
+        if (lines.length >= 2) return lines[0] + ' ' + lines[1] + '...';
+        if (lines.length === 1) return lines[0] + '...';
+        return null;
       }
-      
-      // Get content after "History"
-      const afterHistory = content.substring(historyIndex + 7); // 7 = length of "history"
-      
-      // Split into lines and filter out empty lines
-      const lines = afterHistory.split('\n').filter(line => line.trim() !== '');
-      
-      if (lines.length >= 2) {
-        return lines[0].trim() + ' ' + lines[1].trim() + '...';
-      } else if (lines.length >= 1) {
-        return lines[0].trim() + '...';
+
+      // Find a markdown heading for History like "# History" or "## History"
+      const historyHeadingRegex = /^#{1,6}\s+history\s*$/im;
+      const match = historyHeadingRegex.exec(content);
+      if (match) {
+        const afterHistory = content.slice(match.index + match[0].length);
+        const extracted = firstTwoContentLines(afterHistory);
+        if (extracted) return extracted;
       }
-      
-      return "No description available";
+
+      // Fallback: first two content lines from the whole document (ignoring headings like ## Overview)
+      const fallback = firstTwoContentLines(content);
+      return fallback || "No description available";
     }
 
     function formatDate(dateStr) {

@@ -1,3 +1,8 @@
+---
+title: "QR code Generator"
+date: "2025-10-14"
+author: "Anushree Shenoy"
+---
 # QR Code Generator – Create, Customize, and Share Instantly
 
 ## Overview
