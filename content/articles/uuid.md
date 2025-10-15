@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 # UUID v4 Generator – Generate Unique Identifiers with Precision
 
 ## Overview
 
 A compact, user-friendly web tool that generates UUID v4 identifiers instantly. Built with a clean UI and essential utilities — generate single or multiple UUIDs, encode output as Base64 or Hex, copy to clipboard, and download results as a text file. Ideal for developers, QA, and product teams who need quick, collision-resistant identifiers for testing, mock data, or lightweight production uses (with recommended cryptographic improvements for high-security needs).
+=======
+---
+title: "Free UUID v4 Generators"
+date: "2025-10-14"
+author: "Anushree Shenoy"
+---
+ompact, user-friendly web tool that generates UUID v4 identifiers instantly. Built with a clean UI and essential utilities — generate single or multiple UUIDs, encode output as Base64 or Hex, copy to clipboard, and download results as a text file. Ideal for developers, QA, and product teams who need quick, collision-resistant identifiers for testing, mock data, or lightweight production uses (with recommended cryptographic improvements for high-security needs).
+>>>>>>> d900ebc (Modified list of articles and .md files)
 
 
 ## History
