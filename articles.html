@@ -465,11 +465,12 @@
     }
 
     function extractExcerpt(md) {
-      // Remove frontmatter if present
-      const content = md.replace(/^---[\s\S]*?---\n/, "");
+      // Normalize newlines (handle CRLF) and remove frontmatter if present
+      const normalized = md.replace(/\r\n?/g, '\n');
+      const content = normalized.replace(/^---[\s\S]*?---\n/, "");
 
       // Try to extract the entire History section (until the next heading)
-      const sectionRegex = /^#{1,6}\s+history\s*\n+([\s\S]*?)(?=^#{1,6}\s+\S|$)/im;
+      const sectionRegex = /^\s{0,3}#{1,6}\s+history\s*\n+([\s\S]*?)(?=^\s{0,3}#{1,6}\s+\S|$)/im;
       const sectionMatch = content.match(sectionRegex);
       if (sectionMatch && sectionMatch[1]) {
         const rawSection = sectionMatch[1]
@@ -477,7 +478,7 @@
           .replace(/^\s+|\s+$/g, '')
           // ignore lines that are headings inside this block (rare)
           .split('\n')
-          .filter(l => l.trim() && !/^#{1,6}\s+/.test(l))
+          .filter(l => l.trim() && !/^\s{0,3}#{1,6}\s+/.test(l))
           .join('\n');
         if (rawSection) {
           // collapse multiple newlines to spaces for a clean card excerpt
@@ -489,7 +490,7 @@
       const lines = content
         .split('\n')
         .map(l => l.trim())
-        .filter(l => l && !/^#{1,6}\s+/.test(l));
+        .filter(l => l && !/^\s{0,3}#{1,6}\s+/.test(l));
       if (lines.length >= 2) return lines[0] + ' ' + lines[1] + '...';
       if (lines.length === 1) return lines[0] + '...';
       return "No description available";
