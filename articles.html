@@ -412,32 +412,38 @@
       listContainer.innerHTML = "<p>Loading articles...</p>";
 
       try {
-        const res = await fetch(`https://api.github.com/repos/${repoUser}/${repoName}/contents/${folder}`);
-        const files = await res.json();
+        // Use jsDelivr directory API to avoid GitHub REST API rate limits (403)
+        const indexRes = await fetch(`https://data.jsdelivr.com/v1/package/gh/${repoUser}/${repoName}@${branch}/flat`);
+        const indexJson = await indexRes.json();
+        const mdFiles = (Array.isArray(indexJson) ? indexJson : indexJson.files || [])
+          .map(f => typeof f === 'string' ? f : f.name)
+          .filter(p => p && p.startsWith(`${folder}/`) && p.endsWith('.md'))
+          .map(p => p.split('/').pop());
 
         const posts = await Promise.all(
-          files
-            .filter(file => file.name.endsWith(".md"))
-            .map(async (file) => {
-              const rawUrl = `https://raw.githubusercontent.com/${repoUser}/${repoName}/${branch}/${folder}/${file.name}`;
+          mdFiles
+            .map(async (fileName) => {
+              const rawUrl = `https://cdn.jsdelivr.net/gh/${repoUser}/${repoName}@${branch}/${folder}/${fileName}`;
               const md = await fetch(rawUrl).then(r => r.text());
               const meta = extractFrontMatter(md);
               const excerpt = extractExcerpt(md);
               
               // Get the commit date for this file
               try {
-                const commitRes = await fetch(`https://api.github.com/repos/${repoUser}/${repoName}/commits?path=${folder}/${file.name}&per_page=1`);
-                const commits = await commitRes.json();
-                if (commits.length > 0) {
+                const commitRes = await fetch(`https://api.github.com/repos/${repoUser}/${repoName}/commits?path=${folder}/${fileName}&per_page=1`);
+                if (commitRes.ok) {
+                  const commits = await commitRes.json();
+                  if (Array.isArray(commits) && commits.length > 0 && commits[0].commit && commits[0].commit.committer) {
                   // Use the commit date instead of frontmatter date
-                  meta.date = commits[0].commit.committer.date.split('T')[0];
+                    meta.date = commits[0].commit.committer.date.split('T')[0];
+                  }
                 }
               } catch (e) {
                 console.warn(`Could not fetch commit date for ${file.name}:`, e);
                 // Keep the frontmatter date as fallback
               }
               
-              return { slug: file.name.replace(".md", ""), ...meta, excerpt };
+              return { slug: fileName.replace(".md", ""), ...meta, excerpt };
             })
         );
 
